@@ -1,11 +1,16 @@
 .field {
   width: 100%;
   height: auto;
-  max-height: calc(100vh - 140px);
+  max-height: calc(100vh - 56px - 4vw);
   max-width: 94vw;
-  margin-left: 3vw;
-  margin-top: 40px;
+  margin-left: 2vw;
+  margin-top: 2vw;
   display: flex;
   align-content: center;
   justify-content: center;
+}
+
+.field svg {
+  height: auto;
+  width: auto;
 }

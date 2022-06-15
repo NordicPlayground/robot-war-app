@@ -14,7 +14,7 @@ export const Field = ({
 	widthMm: number
 	onClick: (args: { xMm: number; yMm: number }) => void
 }>) => {
-	const svgRef = useRef<SVGSVGElement>(null)
+	const rectRef = useRef<SVGRectElement>(null)
 
 	// Construct positions of helper lines
 	const helperLines: number[] = []
@@ -30,18 +30,6 @@ export const Field = ({
 			viewBox={`0 0 ${widthMm} ${heightMm}`}
 			height={heightMm}
 			width={widthMm}
-			style={{ height: 'auto', width: 'auto' }}
-			onClick={(e) => {
-				if (svgRef.current === null) return
-				const box = svgRef.current.getBoundingClientRect()
-				const relativeXPosition = (e.clientX - box.left) / box.width
-				const relativeYPosition = (e.clientY - box.top) / box.height
-				onClick({
-					xMm: relativeXPosition * widthMm,
-					yMm: relativeYPosition * heightMm,
-				})
-			}}
-			ref={svgRef}
 		>
 			{/* Start zone A */}
 			<rect
@@ -99,6 +87,7 @@ export const Field = ({
 					/>
 				</g>
 			))}
+			{/* Border */}
 			<rect
 				style={{
 					strokeWidth: 1,
@@ -112,6 +101,29 @@ export const Field = ({
 				x="0"
 				height={heightMm}
 				width={widthMm}
+			/>
+			{/* Click target */}
+			<rect
+				ref={rectRef}
+				style={{
+					fill: '#ffffff',
+					opacity: 0,
+					stroke: 'none',
+				}}
+				y="0"
+				x="0"
+				height={heightMm}
+				width={widthMm}
+				onClick={(e) => {
+					if (rectRef.current === null) return
+					const box = rectRef.current.getBoundingClientRect()
+					const relativeXPosition = (e.clientX - box.left) / box.width
+					const relativeYPosition = (e.clientY - box.top) / box.height
+					onClick({
+						xMm: relativeXPosition * widthMm,
+						yMm: relativeYPosition * heightMm,
+					})
+				}}
 			/>
 			{children}
 		</svg>
