@@ -34,16 +34,8 @@ export const Field = ({
 			onClick={(e) => {
 				if (svgRef.current === null) return
 				const box = svgRef.current.getBoundingClientRect()
-				console.log(svgRef.current)
 				const relativeXPosition = (e.clientX - box.left) / box.width
 				const relativeYPosition = (e.clientY - box.top) / box.height
-
-				// Mouse position
-				const x = e.clientX - box.left
-				const y = e.clientY - box.top
-
-				console.log({ x, y })
-
 				onClick({
 					xMm: relativeXPosition * widthMm,
 					yMm: relativeYPosition * heightMm,
