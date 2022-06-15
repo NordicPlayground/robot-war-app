@@ -1,0 +1,11 @@
+.field {
+  width: 100%;
+  height: auto;
+  max-height: calc(100vh - 140px);
+  max-width: 94vw;
+  margin-left: 3vw;
+  margin-top: 40px;
+  display: flex;
+  align-content: center;
+  justify-content: center;
+}

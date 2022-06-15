@@ -1,0 +1,7 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+npx lint-staged
+npx tsc
+npm test
+npx tsc -p e2e-tests/tsconfig.json

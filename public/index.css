@@ -1,0 +1,67 @@
+html {
+  font-family: "Inter", "system-ui";
+}
+
+:root {
+  --bs-font-sans-serif: "Inter", "system-ui";
+  --bs-body-font-weight: 300;
+}
+
+@supports (font-variation-settings: normal) {
+  html {
+    font-family: "Inter var", "system-ui";
+  }
+  :root {
+    --bs-font-sans-serif: "Inter var", "system-ui";
+  }
+}
+
+main h4 {
+  font-size: 100%;
+}
+
+@media (max-width: 575px) {
+  .card {
+    border-left: 0;
+    border-right: 0;
+    border-radius: 0;
+  }
+  main > .row > * {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+
+@media (min-width: 576px) {
+  main.container {
+    margin-top: 1.5rem;
+  }
+}
+
+.card > .table {
+  margin-bottom: 0;
+}
+.card > .table tbody tr:last-child td {
+  border-bottom: 0;
+}
+.card > .table td:first-child,
+.card > .table th:first-child {
+  padding-left: 1rem;
+}
+.card > .table td:last-child,
+.card > .table th:last-child {
+  padding-right: 1rem;
+}
+
+.card-body > dl:last-child,
+.card-body > dl:last-child dd {
+  margin-bottom: 0;
+}
+
+a {
+  text-decoration: none;
+}
+
+dt {
+  font-weight: 600;
+}
