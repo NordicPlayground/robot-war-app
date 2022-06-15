@@ -34,7 +34,7 @@ jobs:
       - name: Build
         env:
           PUBLIC_VERSION: ${{ github.sha }}
-        run: npm run build
+        run: npm run build -- --base=/${{ github.repository }}/
 
       - uses: actions/upload-artifact@v3
         if: always()
@@ -48,6 +48,7 @@ jobs:
           echo "machine github.com login accesskey password ${{ secrets.GITHUB_TOKEN }}" > ~/.netrc
           git config --global user.email "actions@example.com"
           git config --global user.name "GitHub Actions"
+          git config --global init.defaultBranch gh-pages
           cd build
           touch .nojekyll
           git init
