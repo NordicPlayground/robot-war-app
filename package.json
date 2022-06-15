@@ -12,12 +12,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/NordicPlayground/nrf-robot-wars-app-js.git"
+    "url": "git+https://github.com/coderbyheart/nrf-robot-wars-app.git"
   },
   "bugs": {
-    "url": "https://github.com/NordicPlayground/nrf-robot-wars-app-js/issues"
+    "url": "https://github.com/coderbyheart/nrf-robot-wars-app/issues"
   },
-  "homepage": "https://github.com/NordicPlayground/nrf-robot-wars-app-js#readme",
+  "homepage": "https://github.com/coderbyheart/nrf-robot-wars-app#readme",
   "keywords": [
     "nrf-asset-tracker",
     "iot",
