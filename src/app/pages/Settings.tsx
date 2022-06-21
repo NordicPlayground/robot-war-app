@@ -28,9 +28,7 @@ export const Settings = () => {
 								setAccessKey(e.target.value)
 							}
 						/>
-						<button background-color="#e681b3" onClick={onSubmitAccessKey}>
-							SUBMIT
-						</button>
+						<button onClick={onSubmitAccessKey}>SUBMIT</button>
 					</p>
 					<p>
 						Please enter your <code>AWS SECRET ACCESS KEY</code>:<br></br>
@@ -42,12 +40,7 @@ export const Settings = () => {
 								setprivateAccessKey(e.target.value)
 							}
 						/>
-						<button
-							background-color="#e681b3"
-							onClick={onSubmitPrivateAccessKey}
-						>
-							SUBMIT
-						</button>
+						<button onClick={onSubmitPrivateAccessKey}>SUBMIT</button>
 					</p>
 				</div>
 			</div>
