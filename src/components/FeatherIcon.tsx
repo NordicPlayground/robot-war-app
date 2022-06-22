@@ -339,6 +339,10 @@ export const InfoIcon = (options?: TypedIconOptions) => (
 	<FeatherIcon {...options} title="center" type="info" />
 )
 
+export const SettingsIcon = (options?: TypedIconOptions) => (
+	<FeatherIcon {...options} title="center" type="settings" />
+)
+
 export const IconWithText: FunctionComponent<PropsWithChildren<any>> = ({
 	children,
 	...rest
