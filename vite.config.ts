@@ -18,6 +18,8 @@ process.env.PUBLIC_MANIFEST_SHORT_NAME = short_name
 process.env.PUBLIC_MANIFEST_NAME = name
 process.env.PUBLIC_MANIFEST_THEME_COLOR = theme_color
 process.env.PUBLIC_MANIFEST_BACKGROUND_COLOR = background_color
+process.env.PUBLIC_AWS_REGION =
+	process.env.AWS_REGION ?? process.env.AWS_DEFAULT_REGION ?? 'us-east-2'
 
 const replaceInIndex = (data: Record<string, string>) => ({
 	name: 'replace-in-index',

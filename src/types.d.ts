@@ -25,5 +25,7 @@ interface ImportMeta {
 		PUBLIC_MANIFEST_SHORT_NAME: string
 		PUBLIC_MANIFEST_THEME_COLOR: string
 		PUBLIC_MANIFEST_BACKGROUND_COLOR: string
+		// AWS configuration
+		PUBLIC_AWS_REGION: string
 	}
 }

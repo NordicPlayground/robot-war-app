@@ -1,3 +1,4 @@
+import { fromEnv } from '@nordicsemiconductor/from-env'
 import {
 	createContext,
 	FunctionComponent,
@@ -6,15 +7,21 @@ import {
 	useState,
 } from 'react'
 
+const { region } = fromEnv({
+	region: 'PUBLIC_AWS_REGION',
+})(import.meta.env)
+
 export const CredentialsContext = createContext<{
 	accessKeyId?: string
 	secretAccessKey?: string
+	region: string
 	updateCredentials: (credentials: {
 		accessKeyId: string
 		secretAccessKey: string
 	}) => void
 }>({
 	updateCredentials: () => undefined,
+	region,
 })
 
 export const useCredentials = () => useContext(CredentialsContext)
@@ -49,6 +56,7 @@ export const CredentialsProvider: FunctionComponent<{
 					setAccessKeyId(accessKeyId)
 					setSecretAccessKey(secretAccessKey)
 				},
+				region,
 			}}
 		>
 			{children}
