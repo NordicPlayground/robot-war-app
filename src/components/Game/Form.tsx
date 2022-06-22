@@ -13,22 +13,26 @@ export const Form: FunctionComponent<{
 	return (
 		<form>
 			{nextRobotCommand
-				.sort(({ id: idA }, { id: idB }) => idA.localeCompare(idB))
+				.sort(({ robotMac: macA }, { robotMac: macB }) =>
+					macA.localeCompare(macB),
+				)
 				.map((robot) => {
-					const { id, angleDeg, driveTimeMs } = robot
+					const { robotMac, angleDeg, driveTimeMs } = robot
 					return (
 						<RobotConfig
-							key={id}
-							id={id}
+							key={robotMac}
+							id={robotMac}
 							driveTimeMs={driveTimeMs}
 							angleDeg={angleDeg}
 							onUpdateAngleDeg={(angleDeg) =>
 								setNextRobotCommand((robots) => {
 									const robot = robots.find(
-										(robot) => robot.id === id,
+										(robot) => robot.robotMac === robotMac,
 									) as RobotCommand
 									return [
-										...robots.filter(({ id: robotId }) => robotId !== id),
+										...robots.filter(
+											({ robotMac: robotId }) => robotId !== robotMac,
+										),
 										{
 											...robot,
 											angleDeg,
@@ -39,10 +43,12 @@ export const Form: FunctionComponent<{
 							onUpdateDriveTimeMs={(driveTimeMs) =>
 								setNextRobotCommand((robots) => {
 									const robot = robots.find(
-										(robot) => robot.id === id,
+										(robot) => robot.robotMac === robotMac,
 									) as RobotCommand
 									return [
-										...robots.filter(({ id: robotId }) => robotId !== id),
+										...robots.filter(
+											({ robotMac: robotId }) => robotId !== robotMac,
+										),
 										{
 											...robot,
 											driveTimeMs,

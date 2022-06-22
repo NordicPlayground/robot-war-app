@@ -2,9 +2,12 @@ import { IoTClient, ListThingsInThingGroupCommand } from '@aws-sdk/client-iot'
 import {
 	GetThingShadowCommand,
 	IoTDataPlaneClient,
-	UpdateThingShadowCommand,
 } from '@aws-sdk/client-iot-data-plane'
-import { fromUtf8 } from '@aws-sdk/util-utf8-browser'
+import {
+	ReportedGameState,
+	updateGameController,
+} from 'api/updateGameController'
+import type { RobotCommand } from 'app/pages/Game'
 import equal from 'fast-deep-equal'
 import { useCredentials } from 'hooks/useCredentials'
 import {
@@ -16,28 +19,16 @@ import {
 	useState,
 } from 'react'
 
-type Robot = {
-	id: string
-	driveTime: number
-	angle: number
-	revolutions: number
-}
-
-export type GameState = {
-	round: number
-	robots: Robot[]
-}
-
 export const GameControllerContext = createContext<{
-	gameState: GameState
-	nextGameState: (next: GameState) => void
+	gameState: ReportedGameState
+	nextRoundCommands: (commands: RobotCommand[]) => void
 	setAutoUpdate: (update: boolean) => void
 }>({
 	gameState: {
 		round: 1,
 		robots: [],
 	},
-	nextGameState: () => undefined,
+	nextRoundCommands: () => undefined,
 	setAutoUpdate: () => undefined,
 })
 
@@ -46,7 +37,7 @@ export const useGameController = () => useContext(GameControllerContext)
 export const GameControllerProvider: FunctionComponent<{
 	children: ReactNode
 }> = ({ children }) => {
-	const [gameState, setGameState] = useState<GameState>({
+	const [gameState, setGameState] = useState<ReportedGameState>({
 		round: 1,
 		robots: [],
 	})
@@ -56,6 +47,7 @@ export const GameControllerProvider: FunctionComponent<{
 
 	let iotClient: IoTClient | undefined = undefined
 	let iotDataPlaneClient: IoTDataPlaneClient | undefined = undefined
+	let commandHandler: (commands: RobotCommand[]) => void = () => undefined
 
 	if (accessKeyId === undefined || secretAccessKey === undefined) {
 		console.debug('AWS credentials not available')
@@ -73,6 +65,13 @@ export const GameControllerProvider: FunctionComponent<{
 				accessKeyId,
 				secretAccessKey,
 			},
+		})
+	}
+
+	if (iotDataPlaneClient !== undefined && gameControllerThing !== undefined) {
+		commandHandler = updateGameController({
+			iotData: iotDataPlaneClient,
+			controllerThingName: gameControllerThing,
 		})
 	}
 
@@ -109,7 +108,7 @@ export const GameControllerProvider: FunctionComponent<{
 				)
 				.then(({ payload }) => JSON.parse(new TextDecoder().decode(payload)))
 				.then((shadow) => {
-					const newGameSate: GameState = {
+					const newGameSate: ReportedGameState = {
 						round: shadow?.state?.reported?.round ?? gameState.round,
 						robots: shadow?.state?.reported?.robots ?? gameState.robots,
 					} // TODO: validate game state using ajv
@@ -126,35 +125,11 @@ export const GameControllerProvider: FunctionComponent<{
 		}
 	}, [gameControllerThing, gameState, autoUpdate, iotDataPlaneClient])
 
-	const nextGameState = (next: GameState): void => {
-		if (iotDataPlaneClient === undefined) {
-			console.error('Not connected to AWS!')
-			return
-		}
-		iotDataPlaneClient
-			.send(
-				new UpdateThingShadowCommand({
-					thingName: gameControllerThing,
-					payload: fromUtf8(
-						JSON.stringify({
-							state: {
-								desired: next,
-							},
-						}),
-					),
-				}),
-			)
-			.catch((error) => {
-				console.error('Failed to write to shadow')
-				console.error(error)
-			})
-	}
-
 	return (
 		<GameControllerContext.Provider
 			value={{
 				gameState,
-				nextGameState,
+				nextRoundCommands: commandHandler,
 				setAutoUpdate,
 			}}
 		>

@@ -2,8 +2,9 @@ import style from 'app/pages/Game.module.css'
 import { Field } from 'components/Game/Field'
 import { Form } from 'components/Game/Form'
 import { Robot } from 'components/Game/Robot'
+import { useGameController } from 'hooks/useGameController'
 import { nanoid } from 'nanoid'
-import React, { useState } from 'react'
+import { useState } from 'react'
 
 const randomColor = () =>
 	`#${Math.floor(Math.random() * 16777215)
@@ -11,15 +12,18 @@ const randomColor = () =>
 		.padEnd(6, '0')}`
 
 export type RobotState = {
-	id: string
+	mac: string
 	xMm: number
 	yMm: number
 	colorHex: string
 	executedCommands: ExecutedRobotCommand[]
 }
-//Lena trenger: id, drivetime, angle
 
-export type RobotCommand = { id: string; angleDeg: number; driveTimeMs: number }
+export type RobotCommand = {
+	robotMac: string
+	angleDeg: number
+	driveTimeMs: number
+}
 
 type ExecutedRobotCommand = RobotCommand & {
 	success: boolean
@@ -38,15 +42,21 @@ export const Game = () => {
 
 	const [robots, setRobots] = useState<Robots>([])
 	const [robotCommands, setRobotCommands] = useState<RobotCommand[]>([])
+	const { nextRoundCommands } = useGameController()
 
-	console.log(robotCommands)
 	return (
 		<>
-			<Form
-				commands={robotCommands}
-				onUpdateCommands={setRobotCommands}
-				key={JSON.stringify(robotCommands)}
-			/>
+			<div>
+				<button
+					type="button"
+					className="btn btn-danger"
+					onClick={() => {
+						nextRoundCommands(robotCommands)
+					}}
+				>
+					Fight!
+				</button>
+			</div>
 			<div className={style.field}>
 				<Field
 					heightMm={fieldHeightMm}
@@ -54,11 +64,11 @@ export const Game = () => {
 					numberOfHelperLines={3}
 					startZoneSizeMm={startZoneSizeMm}
 					onClick={({ xMm, yMm }) => {
-						const id = nanoid()
+						const mac = nanoid()
 						setRobots((robots) => [
 							...robots,
 							{
-								id,
+								mac,
 								xMm,
 								yMm,
 								colorHex: randomColor(),
@@ -68,25 +78,25 @@ export const Game = () => {
 						setRobotCommands((commands) => [
 							...commands,
 							{
-								id,
+								robotMac: mac,
 								angleDeg: 0,
 								driveTimeMs: 0,
 							},
 						])
 					}}
 				>
-					{robots.map(({ xMm, yMm, id, colorHex, executedCommands }) => {
+					{robots.map(({ xMm, yMm, mac, colorHex, executedCommands }) => {
 						const nextRobotCommand: RobotCommand = robotCommands.find(
-							(robot) => id === robot.id,
+							(robot) => mac === robot.robotMac,
 						) ?? {
-							id,
+							robotMac: mac,
 							angleDeg: 0,
 							driveTimeMs: 0,
 						}
 						return (
 							<Robot
-								key={id}
-								id={id}
+								key={mac}
+								id={mac}
 								xMm={xMm}
 								yMm={yMm}
 								widthMm={robotWidthMM}
@@ -105,7 +115,7 @@ export const Game = () => {
 										nextRobotCommand.angleDeg =
 											((nextRobotCommand.angleDeg - 180) % 360) + 180
 									setRobotCommands((commands) => [
-										...commands.filter((cmd) => cmd.id !== id),
+										...commands.filter((cmd) => cmd.robotMac !== mac),
 										nextRobotCommand,
 									])
 								}}
@@ -114,6 +124,11 @@ export const Game = () => {
 					})}
 				</Field>
 			</div>
+			<Form
+				commands={robotCommands}
+				onUpdateCommands={setRobotCommands}
+				key={JSON.stringify(robotCommands)}
+			/>
 		</>
 	)
 }
