@@ -335,6 +335,10 @@ export const GameIcon = (options?: TypedIconOptions) => (
 	<FeatherIcon {...options} title="center" type="fast-forward" />
 )
 
+export const GameControllerIcon = (options?: TypedIconOptions) => (
+	<FeatherIcon {...options} title="center" type="compass" />
+)
+
 export const InfoIcon = (options?: TypedIconOptions) => (
 	<FeatherIcon {...options} title="center" type="info" />
 )

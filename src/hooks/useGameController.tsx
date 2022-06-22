@@ -57,7 +57,7 @@ export const GameControllerProvider: FunctionComponent<{
 	let iotClient: IoTClient | undefined = undefined
 	let iotDataPlaneClient: IoTDataPlaneClient | undefined = undefined
 
-	if (accessKeyId === null || secretAccessKey === null) {
+	if (accessKeyId === undefined || secretAccessKey === undefined) {
 		console.debug('AWS credentials not available')
 	} else {
 		const region = 'us-east-2'

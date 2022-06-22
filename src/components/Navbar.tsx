@@ -1,4 +1,5 @@
 import {
+	GameControllerIcon,
 	GameIcon,
 	IconWithText,
 	InfoIcon,
@@ -61,6 +62,13 @@ export const Navbar = () => {
 									<Link className="nav-link" to="/game" onClick={close}>
 										<IconWithText>
 											<GameIcon /> Game
+										</IconWithText>
+									</Link>
+								</li>
+								<li className="nav-item">
+									<Link className="nav-link" to="/controllers" onClick={close}>
+										<IconWithText>
+											<GameControllerIcon /> Game Controllers
 										</IconWithText>
 									</Link>
 								</li>
