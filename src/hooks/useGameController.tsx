@@ -126,43 +126,35 @@ export const GameControllerProvider: FunctionComponent<{
 		}
 	}, [gameControllerThing, gameState, autoUpdate, iotDataPlaneClient])
 
-	useEffect(() => {
-		if (gameControllerThing === undefined) return
-		if (iotDataPlaneClient === undefined) return
-		const i = setInterval(() => {
-			if (!autoUpdate) return
-			;(iotDataPlaneClient as IoTDataPlaneClient)
-				.send(
-					new UpdateThingShadowCommand({
-						thingName: gameControllerThing,
-						payload: fromUtf8(
-							JSON.stringify({
-								state: {
-									desired: {
-										round: 5,
-										robots: [],
-									},
-								},
-							}),
-						),
-					}),
-				)
-				.catch((error) => {
-					console.error('Failed to write to shadow')
-					console.error(error)
-				})
-		}, 2000)
-
-		return () => {
-			clearInterval(i)
+	const nextGameState = (next: GameState): void => {
+		if (iotDataPlaneClient === undefined) {
+			console.error('Not connected to AWS!')
+			return
 		}
-	}, [gameControllerThing, gameState, autoUpdate, iotDataPlaneClient])
+		iotDataPlaneClient
+			.send(
+				new UpdateThingShadowCommand({
+					thingName: gameControllerThing,
+					payload: fromUtf8(
+						JSON.stringify({
+							state: {
+								desired: next,
+							},
+						}),
+					),
+				}),
+			)
+			.catch((error) => {
+				console.error('Failed to write to shadow')
+				console.error(error)
+			})
+	}
 
 	return (
 		<GameControllerContext.Provider
 			value={{
 				gameState,
-				nextGameState: () => undefined,
+				nextGameState,
 				setAutoUpdate,
 			}}
 		>
