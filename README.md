@@ -36,4 +36,4 @@ allow re-use when changing the UI framework.
 
 You can then run the tests using
 
-    npx playwright test
+    npm test
