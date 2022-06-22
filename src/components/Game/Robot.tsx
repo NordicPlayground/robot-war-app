@@ -1,6 +1,6 @@
 import Color from 'color'
+import styles from 'components/Game/Robot.module.css'
 import { nanoid } from 'nanoid'
-import styles from './Robot.module.css'
 
 export const Robot = ({
 	id,
@@ -24,11 +24,11 @@ export const Robot = ({
 	// Construct points for a triangle.
 	const points: [number, number][] = []
 	// First point centered tip
-	points.push([xMm, yMm - heightMm / 2])
-	// Left corner
 	points.push([xMm - widthMm / 2, yMm + heightMm / 2])
+	// Left corner
+	points.push([xMm + widthMm / 2, yMm])
 	// Right corner
-	points.push([xMm + widthMm / 2, yMm + heightMm / 2])
+	points.push([xMm - widthMm / 2, yMm - heightMm / 2])
 
 	const gradientId = nanoid()
 
