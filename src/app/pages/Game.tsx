@@ -1,6 +1,6 @@
 import style from 'app/pages/Game.module.css'
 import { Field } from 'components/Game/Field'
-import { InputField } from 'components/Game/InputField'
+import { Form } from 'components/Game/Form'
 import { Robot } from 'components/Game/Robot'
 import { nanoid } from 'nanoid'
 import React, { useState } from 'react'
@@ -10,93 +10,113 @@ const randomColor = () =>
 		.toString(16)
 		.padEnd(6, '0')}`
 
+export type RobotState = {
+	id: string
+	xMm: number
+	yMm: number
+	colorHex: string
+	executedCommands: ExecutedRobotCommand[]
+}
+//Lena trenger: id, drivetime, angle
+
+export type RobotCommand = { id: string; angleDeg: number; driveTimeMs: number }
+
+type ExecutedRobotCommand = RobotCommand & {
+	success: boolean
+	/* Unix timestamp in milliseconds */
+	tsMs: number
+}
+
+export type Robots = RobotState[]
+
 export const Game = () => {
 	const fieldWidthMm = 1500
 	const fieldHeightMm = 1000
 	const startZoneSizeMm = 100
-	const robotWidthMM = 60
-	const robotLengthMm = 150
+	const robotWidthMM = 90
+	const robotLengthMm = 65
 
-	const [robots, setRobots] = useState<
-		{
-			id: string
-			xMm: number
-			yMm: number
-			colorHex: string
-			rotationDeg: number
-			drivetime: number
-		}[]
-	>([])
-	console.log(robots)
+	const [robots, setRobots] = useState<Robots>([])
+	const [robotCommands, setRobotCommands] = useState<RobotCommand[]>([])
 
+	console.log(robotCommands)
 	return (
-		<div>
+		<>
+			<Form
+				commands={robotCommands}
+				onUpdateCommands={setRobotCommands}
+				key={JSON.stringify(robotCommands)}
+			/>
 			<div className={style.field}>
 				<Field
 					heightMm={fieldHeightMm}
 					widthMm={fieldWidthMm}
 					numberOfHelperLines={3}
 					startZoneSizeMm={startZoneSizeMm}
-					onClick={({ xMm, yMm }) =>
+					onClick={({ xMm, yMm }) => {
+						const id = nanoid()
 						setRobots((robots) => [
 							...robots,
 							{
+								id,
 								xMm,
 								yMm,
-								id: nanoid(),
 								colorHex: randomColor(),
-								rotationDeg: 90,
-								drivetime: 0,
+								executedCommands: [],
 							},
 						])
-					}
-				>
-					{robots.map(({ xMm, yMm, id, colorHex, rotationDeg }) => (
-						<Robot
-							key={id}
-							id={id}
-							xMm={xMm}
-							yMm={yMm}
-							widthMm={robotWidthMM}
-							heightMm={robotLengthMm}
-							colorHex={colorHex}
-							rotationDeg={rotationDeg}
-							onRotate={(rotation) => {
-								setRobots((robots) => [
-									...robots.filter(({ id: robotId }) => robotId !== id),
-									{
-										xMm,
-										yMm,
-										id,
-										colorHex,
-										rotationDeg: rotationDeg + rotation,
-										drivetime: 0,
-									},
-								])
-							}}
-						/>
-					))}
-				</Field>
-			</div>
-			{robots.map(({ xMm, yMm, id, colorHex, rotationDeg }) => (
-				<InputField
-					key={id}
-					id={id}
-					onpress={(rotation, duration) => {
-						setRobots((robots) => [
-							...robots.filter(({ id: robotId }) => robotId !== id),
+						setRobotCommands((commands) => [
+							...commands,
 							{
-								xMm,
-								yMm,
 								id,
-								colorHex,
-								rotationDeg: rotationDeg + rotation,
-								drivetime: duration,
+								angleDeg: 0,
+								driveTimeMs: 0,
 							},
 						])
 					}}
-				></InputField>
-			))}
-		</div>
+				>
+					{robots.map(({ xMm, yMm, id, colorHex, executedCommands }) => {
+						const nextRobotCommand: RobotCommand = robotCommands.find(
+							(robot) => id === robot.id,
+						) ?? {
+							id,
+							angleDeg: 0,
+							driveTimeMs: 0,
+						}
+						return (
+							<Robot
+								key={id}
+								id={id}
+								xMm={xMm}
+								yMm={yMm}
+								widthMm={robotWidthMM}
+								heightMm={robotLengthMm}
+								colorHex={colorHex}
+								rotationDeg={calculateExpectedRotation([
+									...executedCommands,
+									nextRobotCommand,
+								])}
+								onRotate={(rotation) => {
+									nextRobotCommand.angleDeg += rotation
+									if (nextRobotCommand.angleDeg >= 180)
+										nextRobotCommand.angleDeg =
+											((nextRobotCommand.angleDeg + 180) % 360) - 180
+									if (nextRobotCommand.angleDeg <= -180)
+										nextRobotCommand.angleDeg =
+											((nextRobotCommand.angleDeg - 180) % 360) + 180
+									setRobotCommands((commands) => [
+										...commands.filter((cmd) => cmd.id !== id),
+										nextRobotCommand,
+									])
+								}}
+							/>
+						)
+					})}
+				</Field>
+			</div>
+		</>
 	)
 }
+
+const calculateExpectedRotation = (commands: RobotCommand[]): number =>
+	commands.reduce((angle, { angleDeg }) => angle + angleDeg, 0)
