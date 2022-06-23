@@ -1,4 +1,5 @@
 import type { RobotCommand } from 'app/pages/Game'
+import styles from 'components/Game/Form.module.css'
 import { RobotConfig } from 'components/Game/RobotConfig'
 import { FunctionComponent, useState } from 'react'
 
@@ -61,6 +62,7 @@ export const Form: FunctionComponent<{
 				})}
 			<footer>
 				<button
+					className={styles.button1}
 					type="button"
 					onClick={() => {
 						onUpdateCommands(nextRobotCommand)
