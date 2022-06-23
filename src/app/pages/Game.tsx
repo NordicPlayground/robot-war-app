@@ -5,6 +5,8 @@ import { Robot } from 'components/Game/Robot'
 import { useGameController } from 'hooks/useGameController'
 import { nanoid } from 'nanoid'
 import { useState } from 'react'
+import { calculateExpectedRotation } from 'utils/calculateExpectedRotation'
+import { shortestRotation } from 'utils/shortestRotation'
 
 const randomColor = () =>
 	`#${Math.floor(Math.random() * 16777215)
@@ -107,13 +109,9 @@ export const Game = () => {
 									nextRobotCommand,
 								])}
 								onRotate={(rotation) => {
-									nextRobotCommand.angleDeg += rotation
-									if (nextRobotCommand.angleDeg >= 180)
-										nextRobotCommand.angleDeg =
-											((nextRobotCommand.angleDeg + 180) % 360) - 180
-									if (nextRobotCommand.angleDeg <= -180)
-										nextRobotCommand.angleDeg =
-											((nextRobotCommand.angleDeg - 180) % 360) + 180
+									nextRobotCommand.angleDeg = shortestRotation(
+										nextRobotCommand.angleDeg + rotation,
+									)
 									setRobotCommands((commands) => [
 										...commands.filter((cmd) => cmd.robotMac !== mac),
 										nextRobotCommand,
@@ -132,6 +130,3 @@ export const Game = () => {
 		</>
 	)
 }
-
-const calculateExpectedRotation = (commands: RobotCommand[]): number =>
-	commands.reduce((angle, { angleDeg }) => angle + angleDeg, 0)
