@@ -33,6 +33,8 @@
     "@aws-sdk/client-iot": "3.112.0",
     "@aws-sdk/client-iot-data-plane": "3.112.0",
     "@nordicsemiconductor/from-env": "1.0.1",
+    "@sinclair/typebox": "0.23.5",
+    "ajv": "8.11.0",
     "bootstrap": "5.1.3",
     "color": "4.2.3",
     "fast-deep-equal": "3.1.3",
@@ -93,6 +95,7 @@
       "/node_modules/"
     ],
     "moduleNameMapper": {
+      "^api\\/(.*)\\.js$": "<rootDir>/src/api/$1",
       "^utils\\/(.*)\\.js$": "<rootDir>/src/utils/$1"
     },
     "transform": {

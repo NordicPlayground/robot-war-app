@@ -14,7 +14,7 @@ type Robot = {
 }
 
 type ReportedRobot = Robot & {
-	revolutionCount: number
+	revolutionCount?: number
 }
 
 export type ReportedGameState = {

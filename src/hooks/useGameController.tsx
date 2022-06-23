@@ -7,6 +7,7 @@ import {
 	ReportedGameState,
 	updateGameController,
 } from 'api/updateGameController'
+import { validateGameControllerShadow } from 'api/validateGameControllerShadow'
 import type { RobotCommand } from 'app/pages/Game'
 import equal from 'fast-deep-equal'
 import { useCredentials } from 'hooks/useCredentials'
@@ -108,10 +109,18 @@ export const GameControllerProvider: FunctionComponent<{
 				)
 				.then(({ payload }) => JSON.parse(new TextDecoder().decode(payload)))
 				.then((shadow) => {
+					const maybeValidShadow = validateGameControllerShadow(shadow)
+					if ('error' in maybeValidShadow) {
+						// Validation failed
+						console.error(maybeValidShadow.error)
+						console.debug(maybeValidShadow.error.details)
+						return
+					}
+					// Game shadow is valid
 					const newGameSate: ReportedGameState = {
-						round: shadow?.state?.reported?.round ?? gameState.round,
-						robots: shadow?.state?.reported?.robots ?? gameState.robots,
-					} // TODO: validate game state using ajv
+						round: maybeValidShadow.state.reported.round ?? gameState.round,
+						robots: maybeValidShadow.state.reported.robots ?? gameState.robots,
+					}
 					if (!equal(newGameSate, gameState)) setGameState(newGameSate)
 				})
 				.catch((error) => {
