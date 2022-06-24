@@ -3,11 +3,15 @@ import {
 	GetThingShadowCommand,
 	IoTDataPlaneClient,
 } from '@aws-sdk/client-iot-data-plane'
+import type { Static } from '@sinclair/typebox'
 import {
 	ReportedGameState,
 	updateGameController,
 } from 'api/updateGameController'
-import { validateGameControllerShadow } from 'api/validateGameControllerShadow'
+import {
+	MacAddress,
+	validateGameControllerShadow,
+} from 'api/validateGameControllerShadow'
 import type { RobotCommand } from 'app/pages/Game'
 import equal from 'fast-deep-equal'
 import { useCredentials } from 'hooks/useCredentials'
@@ -20,8 +24,17 @@ import {
 	useState,
 } from 'react'
 
+type ReportedGameStateWithMac = ReportedGameState & {
+	robots: Record<
+		Static<typeof MacAddress>,
+		{
+			mac: Static<typeof MacAddress>
+		}
+	>
+}
+
 export const GameControllerContext = createContext<{
-	gameState: ReportedGameState
+	gameState: ReportedGameStateWithMac
 	nextRoundCommands: (commands: RobotCommand[]) => void
 	setAutoUpdate: (update: boolean) => void
 }>({
@@ -38,7 +51,7 @@ export const useGameController = () => useContext(GameControllerContext)
 export const GameControllerProvider: FunctionComponent<{
 	children: ReactNode
 }> = ({ children }) => {
-	const [gameState, setGameState] = useState<ReportedGameState>({
+	const [gameState, setGameState] = useState<ReportedGameStateWithMac>({
 		round: 1,
 		robots: {},
 	})
@@ -117,9 +130,22 @@ export const GameControllerProvider: FunctionComponent<{
 						return
 					}
 					// Game shadow is valid
-					const newGameSate: ReportedGameState = {
+					const newGameSate: ReportedGameStateWithMac = {
 						round: maybeValidShadow.state.reported.round ?? gameState.round,
-						robots: maybeValidShadow.state.reported.robots ?? gameState.robots,
+						robots: Object.entries(
+							maybeValidShadow.state.reported.robots ?? gameState.robots,
+						)
+							.map(([mac, robot]) => ({
+								...robot,
+								mac,
+							}))
+							.reduce(
+								(robots, robot) => ({
+									...robots,
+									[robot.mac]: robot,
+								}),
+								{} as ReportedGameStateWithMac['robots'],
+							),
 					}
 					if (!equal(newGameSate, gameState)) setGameState(newGameSate)
 				})
