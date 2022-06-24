@@ -8,14 +8,22 @@ const goodShadow: Static<typeof gameControllerShadow> = {
 	state: {
 		reported: {
 			round: 0,
-			robots: [
-				{
-					mac: '00:25:96:FF:FE:12:34:56',
+			robots: {
+				'00:25:96:FF:FE:12:34:56': {
 					angleDeg: 0,
 					driveTimeMs: 0,
 					revolutionCount: 0,
 				},
-			],
+			},
+		},
+		desired: {
+			robots: {
+				'00:25:96:FF:FE:12:34:56': {
+					angleDeg: 0,
+					driveTimeMs: 0,
+					wheelCircumfenceMm: 10,
+				},
+			},
 		},
 	},
 }

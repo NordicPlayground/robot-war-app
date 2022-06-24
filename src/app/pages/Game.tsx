@@ -42,6 +42,10 @@ export const Game = () => {
 	const robotWidthMM = 90
 	const robotLengthMm = 65
 
+	// FIXME: retrieve robots in game from GameController
+	const { gameState } = useGameController()
+	console.log(gameState.robots) // <- use this below
+
 	const [robots, setRobots] = useState<Robots>([])
 	const [robotCommands, setRobotCommands] = useState<RobotCommand[]>([])
 	const { nextRoundCommands } = useGameController()

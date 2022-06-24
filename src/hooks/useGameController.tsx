@@ -27,7 +27,7 @@ export const GameControllerContext = createContext<{
 }>({
 	gameState: {
 		round: 1,
-		robots: [],
+		robots: {},
 	},
 	nextRoundCommands: () => undefined,
 	setAutoUpdate: () => undefined,
@@ -40,7 +40,7 @@ export const GameControllerProvider: FunctionComponent<{
 }> = ({ children }) => {
 	const [gameState, setGameState] = useState<ReportedGameState>({
 		round: 1,
-		robots: [],
+		robots: {},
 	})
 	const [gameControllerThing, setGameControllerThing] = useState<string>()
 	const [autoUpdate, setAutoUpdate] = useState<boolean>(true)

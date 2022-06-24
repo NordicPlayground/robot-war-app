@@ -4,28 +4,20 @@ import {
 	UpdateThingShadowCommand,
 } from '@aws-sdk/client-iot-data-plane'
 import { fromUtf8, toUtf8 } from '@aws-sdk/util-utf8-browser'
+import type { Static } from '@sinclair/typebox'
+import type {
+	DesiredGameState as DesiredGameStateSchema,
+	DesiredRobot as DesiredRobotSchema,
+	ReportedGameState as ReportedGameStateSchema,
+	ReportedRobot as ReportedRobotSchema,
+} from 'api/validateGameControllerShadow'
+import { validateGameControllerShadow } from 'api/validateGameControllerShadow'
 import type { RobotCommand } from 'app/pages/Game'
 
-type Robot = {
-	mac: string
-	driveTimeMs: number
-	angleDeg: number
-	wheelCircumfenceMm?: number
-}
-
-type ReportedRobot = Robot & {
-	revolutionCount?: number
-}
-
-export type ReportedGameState = {
-	round: number
-	robots: ReportedRobot[]
-}
-
-export type DesiredGameState = {
-	round: number
-	robots: Robot[]
-}
+export type DesiredRobot = Static<typeof DesiredRobotSchema>
+export type ReportedRobot = Static<typeof ReportedRobotSchema>
+export type ReportedGameState = Static<typeof ReportedGameStateSchema>
+export type DesiredGameState = Static<typeof DesiredGameStateSchema>
 
 export const updateGameController =
 	({
@@ -47,55 +39,43 @@ export const updateGameController =
 			return
 		}
 
+		const shadow = JSON.parse(toUtf8(currentShadow.payload))
+
+		const maybeValidShadow = validateGameControllerShadow(shadow)
+
+		if ('error' in maybeValidShadow) {
+			console.error(`Failed to validate game controller shadow!`)
+			console.error(maybeValidShadow.error)
+			return
+		}
+
 		const {
 			state: { desired, reported },
-		} = JSON.parse(toUtf8(currentShadow.payload))
+		} = maybeValidShadow
+
 		console.debug('Current desired', desired)
 		console.debug('Current reported', reported)
 
-		const reportedGameState = reported as ReportedGameState // FIXME: validate
-		const desiredGameState = desired as ReportedGameState // FIXME: validate
-
-		const ourRobotMacs = commands.map(({ robotMac }) => robotMac) // FIXME: use global list of team's robot ids
-		const ourRobots = reportedGameState.robots.filter(({ mac: robotId }) =>
-			ourRobotMacs.includes(robotId),
-		) as Robot[]
-		// Fill up with fake robots
-		ourRobotMacs.forEach((robotMac) => {
-			if (!ourRobots.find(({ mac }) => mac === robotMac)) {
-				ourRobots.push({
-					mac: robotMac,
-					angleDeg: 0,
-					driveTimeMs: 0,
-				})
-			}
-		})
-
-		const otherRobots = [
-			// Add the robots other teams might have defined
-			...desiredGameState.robots.filter((robot) => !ourRobots.includes(robot)),
-			// then add the robots the Gateway sees
-			...reportedGameState.robots.filter((robot) => !ourRobots.includes(robot)),
-		]
-
-		const newDesiredGameSate: Partial<DesiredGameState> = {
-			robots: [
-				...otherRobots,
-				// Only send updates for the current teams robots
-				...ourRobots.map((robot) => {
-					const command = commands.find(
-						({ robotMac: robotId }) => robot.mac === robotId,
-					)
-					if (command === undefined) return robot
-					return {
-						...robot,
-						angleDeg: robot.angleDeg + command.angleDeg,
-						driveTimeMs: command.driveTimeMs,
-					}
-				}),
-			],
+		const reportedGameState = reported
+		const desiredGameState = desired ?? {
+			robots: {},
 		}
-		console.debug('New desired', newDesiredGameSate)
+
+		for (const command of commands) {
+			const robot = reportedGameState.robots[command.robotMac]
+			if (robot === undefined) {
+				console.debug(`Robot ${command.robotMac} unknown!`)
+				continue
+			}
+			const updatedRobot: DesiredRobot = {
+				...robot,
+				angleDeg: robot.angleDeg + command.angleDeg,
+				driveTimeMs: command.driveTimeMs,
+			}
+			desiredGameState.robots[command.robotMac] = updatedRobot
+		}
+
+		console.debug('Updated desired', desiredGameState)
 
 		await iotData
 			.send(
@@ -104,7 +84,7 @@ export const updateGameController =
 					payload: fromUtf8(
 						JSON.stringify({
 							state: {
-								desired: newDesiredGameSate,
+								desired: desiredGameState,
 							},
 						}),
 					),
