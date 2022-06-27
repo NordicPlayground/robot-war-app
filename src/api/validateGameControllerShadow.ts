@@ -59,12 +59,13 @@ export const gameControllerShadow = Type.Object({
 	}),
 })
 
-const validate = validateWithJSONSchema(gameControllerShadow)
-
+/**
+ * The default shadow for the Gateway contains the desired and report robot information.
+ */
 export const validateGameControllerShadow = (
 	shadow: Record<string, any>,
 ):
 	| Static<typeof gameControllerShadow>
 	| {
 			error: ValidationError
-	  } => validate(shadow)
+	  } => validateWithJSONSchema(gameControllerShadow)(shadow)

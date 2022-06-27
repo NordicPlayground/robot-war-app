@@ -1,4 +1,3 @@
-import { IoTClient, ListThingsInThingGroupCommand } from '@aws-sdk/client-iot'
 import {
 	GetThingShadowCommand,
 	IoTDataPlaneClient,
@@ -15,6 +14,7 @@ import {
 import type { RobotCommand } from 'app/pages/Game'
 import equal from 'fast-deep-equal'
 import { useCredentials } from 'hooks/useCredentials'
+import { useGameControllerThing } from 'hooks/useGameControllerThing.js'
 import {
 	createContext,
 	FunctionComponent,
@@ -31,6 +31,61 @@ type ReportedGameStateWithMac = ReportedGameState & {
 			mac: Static<typeof MacAddress>
 		}
 	>
+}
+
+/**
+ * This is a *sample* robot configuration that simulates what the Gateway would report.
+ * FIXME: remove once the Gateway actually sends data
+ */
+const exampleRobots: ReportedGameStateWithMac['robots'] = {
+	'00:25:96:FF:FE:12:34:51': {
+		angleDeg: 0,
+		driveTimeMs: 0,
+		mac: '00:25:96:FF:FE:12:34:51',
+		revolutionCount: 0,
+	},
+	'00:25:96:FF:FE:12:34:52': {
+		angleDeg: 0,
+		driveTimeMs: 0,
+		mac: '00:25:96:FF:FE:12:34:52',
+		revolutionCount: 0,
+	},
+	'00:25:96:FF:FE:12:34:53': {
+		angleDeg: 0,
+		driveTimeMs: 0,
+		mac: '00:25:96:FF:FE:12:34:53',
+		revolutionCount: 0,
+	},
+	'00:25:96:FF:FE:12:34:54': {
+		angleDeg: 0,
+		driveTimeMs: 0,
+		mac: '00:25:96:FF:FE:12:34:54',
+		revolutionCount: 0,
+	},
+	'00:25:96:FF:FE:12:34:55': {
+		angleDeg: 0,
+		driveTimeMs: 0,
+		mac: '00:25:96:FF:FE:12:34:55',
+		revolutionCount: 0,
+	},
+	'00:25:96:FF:FE:12:34:56': {
+		angleDeg: 0,
+		driveTimeMs: 0,
+		mac: '00:25:96:FF:FE:12:34:56',
+		revolutionCount: 0,
+	},
+	'00:25:96:FF:FE:12:34:57': {
+		angleDeg: 0,
+		driveTimeMs: 0,
+		mac: '00:25:96:FF:FE:12:34:57',
+		revolutionCount: 0,
+	},
+	'00:25:96:FF:FE:12:34:58': {
+		angleDeg: 0,
+		driveTimeMs: 0,
+		mac: '00:25:96:FF:FE:12:34:58',
+		revolutionCount: 0,
+	},
 }
 
 export const GameControllerContext = createContext<{
@@ -53,26 +108,18 @@ export const GameControllerProvider: FunctionComponent<{
 }> = ({ children }) => {
 	const [gameState, setGameState] = useState<ReportedGameStateWithMac>({
 		round: 1,
-		robots: {},
+		robots: exampleRobots,
 	})
-	const [gameControllerThing, setGameControllerThing] = useState<string>()
+	const { thingName: gameControllerThing } = useGameControllerThing()
 	const [autoUpdate, setAutoUpdate] = useState<boolean>(true)
 	const { accessKeyId, secretAccessKey, region } = useCredentials()
 
-	let iotClient: IoTClient | undefined = undefined
 	let iotDataPlaneClient: IoTDataPlaneClient | undefined = undefined
 	let commandHandler: (commands: RobotCommand[]) => void = () => undefined
 
 	if (accessKeyId === undefined || secretAccessKey === undefined) {
 		console.debug('AWS credentials not available')
 	} else {
-		iotClient = new IoTClient({
-			region,
-			credentials: {
-				accessKeyId,
-				secretAccessKey,
-			},
-		})
 		iotDataPlaneClient = new IoTDataPlaneClient({
 			region,
 			credentials: {
@@ -89,25 +136,7 @@ export const GameControllerProvider: FunctionComponent<{
 		})
 	}
 
-	useEffect(() => {
-		if (iotClient === undefined) return
-		iotClient
-			.send(
-				new ListThingsInThingGroupCommand({
-					thingGroupName: 'gameController',
-				}),
-			)
-			.then(({ things }) => {
-				// use the first we find, we might later want to have a selection
-				setGameControllerThing(things?.[1])
-			})
-			.catch((error) => {
-				console.error('Failed to list things in group')
-				console.error(error)
-			})
-	}, [iotClient])
-
-	// If a game controller thing is found, fetch state
+	// If a game controller thing is found, fetch the robot configuration
 	useEffect(() => {
 		if (gameControllerThing === undefined) return
 		if (iotDataPlaneClient === undefined) return
