@@ -39,13 +39,18 @@ export const Admin = () => {
 
 	useEffect(() => {
 		const defaultRobotConfig: RobotFieldConfig = {}
-		for (const robot of Object.values(gameState.robots)) {
-			defaultRobotConfig[robot.mac] = {
-				xMm: robotFieldPosition[robot.mac]?.xMm ?? Math.random() * fieldWidthMm,
+		for (const reportedRobot of Object.values(gameState.robots)) {
+			defaultRobotConfig[reportedRobot.mac] = {
+				xMm:
+					robotFieldPosition[reportedRobot.mac]?.xMm ??
+					Math.random() * fieldWidthMm,
 				yMm:
-					robotFieldPosition[robot.mac]?.yMm ?? Math.random() * fieldHeightMm,
+					robotFieldPosition[reportedRobot.mac]?.yMm ??
+					Math.random() * fieldHeightMm,
 				colorHex: randomColor(),
-				rotationDeg: robot.angleDeg ?? 0,
+				rotationDeg:
+					(reportedRobot.angleDeg ?? 0) +
+					(robotFieldPosition[reportedRobot.mac]?.rotationDeg ?? 0),
 			}
 		}
 		setRobots(defaultRobotConfig)
@@ -70,7 +75,11 @@ export const Admin = () => {
 								yMm,
 							},
 						}))
-						setRobotPosition(selectedRobot, { xMm, yMm })
+						setRobotPosition(selectedRobot, {
+							xMm,
+							yMm,
+							rotationDeg: robots[selectedRobot].rotationDeg,
+						})
 					}
 				}}
 			>
@@ -98,6 +107,11 @@ export const Admin = () => {
 										rotationDeg: rotationDeg + rotation,
 									},
 								}))
+								setRobotPosition(mac, {
+									xMm: robots[mac].xMm,
+									yMm: robots[mac].yMm,
+									rotationDeg: rotationDeg + rotation,
+								})
 							}}
 							onClick={() => {
 								console.log('Clicked on robot', mac)

@@ -14,6 +14,7 @@ import type { MacAddress } from 'api/validateGameControllerShadow.js'
 import equal from 'fast-deep-equal'
 import { useCredentials } from 'hooks/useCredentials.js'
 import { useGameControllerThing } from 'hooks/useGameControllerThing.js'
+import { debounce } from 'lodash-es'
 import {
 	createContext,
 	FunctionComponent,
@@ -49,6 +50,31 @@ export const GameAdminContext = createContext<{
 })
 
 export const useGameAdmin = () => useContext(GameAdminContext)
+
+const updateShadow = debounce(
+	(
+		iotDataPlaneClient: IoTDataPlaneClient,
+		gameAdminThing: string,
+		gameMetaDataUpdate: Partial<GameMetadata>,
+	) => {
+		iotDataPlaneClient
+			.send(
+				new UpdateThingShadowCommand({
+					thingName: gameAdminThing,
+					shadowName: 'admin',
+					payload: new TextEncoder().encode(
+						JSON.stringify({
+							state: {
+								reported: gameMetaDataUpdate,
+							},
+						}),
+					),
+				}),
+			)
+			.catch(console.error)
+	},
+	500,
+)
 
 export const GameAdminProvider: FunctionComponent<{
 	children: ReactNode
@@ -128,24 +154,15 @@ export const GameAdminProvider: FunctionComponent<{
 			value={{
 				metaData: gameMetaData,
 				setAutoUpdate,
-				setRobotTeam: (robot, teamId) =>
-					iotDataPlaneClient?.send(
-						new UpdateThingShadowCommand({
-							thingName: gameAdminThing,
-							shadowName: 'admin',
-							payload: new TextEncoder().encode(
-								JSON.stringify({
-									state: {
-										reported: {
-											robotTeamAssignment: {
-												[robot]: teamId,
-											},
-										},
-									},
-								}),
-							),
-						}),
-					),
+				setRobotTeam: (robot, teamId) => {
+					if (iotDataPlaneClient === undefined) return
+					if (gameAdminThing === undefined) return
+					updateShadow(iotDataPlaneClient, gameAdminThing, {
+						robotTeamAssignment: {
+							[robot]: teamId,
+						},
+					})
+				},
 				setRobotPosition: (robot, position) => {
 					setGameMetaData((metadata) => ({
 						...metadata,
@@ -154,26 +171,13 @@ export const GameAdminProvider: FunctionComponent<{
 							[robot]: position,
 						},
 					}))
-					iotDataPlaneClient
-						?.send(
-							new UpdateThingShadowCommand({
-								thingName: gameAdminThing,
-								shadowName: 'admin',
-								payload: new TextEncoder().encode(
-									JSON.stringify({
-										state: {
-											reported: {
-												robotTeamAssignment: {},
-												robotFieldPosition: {
-													[robot]: position,
-												},
-											},
-										},
-									}),
-								),
-							}),
-						)
-						.catch(console.error)
+					if (iotDataPlaneClient === undefined) return
+					if (gameAdminThing === undefined) return
+					updateShadow(iotDataPlaneClient, gameAdminThing, {
+						robotFieldPosition: {
+							[robot]: position,
+						},
+					})
 				},
 			}}
 		>
