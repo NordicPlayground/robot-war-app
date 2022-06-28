@@ -146,24 +146,35 @@ export const GameAdminProvider: FunctionComponent<{
 							),
 						}),
 					),
-				setRobotPosition: (robot, position) =>
-					iotDataPlaneClient?.send(
-						new UpdateThingShadowCommand({
-							thingName: gameAdminThing,
-							shadowName: 'admin',
-							payload: new TextEncoder().encode(
-								JSON.stringify({
-									state: {
-										reported: {
-											robotTeamAssignment: {
-												[robot]: position,
+				setRobotPosition: (robot, position) => {
+					setGameMetaData((metadata) => ({
+						...metadata,
+						robotFieldPosition: {
+							...metadata.robotFieldPosition,
+							[robot]: position,
+						},
+					}))
+					iotDataPlaneClient
+						?.send(
+							new UpdateThingShadowCommand({
+								thingName: gameAdminThing,
+								shadowName: 'admin',
+								payload: new TextEncoder().encode(
+									JSON.stringify({
+										state: {
+											reported: {
+												robotTeamAssignment: {},
+												robotFieldPosition: {
+													[robot]: position,
+												},
 											},
 										},
-									},
-								}),
-							),
-						}),
-					),
+									}),
+								),
+							}),
+						)
+						.catch(console.error)
+				},
 			}}
 		>
 			{children}

@@ -11,6 +11,8 @@ export const Robot = ({
 	rotationDeg,
 	colorHex,
 	onRotate,
+	onClick,
+	outline,
 }: {
 	id: string
 	xMm: number
@@ -20,6 +22,8 @@ export const Robot = ({
 	rotationDeg: number
 	colorHex: string
 	onRotate: (rotateDeg: number) => void
+	onClick?: () => void
+	outline?: boolean
 }) => {
 	// Construct points for a triangle.
 	const points: [number, number][] = []
@@ -54,15 +58,27 @@ export const Robot = ({
 			</defs>
 			<g transform={`rotate(${rotationDeg}, ${xMm}, ${yMm})`}>
 				<polygon
-					style={{
-						fill: `url(#${gradientId})`,
-						fillOpacity: 1,
-						stroke: 'none',
-					}}
+					style={
+						outline ?? false
+							? {
+									fill: `none`,
+									stroke: colorHex,
+									strokeWidth: 4,
+							  }
+							: {
+									fill: `url(#${gradientId})`,
+									fillOpacity: 1,
+									stroke: 'none',
+							  }
+					}
 					points={points.map((pointDef) => pointDef.join(',')).join(' ')}
 					onWheel={(e) => {
 						e.stopPropagation()
-						onRotate(e.deltaY > 0 ? 1 : -1)
+						onRotate(e.deltaY > 0 ? 5 : -5)
+					}}
+					onClick={(e) => {
+						e.stopPropagation()
+						onClick?.()
 					}}
 				/>
 			</g>

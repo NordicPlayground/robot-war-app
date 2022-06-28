@@ -33,61 +33,6 @@ type ReportedGameStateWithMac = ReportedGameState & {
 	>
 }
 
-/**
- * This is a *sample* robot configuration that simulates what the Gateway would report.
- * FIXME: remove once the Gateway actually sends data
- */
-const exampleRobots: ReportedGameStateWithMac['robots'] = {
-	'00:25:96:FF:FE:12:34:51': {
-		angleDeg: 0,
-		driveTimeMs: 0,
-		mac: '00:25:96:FF:FE:12:34:51',
-		revolutionCount: 0,
-	},
-	'00:25:96:FF:FE:12:34:52': {
-		angleDeg: 0,
-		driveTimeMs: 0,
-		mac: '00:25:96:FF:FE:12:34:52',
-		revolutionCount: 0,
-	},
-	'00:25:96:FF:FE:12:34:53': {
-		angleDeg: 0,
-		driveTimeMs: 0,
-		mac: '00:25:96:FF:FE:12:34:53',
-		revolutionCount: 0,
-	},
-	'00:25:96:FF:FE:12:34:54': {
-		angleDeg: 0,
-		driveTimeMs: 0,
-		mac: '00:25:96:FF:FE:12:34:54',
-		revolutionCount: 0,
-	},
-	'00:25:96:FF:FE:12:34:55': {
-		angleDeg: 0,
-		driveTimeMs: 0,
-		mac: '00:25:96:FF:FE:12:34:55',
-		revolutionCount: 0,
-	},
-	'00:25:96:FF:FE:12:34:56': {
-		angleDeg: 0,
-		driveTimeMs: 0,
-		mac: '00:25:96:FF:FE:12:34:56',
-		revolutionCount: 0,
-	},
-	'00:25:96:FF:FE:12:34:57': {
-		angleDeg: 0,
-		driveTimeMs: 0,
-		mac: '00:25:96:FF:FE:12:34:57',
-		revolutionCount: 0,
-	},
-	'00:25:96:FF:FE:12:34:58': {
-		angleDeg: 0,
-		driveTimeMs: 0,
-		mac: '00:25:96:FF:FE:12:34:58',
-		revolutionCount: 0,
-	},
-}
-
 export const GameControllerContext = createContext<{
 	gameState: ReportedGameStateWithMac
 	nextRoundCommands: (commands: RobotCommand[]) => void
@@ -108,7 +53,7 @@ export const GameControllerProvider: FunctionComponent<{
 }> = ({ children }) => {
 	const [gameState, setGameState] = useState<ReportedGameStateWithMac>({
 		round: 1,
-		robots: exampleRobots,
+		robots: {},
 	})
 	const { thingName: gameControllerThing } = useGameControllerThing()
 	const [autoUpdate, setAutoUpdate] = useState<boolean>(true)
@@ -176,7 +121,10 @@ export const GameControllerProvider: FunctionComponent<{
 								{} as ReportedGameStateWithMac['robots'],
 							),
 					}
-					if (!equal(newGameSate, gameState)) setGameState(newGameSate)
+					if (!equal(newGameSate, gameState)) {
+						setGameState(newGameSate)
+						console.debug('[useGameAdmin] new game state', gameState)
+					}
 				})
 				.catch((error) => {
 					console.error('Failed to get shadow')

@@ -8,7 +8,7 @@ import {
 export const TeamId = Type.String({
 	minLength: 1,
 })
-const DistanceInMm = Type.Integer({ minimum: 0, title: 'Distance in MM' })
+const DistanceInMm = Type.Number({ minimum: 0, title: 'Distance in MM' })
 
 export const Position = Type.Object(
 	{

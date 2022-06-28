@@ -72,7 +72,10 @@ export const updateGameController =
 				angleDeg: robot.angleDeg + command.angleDeg,
 				driveTimeMs: command.driveTimeMs,
 			}
-			desiredGameState.robots[command.robotMac] = updatedRobot
+			desiredGameState.robots = {
+				...(desiredGameState.robots ?? {}),
+				[command.robotMac]: updatedRobot,
+			}
 		}
 
 		console.debug('Updated desired', desiredGameState)

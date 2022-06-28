@@ -49,7 +49,7 @@ export const ReportedGameState = Type.Object({
 })
 
 export const DesiredGameState = Type.Object({
-	robots: Type.Record(MacAddress, DesiredRobot),
+	robots: Type.Optional(Type.Record(MacAddress, DesiredRobot)),
 })
 
 export const gameControllerShadow = Type.Object({

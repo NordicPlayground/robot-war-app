@@ -1,5 +1,4 @@
 import { IoTClient, ListThingsInThingGroupCommand } from '@aws-sdk/client-iot'
-import { IoTDataPlaneClient } from '@aws-sdk/client-iot-data-plane'
 import { useCredentials } from 'hooks/useCredentials'
 import {
 	createContext,
@@ -24,19 +23,11 @@ export const GameControllerThingProvider: FunctionComponent<{
 	const { accessKeyId, secretAccessKey, region } = useCredentials()
 
 	let iotClient: IoTClient | undefined = undefined
-	let iotDataPlaneClient: IoTDataPlaneClient | undefined = undefined
 
 	if (accessKeyId === undefined || secretAccessKey === undefined) {
 		console.debug('AWS credentials not available')
 	} else {
 		iotClient = new IoTClient({
-			region,
-			credentials: {
-				accessKeyId,
-				secretAccessKey,
-			},
-		})
-		iotDataPlaneClient = new IoTDataPlaneClient({
 			region,
 			credentials: {
 				accessKeyId,
@@ -50,7 +41,7 @@ export const GameControllerThingProvider: FunctionComponent<{
 		iotClient
 			.send(
 				new ListThingsInThingGroupCommand({
-					thingGroupName: 'gameControllerThing',
+					thingGroupName: 'gameController',
 				}),
 			)
 			.then(({ things }) => {
