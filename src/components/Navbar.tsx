@@ -1,4 +1,5 @@
 import {
+	AdminIcon,
 	GameControllerIcon,
 	GameIcon,
 	IconWithText,
@@ -69,6 +70,13 @@ export const Navbar = () => {
 									<Link className="nav-link" to="/controllers" onClick={close}>
 										<IconWithText>
 											<GameControllerIcon /> Game Controllers
+										</IconWithText>
+									</Link>
+								</li>
+								<li className="nav-item">
+									<Link className="nav-link" to="/admin" onClick={close}>
+										<IconWithText>
+											<AdminIcon /> Admin
 										</IconWithText>
 									</Link>
 								</li>

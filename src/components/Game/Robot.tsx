@@ -24,11 +24,11 @@ export const Robot = ({
 	// Construct points for a triangle.
 	const points: [number, number][] = []
 	// First point centered tip
-	points.push([xMm - widthMm / 2, yMm + heightMm / 2])
+	points.push([xMm, yMm - heightMm / 2])
 	// Left corner
-	points.push([xMm + widthMm / 2, yMm])
+	points.push([xMm - widthMm / 2, yMm + heightMm / 2])
 	// Right corner
-	points.push([xMm - widthMm / 2, yMm - heightMm / 2])
+	points.push([xMm + widthMm / 2, yMm + heightMm / 2])
 
 	const gradientId = nanoid()
 

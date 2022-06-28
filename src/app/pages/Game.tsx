@@ -39,8 +39,8 @@ export const Game = () => {
 	const fieldWidthMm = 1500
 	const fieldHeightMm = 1000
 	const startZoneSizeMm = 100
-	const robotWidthMM = 90
-	const robotLengthMm = 65
+	const robotWidthMM = 65
+	const robotLengthMm = 90
 
 	// FIXME: retrieve robots in game from GameController
 	const { gameState } = useGameController()

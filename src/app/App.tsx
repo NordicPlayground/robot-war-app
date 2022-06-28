@@ -1,4 +1,5 @@
 import { About } from 'app/pages/About'
+import { Admin } from 'app/pages/Admin'
 import { Game } from 'app/pages/Game'
 import { GameControllers } from 'app/pages/GameControllers'
 import { Settings } from 'app/pages/Settings'
@@ -21,6 +22,7 @@ export const App = () => {
 				<Route index element={<Navigate to="/game" />} />
 				<Route path="/game" element={<Game />} />
 				<Route path="/controllers" element={<GameControllers />} />
+				<Route path="/admin" element={<Admin />} />
 				<Route path="/settings" element={<Settings />} />
 				<Route path="/about" element={<About />} />
 			</Routes>
