@@ -10,8 +10,8 @@ export const TeamId = Type.String({
 })
 const DistanceInMm = Type.Number({ minimum: 0, title: 'Distance in MM' })
 const RotationDeg = Type.Number({
-	minimum: 0,
-	maximum: 360,
+	minimum: -180,
+	maximum: 180,
 	title: 'Rotation in degrees',
 })
 
