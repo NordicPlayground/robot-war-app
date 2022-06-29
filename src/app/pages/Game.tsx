@@ -4,7 +4,7 @@ import { Form } from 'components/Game/Form'
 import { Robot } from 'components/Game/Robot'
 import { useGameAdmin } from 'hooks/useGameAdmin'
 import { RobotCommand, useGameController } from 'hooks/useGameController'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { shortestRotation } from 'utils/shortestRotation'
 
 const randomColor = () =>
@@ -19,19 +19,18 @@ export const Game = () => {
 	const robotWidthMM = 65
 	const robotLengthMm = 90
 
-	// FIXME: retrieve robots in game from GameController
-	const { gameState } = useGameController()
-	//console.log(gameState.robots) // <- use this below
+	const { gameState, setNextRoundCommands, nextRoundCommands } =
+		useGameController()
 	const {
 		metaData: { robotFieldPosition },
 	} = useGameAdmin()
 
-	console.log(robotFieldPosition)
+	const [robotCommands, setRobotCommands] =
+		useState<Record<string, RobotCommand>>(nextRoundCommands)
 
-	const [robotCommands, setRobotCommands] = useState<
-		Record<string, RobotCommand>
-	>({})
-	const { nextRoundCommands } = useGameController()
+	useEffect(() => {
+		setRobotCommands(nextRoundCommands)
+	}, [nextRoundCommands])
 
 	return (
 		<>
@@ -40,7 +39,7 @@ export const Game = () => {
 					type="button"
 					className="btn btn-danger"
 					onClick={() => {
-						nextRoundCommands(robotCommands)
+						setNextRoundCommands(robotCommands)
 					}}
 				>
 					Fight!
@@ -62,7 +61,11 @@ export const Game = () => {
 							driveTimeMs: 0,
 						}
 
-						const { rotationDeg, xMm, yMm } = robotFieldPosition[mac]
+						const { rotationDeg, xMm, yMm } = robotFieldPosition[mac] ?? {
+							rotationDeg: 0,
+							xMm: 0,
+							yMm: 0,
+						}
 						// FIXME: use fixed color per team
 						const colorHex = randomColor()
 

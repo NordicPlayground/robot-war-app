@@ -39,14 +39,16 @@ type ReportedGameStateWithMac = ReportedGameState & {
 
 export const GameControllerContext = createContext<{
 	gameState: ReportedGameStateWithMac
-	nextRoundCommands: (commands: Record<string, RobotCommand>) => void
+	nextRoundCommands: Record<string, RobotCommand>
+	setNextRoundCommands: (commands: Record<string, RobotCommand>) => void
 	setAutoUpdate: (update: boolean) => void
 }>({
 	gameState: {
 		round: 1,
 		robots: {},
 	},
-	nextRoundCommands: () => undefined,
+	nextRoundCommands: {},
+	setNextRoundCommands: () => undefined,
 	setAutoUpdate: () => undefined,
 })
 
@@ -62,6 +64,9 @@ export const GameControllerProvider: FunctionComponent<{
 	const { thingName: gameControllerThing } = useGameControllerThing()
 	const [autoUpdate, setAutoUpdate] = useState<boolean>(true)
 	const { accessKeyId, secretAccessKey, region } = useCredentials()
+	const [nextRoundCommands, updateNextRoundCommands] = useState<
+		Record<string, RobotCommand>
+	>({})
 
 	let iotDataPlaneClient: IoTDataPlaneClient | undefined = undefined
 	let commandHandler: (commands: Record<string, RobotCommand>) => void = () =>
@@ -130,6 +135,17 @@ export const GameControllerProvider: FunctionComponent<{
 						setGameState(newGameSate)
 						console.debug('[useGameAdmin] new game state', gameState)
 					}
+					// Populate the desired robot configuration ("commands")
+					const newCommands: Record<string, RobotCommand> = {}
+					Object.entries(maybeValidShadow.state.desired?.robots ?? {}).forEach(
+						([mac, command]) => {
+							newCommands[mac] = command
+						},
+					)
+					if (!equal(newCommands, nextRoundCommands)) {
+						updateNextRoundCommands(newCommands)
+						console.debug('[useGameAdmin] new commands', newCommands)
+					}
 				})
 				.catch((error) => {
 					console.error('Failed to get shadow')
@@ -140,13 +156,23 @@ export const GameControllerProvider: FunctionComponent<{
 		return () => {
 			clearInterval(i)
 		}
-	}, [gameControllerThing, gameState, autoUpdate, iotDataPlaneClient])
+	}, [
+		gameControllerThing,
+		gameState,
+		autoUpdate,
+		iotDataPlaneClient,
+		nextRoundCommands,
+	])
 
 	return (
 		<GameControllerContext.Provider
 			value={{
 				gameState,
-				nextRoundCommands: commandHandler,
+				nextRoundCommands,
+				setNextRoundCommands: (commands) => {
+					commandHandler(commands)
+					updateNextRoundCommands(commands)
+				},
 				setAutoUpdate,
 			}}
 		>
