@@ -12,7 +12,7 @@ import type {
 	ReportedRobot as ReportedRobotSchema,
 } from 'api/validateGameControllerShadow'
 import { validateGameControllerShadow } from 'api/validateGameControllerShadow'
-import type { RobotCommand } from 'app/pages/Game'
+import type { RobotCommand } from 'hooks/useGameController'
 
 export type DesiredRobot = Static<typeof DesiredRobotSchema>
 export type ReportedRobot = Static<typeof ReportedRobotSchema>
@@ -27,7 +27,7 @@ export const updateGameController =
 		iotData: IoTDataPlaneClient
 		controllerThingName: string
 	}) =>
-	async (commands: RobotCommand[]): Promise<void> => {
+	async (commands: Record<string, RobotCommand>): Promise<void> => {
 		const currentShadow = await iotData.send(
 			new GetThingShadowCommand({
 				thingName: controllerThingName,
@@ -61,10 +61,10 @@ export const updateGameController =
 			robots: {},
 		}
 
-		for (const command of commands) {
-			const robot = reportedGameState.robots[command.robotMac]
+		for (const [robotMac, command] of Object.entries(commands)) {
+			const robot = reportedGameState.robots[robotMac]
 			if (robot === undefined) {
-				console.debug(`Robot ${command.robotMac} unknown!`)
+				console.debug(`Robot ${robotMac} unknown!`)
 				continue
 			}
 			const updatedRobot: DesiredRobot = {
@@ -74,7 +74,7 @@ export const updateGameController =
 			}
 			desiredGameState.robots = {
 				...(desiredGameState.robots ?? {}),
-				[command.robotMac]: updatedRobot,
+				[robotMac]: updatedRobot,
 			}
 		}
 

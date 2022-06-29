@@ -1,71 +1,54 @@
-import type { RobotCommand } from 'app/pages/Game'
 import styles from 'components/Game/Form.module.css'
 import { RobotConfig } from 'components/Game/RobotConfig'
+import type { RobotCommand } from 'hooks/useGameController'
 import { FunctionComponent, useState } from 'react'
 
 export const Form: FunctionComponent<{
-	commands: RobotCommand[]
-	onUpdateCommands: (updatedCommands: RobotCommand[]) => void
+	commands: Record<string, RobotCommand>
+	onUpdateCommands: (updatedCommands: Record<string, RobotCommand>) => void
 }> = ({ commands, onUpdateCommands }) => {
-	const [nextRobotCommand, setNextRobotCommand] = useState<RobotCommand[]>([
+	const [nextRobotCommands, setNextRobotCommands] = useState<
+		Record<string, RobotCommand>
+	>({
 		...commands,
-	])
+	})
 
 	return (
 		<form>
-			{nextRobotCommand
-				.sort(({ robotMac: macA }, { robotMac: macB }) =>
-					macA.localeCompare(macB),
-				)
-				.map((robot) => {
-					const { robotMac, angleDeg, driveTimeMs } = robot
-					return (
-						<RobotConfig
-							key={robotMac}
-							id={robotMac}
-							driveTimeMs={driveTimeMs}
-							angleDeg={angleDeg}
-							onUpdateAngleDeg={(angleDeg) =>
-								setNextRobotCommand((robots) => {
-									const robot = robots.find(
-										(robot) => robot.robotMac === robotMac,
-									) as RobotCommand
-									return [
-										...robots.filter(
-											({ robotMac: robotId }) => robotId !== robotMac,
-										),
-										{
-											...robot,
-											angleDeg,
-										},
-									]
-								})
-							}
-							onUpdateDriveTimeMs={(driveTimeMs) =>
-								setNextRobotCommand((robots) => {
-									const robot = robots.find(
-										(robot) => robot.robotMac === robotMac,
-									) as RobotCommand
-									return [
-										...robots.filter(
-											({ robotMac: robotId }) => robotId !== robotMac,
-										),
-										{
-											...robot,
-											driveTimeMs,
-										},
-									]
-								})
-							}
-						></RobotConfig>
-					)
-				})}
+			{Object.entries(nextRobotCommands)
+				.sort(([macA], [macB]) => macA.localeCompare(macB))
+				.map(([robotMac, { angleDeg, driveTimeMs }]) => (
+					<RobotConfig
+						key={robotMac}
+						id={robotMac}
+						driveTimeMs={driveTimeMs}
+						angleDeg={angleDeg}
+						onUpdateAngleDeg={(angleDeg) =>
+							setNextRobotCommands((commands) => ({
+								...commands,
+								[robotMac]: {
+									...commands[robotMac],
+									angleDeg,
+								},
+							}))
+						}
+						onUpdateDriveTimeMs={(driveTimeMs) =>
+							setNextRobotCommands((commands) => ({
+								...commands,
+								[robotMac]: {
+									...commands[robotMac],
+									driveTimeMs,
+								},
+							}))
+						}
+					></RobotConfig>
+				))}
 			<footer>
 				<button
 					className={styles.button1}
 					type="button"
 					onClick={() => {
-						onUpdateCommands(nextRobotCommand)
+						onUpdateCommands(nextRobotCommands)
 					}}
 				>
 					save

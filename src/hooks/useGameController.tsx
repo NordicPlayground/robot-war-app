@@ -11,7 +11,6 @@ import {
 	MacAddress,
 	validateGameControllerShadow,
 } from 'api/validateGameControllerShadow'
-import type { RobotCommand } from 'app/pages/Game'
 import equal from 'fast-deep-equal'
 import { useCredentials } from 'hooks/useCredentials'
 import { useGameControllerThing } from 'hooks/useGameControllerThing.js'
@@ -24,6 +23,11 @@ import {
 	useState,
 } from 'react'
 
+export type RobotCommand = {
+	angleDeg: number
+	driveTimeMs: number
+}
+
 type ReportedGameStateWithMac = ReportedGameState & {
 	robots: Record<
 		Static<typeof MacAddress>,
@@ -35,7 +39,7 @@ type ReportedGameStateWithMac = ReportedGameState & {
 
 export const GameControllerContext = createContext<{
 	gameState: ReportedGameStateWithMac
-	nextRoundCommands: (commands: RobotCommand[]) => void
+	nextRoundCommands: (commands: Record<string, RobotCommand>) => void
 	setAutoUpdate: (update: boolean) => void
 }>({
 	gameState: {
@@ -60,7 +64,8 @@ export const GameControllerProvider: FunctionComponent<{
 	const { accessKeyId, secretAccessKey, region } = useCredentials()
 
 	let iotDataPlaneClient: IoTDataPlaneClient | undefined = undefined
-	let commandHandler: (commands: RobotCommand[]) => void = () => undefined
+	let commandHandler: (commands: Record<string, RobotCommand>) => void = () =>
+		undefined
 
 	if (accessKeyId === undefined || secretAccessKey === undefined) {
 		console.debug('AWS credentials not available')

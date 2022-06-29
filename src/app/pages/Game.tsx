@@ -3,38 +3,14 @@ import { Field } from 'components/Game/Field'
 import { Form } from 'components/Game/Form'
 import { Robot } from 'components/Game/Robot'
 import { useGameAdmin } from 'hooks/useGameAdmin'
-import { useGameController } from 'hooks/useGameController'
-import { nanoid } from 'nanoid'
+import { RobotCommand, useGameController } from 'hooks/useGameController'
 import { useState } from 'react'
-import { calculateExpectedRotation } from 'utils/calculateExpectedRotation'
 import { shortestRotation } from 'utils/shortestRotation'
 
 const randomColor = () =>
 	`#${Math.floor(Math.random() * 16777215)
 		.toString(16)
 		.padEnd(6, '0')}`
-
-export type RobotState = {
-	mac: string
-	xMm: number
-	yMm: number
-	colorHex: string
-	executedCommands: ExecutedRobotCommand[]
-}
-
-export type RobotCommand = {
-	robotMac: string
-	angleDeg: number
-	driveTimeMs: number
-}
-
-type ExecutedRobotCommand = RobotCommand & {
-	success: boolean
-	/* Unix timestamp in milliseconds */
-	tsMs: number
-}
-
-export type Robots = RobotState[]
 
 export const Game = () => {
 	const fieldWidthMm = 1500
@@ -52,8 +28,9 @@ export const Game = () => {
 
 	console.log(robotFieldPosition)
 
-	const [robots, setRobots] = useState<Robots>([])
-	const [robotCommands, setRobotCommands] = useState<RobotCommand[]>([])
+	const [robotCommands, setRobotCommands] = useState<
+		Record<string, RobotCommand>
+	>({})
 	const { nextRoundCommands } = useGameController()
 
 	return (
@@ -75,36 +52,20 @@ export const Game = () => {
 					widthMm={fieldWidthMm}
 					numberOfHelperLines={3}
 					startZoneSizeMm={startZoneSizeMm}
-					onClick={({ xMm, yMm }) => {
-						const mac = nanoid()
-						setRobots((robots) => [
-							...robots,
-							{
-								mac,
-								xMm,
-								yMm,
-								colorHex: randomColor(),
-								executedCommands: [],
-							},
-						])
-						setRobotCommands((commands) => [
-							...commands,
-							{
-								robotMac: mac,
-								angleDeg: 0,
-								driveTimeMs: 0,
-							},
-						])
+					onClick={(position) => {
+						console.debug(`User clicked on field at`, position)
 					}}
 				>
-					{robots.map(({ xMm, yMm, mac, colorHex, executedCommands }) => {
-						const nextRobotCommand: RobotCommand = robotCommands.find(
-							(robot) => mac === robot.robotMac,
-						) ?? {
-							robotMac: mac,
+					{Object.values(gameState.robots).map(({ mac, angleDeg }) => {
+						const nextRobotCommand: RobotCommand = robotCommands[mac] ?? {
 							angleDeg: 0,
 							driveTimeMs: 0,
 						}
+
+						const { rotationDeg, xMm, yMm } = robotFieldPosition[mac]
+						// FIXME: use fixed color per team
+						const colorHex = randomColor()
+
 						return (
 							<Robot
 								key={mac}
@@ -114,18 +75,17 @@ export const Game = () => {
 								widthMm={robotWidthMM}
 								heightMm={robotLengthMm}
 								colorHex={colorHex}
-								rotationDeg={calculateExpectedRotation([
-									...executedCommands,
-									nextRobotCommand,
-								])}
+								rotationDeg={rotationDeg + nextRobotCommand.angleDeg}
 								onRotate={(rotation) => {
-									nextRobotCommand.angleDeg = shortestRotation(
-										nextRobotCommand.angleDeg + rotation,
-									)
-									setRobotCommands((commands) => [
-										...commands.filter((cmd) => cmd.robotMac !== mac),
-										nextRobotCommand,
-									])
+									setRobotCommands((commands) => ({
+										...commands,
+										[mac]: {
+											...nextRobotCommand,
+											angleDeg: shortestRotation(
+												nextRobotCommand.angleDeg + rotation,
+											),
+										},
+									}))
 								}}
 							/>
 						)
