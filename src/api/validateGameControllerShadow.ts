@@ -24,16 +24,7 @@ export const ReportedRobot = Type.Intersect([
 	}),
 ])
 
-export const DesiredRobot = Type.Intersect([
-	Robot,
-	Type.Object({
-		wheelCircumfenceMm: Type.Optional(
-			Type.Integer({
-				minimum: 0,
-			}),
-		),
-	}),
-])
+export const DesiredRobot = Robot
 
 export const MacAddress = Type.String({
 	minLength: 16,

@@ -29,6 +29,18 @@ export const gameControllerAdminShadow = Type.Object({
 		reported: Type.Object({
 			robotTeamAssignment: Type.Record(MacAddress, TeamId),
 			robotFieldPosition: Type.Record(MacAddress, Position),
+			robotConfiguration: Type.Optional(
+				Type.Record(
+					MacAddress,
+					Type.Object({
+						wheelCircumfenceMm: Type.Optional(
+							Type.Integer({
+								minimum: 0,
+							}),
+						),
+					}),
+				),
+			),
 		}),
 	}),
 })
