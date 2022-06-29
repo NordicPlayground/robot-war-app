@@ -78,7 +78,11 @@ export const Game = () => {
 								widthMm={robotWidthMM}
 								heightMm={robotLengthMm}
 								colorHex={colorHex}
-								rotationDeg={rotationDeg + nextRobotCommand.angleDeg}
+								rotationDeg={rotationDeg}
+								desiredRotationDeg={rotationDeg + nextRobotCommand.angleDeg}
+								desiredDriveBudgetPercent={
+									(nextRobotCommand.driveTimeMs ?? 0) / 1000
+								}
 								onRotate={(rotation) => {
 									setRobotCommands((commands) => ({
 										...commands,

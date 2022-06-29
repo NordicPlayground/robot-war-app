@@ -9,6 +9,8 @@ export const Robot = ({
 	widthMm,
 	heightMm,
 	rotationDeg,
+	desiredRotationDeg,
+	desiredDriveBudgetPercent,
 	colorHex,
 	onRotate,
 	onClick,
@@ -20,6 +22,8 @@ export const Robot = ({
 	widthMm: number
 	heightMm: number
 	rotationDeg: number
+	desiredRotationDeg?: number
+	desiredDriveBudgetPercent?: number
 	colorHex: string
 	onRotate: (rotateDeg: number) => void
 	onClick?: () => void
@@ -56,6 +60,26 @@ export const Robot = ({
 					/>
 				</linearGradient>
 			</defs>
+			{desiredRotationDeg !== undefined && (
+				<g transform={`rotate(${desiredRotationDeg}, ${xMm}, ${yMm})`}>
+					<path
+						d={`M${xMm} ${yMm} L${xMm} ${
+							yMm + widthMm * 4 * (desiredDriveBudgetPercent ?? 1)
+						}`}
+						style={{
+							fill: `none`,
+							stroke: 'green',
+							strokeWidth: 4,
+							strokeLinecap: 'butt',
+							strokeLinejoin: 'miter',
+							strokeOpacity: 1,
+							strokeMiterlimit: 4,
+							strokeDasharray: '4,4',
+							strokeDashoffset: 0,
+						}}
+					/>
+				</g>
+			)}
 			<g transform={`rotate(${rotationDeg}, ${xMm}, ${yMm})`}>
 				<polygon
 					style={
