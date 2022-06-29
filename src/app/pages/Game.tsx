@@ -2,6 +2,7 @@ import style from 'app/pages/Game.module.css'
 import { Field } from 'components/Game/Field'
 import { Form } from 'components/Game/Form'
 import { Robot } from 'components/Game/Robot'
+import { useGameAdmin } from 'hooks/useGameAdmin'
 import { useGameController } from 'hooks/useGameController'
 import { nanoid } from 'nanoid'
 import { useState } from 'react'
@@ -44,7 +45,12 @@ export const Game = () => {
 
 	// FIXME: retrieve robots in game from GameController
 	const { gameState } = useGameController()
-	console.log(gameState.robots) // <- use this below
+	//console.log(gameState.robots) // <- use this below
+	const {
+		metaData: { robotFieldPosition },
+	} = useGameAdmin()
+
+	console.log(robotFieldPosition)
 
 	const [robots, setRobots] = useState<Robots>([])
 	const [robotCommands, setRobotCommands] = useState<RobotCommand[]>([])

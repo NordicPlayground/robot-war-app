@@ -1,4 +1,5 @@
 import style from 'app/pages/Game.module.css'
+import { TeamAssigner } from 'components/Admin/TeamAssigner'
 import { Field } from 'components/Game/Field'
 import { Robot } from 'components/Game/Robot'
 import { useGameAdmin } from 'hooks/useGameAdmin'
@@ -28,7 +29,7 @@ export const Admin = () => {
 	const robotLengthMm = 90
 
 	const {
-		metaData: { robotFieldPosition },
+		metaData: { robotFieldPosition, robotTeamAssignment },
 		setRobotPosition,
 	} = useGameAdmin()
 
@@ -36,6 +37,7 @@ export const Admin = () => {
 
 	const [robots, setRobots] = useState<RobotFieldConfig>({})
 	const [selectedRobot, setSelectedRobot] = useState<string>()
+	//console.log(robotTeamAssignment)
 
 	useEffect(() => {
 		const defaultRobotConfig: RobotFieldConfig = {}
@@ -57,86 +59,91 @@ export const Admin = () => {
 	}, [gameState, robotFieldPosition])
 
 	return (
-		<div className={style.field}>
-			<Field
-				heightMm={fieldHeightMm}
-				widthMm={fieldWidthMm}
-				numberOfHelperLines={3}
-				startZoneSizeMm={startZoneSizeMm}
-				onClick={({ xMm, yMm }) => {
-					console.log('Clicked on field', { xMm, yMm })
-					if (selectedRobot !== undefined) {
-						setSelectedRobot(undefined)
-						setRobots((robots) => ({
-							...robots,
-							[selectedRobot]: {
-								...robots[selectedRobot],
+		<div>
+			<div className={style.field}>
+				<Field
+					heightMm={fieldHeightMm}
+					widthMm={fieldWidthMm}
+					numberOfHelperLines={3}
+					startZoneSizeMm={startZoneSizeMm}
+					onClick={({ xMm, yMm }) => {
+						console.log('Clicked on field', { xMm, yMm })
+						if (selectedRobot !== undefined) {
+							setSelectedRobot(undefined)
+							setRobots((robots) => ({
+								...robots,
+								[selectedRobot]: {
+									...robots[selectedRobot],
+									xMm,
+									yMm,
+								},
+							}))
+							setRobotPosition(selectedRobot, {
 								xMm,
 								yMm,
-							},
-						}))
-						setRobotPosition(selectedRobot, {
-							xMm,
-							yMm,
-							rotationDeg: robots[selectedRobot].rotationDeg,
-						})
-					}
-				}}
-			>
-				{Object.entries(robots).map(
-					([mac, { xMm, yMm, colorHex, rotationDeg }]) => (
-						<Robot
-							key={mac}
-							id={mac}
-							xMm={xMm}
-							yMm={yMm}
-							widthMm={robotWidthMM}
-							heightMm={robotLengthMm}
-							colorHex={colorHex}
-							outline={
-								selectedRobot !== undefined && selectedRobot !== mac
-									? true
-									: false
-							}
-							rotationDeg={rotationDeg}
-							onRotate={(rotation) => {
-								setRobots((robots) => ({
-									...robots,
-									[mac]: {
-										...robots[mac],
-										rotationDeg: rotationDeg + rotation,
-									},
-								}))
-								setRobotPosition(mac, {
-									xMm: robots[mac].xMm,
-									yMm: robots[mac].yMm,
-									rotationDeg: rotationDeg + rotation,
-								})
-							}}
-							onClick={() => {
-								console.log('Clicked on robot', mac)
-								setSelectedRobot(mac)
-							}}
-						/>
-					),
-				)}
-			</Field>
-			<form
-				onSubmit={(e) => {
-					e.preventDefault()
-				}}
-			>
-				<button
-					className="btn btn-secondary"
-					type="button"
-					disabled={selectedRobot === undefined}
-					onClick={() => {
-						setSelectedRobot(undefined)
+								rotationDeg: robots[selectedRobot].rotationDeg,
+							})
+						}
 					}}
 				>
-					cancel
-				</button>
-			</form>
+					{Object.entries(robots).map(
+						([mac, { xMm, yMm, colorHex, rotationDeg }]) => (
+							<Robot
+								key={mac}
+								id={mac}
+								xMm={xMm}
+								yMm={yMm}
+								widthMm={robotWidthMM}
+								heightMm={robotLengthMm}
+								colorHex={colorHex}
+								outline={
+									selectedRobot !== undefined && selectedRobot !== mac
+										? true
+										: false
+								}
+								rotationDeg={rotationDeg}
+								onRotate={(rotation) => {
+									setRobots((robots) => ({
+										...robots,
+										[mac]: {
+											...robots[mac],
+											rotationDeg: rotationDeg + rotation,
+										},
+									}))
+									setRobotPosition(mac, {
+										xMm: robots[mac].xMm,
+										yMm: robots[mac].yMm,
+										rotationDeg: rotationDeg + rotation,
+									})
+								}}
+								onClick={() => {
+									console.log('Clicked on robot', mac)
+									setSelectedRobot(mac)
+								}}
+							/>
+						),
+					)}
+				</Field>
+				<form
+					onSubmit={(e) => {
+						e.preventDefault()
+					}}
+				>
+					<button
+						className="btn btn-secondary"
+						type="button"
+						disabled={selectedRobot === undefined}
+						onClick={() => {
+							setSelectedRobot(undefined)
+						}}
+					>
+						cancel
+					</button>
+				</form>
+			</div>
+			<div>
+				<TeamAssigner />
+			</div>
 		</div>
 	)
 }
