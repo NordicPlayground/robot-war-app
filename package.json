@@ -1,7 +1,7 @@
 {
-  "name": "@nordicsemiconductor/nrf-robot-wars-app",
+  "name": "@robot-war/app",
   "version": "0.0.0-development",
-  "description": "A single-page application (SPA) developed using TypeScript to play a game of nRF Robot Wars.",
+  "description": "A single-page application (SPA) developed using TypeScript to play a game of nRF Robot War.",
   "type": "module",
   "scripts": {
     "start": "vite",
@@ -12,14 +12,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/coderbyheart/nrf-robot-wars-app.git"
+    "url": "git+https://github.com/NordicPlayground/robot-war-app.git"
   },
   "bugs": {
-    "url": "https://github.com/coderbyheart/nrf-robot-wars-app/issues"
+    "url": "https://github.com/NordicPlayground/robot-war-app/issues"
   },
-  "homepage": "https://github.com/coderbyheart/nrf-robot-wars-app#readme",
+  "homepage": "https://github.com/NordicPlayground/robot-war-app#readme",
   "keywords": [
-    "nrf-asset-tracker",
     "iot",
     "web-app",
     "aws",

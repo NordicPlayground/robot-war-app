@@ -11,7 +11,7 @@ export const About = () => {
 				<div className="card-header">About</div>
 				<div className="card-body">
 					<p>
-						This is the web application of the <em>nRF Robot Wars</em>. You can
+						This is the web application of the <em>nRF Robot War</em>. You can
 						find the source code on{' '}
 						<a
 							href={homepage.toString()}

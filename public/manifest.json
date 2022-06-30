@@ -1,6 +1,6 @@
 {
-  "short_name": "nRF Robot Wars",
-  "name": "nRF Robot Wars Web Application",
+  "short_name": "nRF Robot War",
+  "name": "nRF Robot War Web Application",
   "icons": [
     {
       "src": "logo.svg",
