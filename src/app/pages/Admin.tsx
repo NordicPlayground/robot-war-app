@@ -37,7 +37,6 @@ export const Admin = () => {
 
 	const [robots, setRobots] = useState<RobotFieldConfig>({})
 	const [selectedRobot, setSelectedRobot] = useState<string>()
-	//console.log(robotTeamAssignment)
 
 	useEffect(() => {
 		const defaultRobotConfig: RobotFieldConfig = {}
@@ -67,7 +66,6 @@ export const Admin = () => {
 					numberOfHelperLines={3}
 					startZoneSizeMm={startZoneSizeMm}
 					onClick={({ xMm, yMm }) => {
-						console.log('Clicked on field', { xMm, yMm })
 						if (selectedRobot !== undefined) {
 							setSelectedRobot(undefined)
 							setRobots((robots) => ({
@@ -117,7 +115,6 @@ export const Admin = () => {
 									})
 								}}
 								onClick={() => {
-									console.log('Clicked on robot', mac)
 									setSelectedRobot(mac)
 								}}
 							/>

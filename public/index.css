@@ -11,6 +11,7 @@ html {
   html {
     font-family: "Inter var", "system-ui";
   }
+
   :root {
     --bs-font-sans-serif: "Inter var", "system-ui";
   }
@@ -26,7 +27,8 @@ main h4 {
     border-right: 0;
     border-radius: 0;
   }
-  main > .row > * {
+
+  main>.row>* {
     padding-left: 0;
     padding-right: 0;
   }
@@ -38,23 +40,26 @@ main h4 {
   }
 }
 
-.card > .table {
+.card>.table {
   margin-bottom: 0;
 }
-.card > .table tbody tr:last-child td {
+
+.card>.table tbody tr:last-child td {
   border-bottom: 0;
 }
-.card > .table td:first-child,
-.card > .table th:first-child {
+
+.card>.table td:first-child,
+.card>.table th:first-child {
   padding-left: 1rem;
 }
-.card > .table td:last-child,
-.card > .table th:last-child {
+
+.card>.table td:last-child,
+.card>.table th:last-child {
   padding-right: 1rem;
 }
 
-.card-body > dl:last-child,
-.card-body > dl:last-child dd {
+.card-body>dl:last-child,
+.card-body>dl:last-child dd {
   margin-bottom: 0;
 }
 
@@ -64,4 +69,12 @@ a {
 
 dt {
   font-weight: 600;
+}
+
+svg text {
+  cursor: default;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }

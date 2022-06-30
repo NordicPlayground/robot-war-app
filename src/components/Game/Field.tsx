@@ -7,12 +7,16 @@ export const Field = ({
 	widthMm,
 	onClick,
 	children,
+	onMouseMove,
+	onMouseUp,
 }: PropsWithChildren<{
 	numberOfHelperLines: number
 	startZoneSizeMm: number
 	heightMm: number
 	widthMm: number
-	onClick: (args: { xMm: number; yMm: number }) => void
+	onClick?: (args: { xMm: number; yMm: number }) => void
+	onMouseMove?: (args: { xMm: number; yMm: number }) => void
+	onMouseUp?: (args: { xMm: number; yMm: number }) => void
 }>) => {
 	const rectRef = useRef<SVGRectElement>(null)
 
@@ -21,6 +25,22 @@ export const Field = ({
 	const interval = 1 / (numberOfHelperLines + 1)
 	for (let i = interval; i < 1; i += interval) {
 		helperLines.push(i)
+	}
+
+	const getMouseCoordinates = (
+		ref: SVGRectElement,
+		e: React.MouseEvent<SVGRectElement, MouseEvent>,
+	): {
+		xMm: number
+		yMm: number
+	} => {
+		const box = ref.getBoundingClientRect()
+		const relativeXPosition = (e.clientX - box.left) / box.width
+		const relativeYPosition = (e.clientY - box.top) / box.height
+		return {
+			xMm: relativeXPosition * widthMm,
+			yMm: relativeYPosition * heightMm,
+		}
 	}
 
 	return (
@@ -116,13 +136,15 @@ export const Field = ({
 				width={widthMm}
 				onClick={(e) => {
 					if (rectRef.current === null) return
-					const box = rectRef.current.getBoundingClientRect()
-					const relativeXPosition = (e.clientX - box.left) / box.width
-					const relativeYPosition = (e.clientY - box.top) / box.height
-					onClick({
-						xMm: relativeXPosition * widthMm,
-						yMm: relativeYPosition * heightMm,
-					})
+					onClick?.(getMouseCoordinates(rectRef.current, e))
+				}}
+				onMouseMove={(e) => {
+					if (rectRef.current === null) return
+					onMouseMove?.(getMouseCoordinates(rectRef.current, e))
+				}}
+				onMouseUp={(e) => {
+					if (rectRef.current === null) return
+					onMouseUp?.(getMouseCoordinates(rectRef.current, e))
 				}}
 			/>
 			{children}

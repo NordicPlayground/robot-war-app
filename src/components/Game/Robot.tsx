@@ -15,6 +15,9 @@ export const Robot = ({
 	onRotate,
 	onClick,
 	outline,
+	desiredDriveTime,
+	onMouseDown,
+	onMouseUp,
 }: {
 	id: string
 	xMm: number
@@ -27,7 +30,10 @@ export const Robot = ({
 	colorHex: string
 	onRotate: (rotateDeg: number) => void
 	onClick?: () => void
+	onMouseDown?: () => void
+	onMouseUp?: () => void
 	outline?: boolean
+	desiredDriveTime?: number
 }) => {
 	// Construct points for a triangle.
 	const points: [number, number][] = []
@@ -38,10 +44,25 @@ export const Robot = ({
 	// Right corner
 	points.push([xMm + widthMm / 2, yMm + heightMm / 2])
 
+	// drive time
+	const driveTimeLine: [number] = [xMm + widthMm / 2]
+	driveTimeLine.push(yMm)
+	driveTimeLine.push(xMm + widthMm / 2 + (desiredDriveTime ?? 0))
+	driveTimeLine.push(yMm)
+
 	const gradientId = nanoid()
 
 	return (
-		<g>
+		<g
+			onMouseDown={(e) => {
+				e.stopPropagation()
+				onMouseDown?.()
+			}}
+			onMouseUp={(e) => {
+				e.stopPropagation()
+				onMouseUp?.()
+			}}
+		>
 			<defs>
 				<linearGradient id={gradientId} gradientTransform="rotate(90)">
 					<stop
@@ -60,6 +81,27 @@ export const Robot = ({
 					/>
 				</linearGradient>
 			</defs>
+			{desiredRotationDeg !== undefined && (
+				<g transform={`rotate(${desiredRotationDeg}, ${xMm}, ${yMm})`}>
+					<path
+						d={`M${xMm} ${yMm} L${xMm} ${
+							yMm + widthMm * 4 * (desiredDriveBudgetPercent ?? 1)
+						}`}
+						style={{
+							fill: `none`,
+							stroke: 'green',
+							strokeWidth: 4,
+							strokeLinecap: 'butt',
+							strokeLinejoin: 'miter',
+							strokeOpacity: 1,
+							strokeMiterlimit: 4,
+							strokeDasharray: '4,4',
+							strokeDashoffset: 0,
+						}}
+					/>
+				</g>
+			)}
+
 			{desiredRotationDeg !== undefined && (
 				<g transform={`rotate(${desiredRotationDeg}, ${xMm}, ${yMm})`}>
 					<path

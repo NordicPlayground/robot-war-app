@@ -4,6 +4,7 @@ import { Form } from 'components/Game/Form'
 import { Robot } from 'components/Game/Robot'
 import { useGameAdmin } from 'hooks/useGameAdmin'
 import { RobotCommand, useGameController } from 'hooks/useGameController'
+import { useRobotActionGesture } from 'hooks/useRobotActionGesture'
 import { useEffect, useState } from 'react'
 import { shortestRotation } from 'utils/shortestRotation'
 
@@ -24,6 +25,11 @@ export const Game = () => {
 	const {
 		metaData: { robotFieldPosition },
 	} = useGameAdmin()
+	const {
+		start: startRobotGesture,
+		end: endRobotGesture,
+		updateMousePosition,
+	} = useRobotActionGesture()
 
 	const [robotCommands, setRobotCommands] =
 		useState<Record<string, RobotCommand>>(nextRoundCommands)
@@ -31,6 +37,38 @@ export const Game = () => {
 	useEffect(() => {
 		setRobotCommands(nextRoundCommands)
 	}, [nextRoundCommands])
+
+	const updateRobotCommandFromGesture = ({
+		mac,
+		angleDeg,
+		driveTimeMs,
+	}: {
+		mac: string
+		angleDeg: number
+		driveTimeMs: number
+	}) => {
+		const reportedAngle = robotFieldPosition[mac]?.rotationDeg ?? 0
+		const nextRobotCommand: RobotCommand = robotCommands[mac] ?? {
+			angleDeg: 0,
+			driveTimeMs: 0,
+		}
+		setRobotCommands((commands) => ({
+			...commands,
+			[mac]: {
+				...nextRobotCommand,
+				angleDeg: shortestRotation(angleDeg - reportedAngle),
+				driveTimeMs,
+			},
+		}))
+	}
+
+	const [activeRobot, setActiveRobot] = useState<string>()
+	const handleRobotGestureEnd = () => {
+		if (activeRobot === undefined) return
+		const { angleDeg, driveTimeMs } = endRobotGesture()
+		updateRobotCommandFromGesture({ mac: activeRobot, angleDeg, driveTimeMs })
+		setActiveRobot(undefined)
+	}
 
 	return (
 		<>
@@ -54,8 +92,19 @@ export const Game = () => {
 					onClick={(position) => {
 						console.debug(`User clicked on field at`, position)
 					}}
+					onMouseMove={(position) => {
+						if (activeRobot === undefined) return
+						updateRobotCommandFromGesture({
+							mac: activeRobot,
+							...updateMousePosition({
+								x: position.xMm,
+								y: position.yMm,
+							}),
+						})
+					}}
+					onMouseUp={handleRobotGestureEnd}
 				>
-					{Object.values(gameState.robots).map(({ mac, angleDeg }) => {
+					{Object.values(gameState.robots).map(({ mac }) => {
 						const nextRobotCommand: RobotCommand = robotCommands[mac] ?? {
 							angleDeg: 0,
 							driveTimeMs: 0,
@@ -66,6 +115,7 @@ export const Game = () => {
 							xMm: 0,
 							yMm: 0,
 						}
+
 						// FIXME: use fixed color per team
 						const colorHex = randomColor()
 
@@ -80,20 +130,25 @@ export const Game = () => {
 								colorHex={colorHex}
 								rotationDeg={rotationDeg}
 								desiredRotationDeg={rotationDeg + nextRobotCommand.angleDeg}
+								desiredDriveTime={nextRobotCommand.driveTimeMs}
 								desiredDriveBudgetPercent={
 									(nextRobotCommand.driveTimeMs ?? 0) / 1000
 								}
-								onRotate={(rotation) => {
-									setRobotCommands((commands) => ({
-										...commands,
-										[mac]: {
-											...nextRobotCommand,
-											angleDeg: shortestRotation(
-												nextRobotCommand.angleDeg + rotation,
-											),
-										},
-									}))
+								onRotate={(angleDeg) =>
+									updateRobotCommandFromGesture({
+										mac,
+										angleDeg,
+										driveTimeMs: nextRobotCommand.driveTimeMs,
+									})
+								}
+								onMouseDown={() => {
+									startRobotGesture({
+										x: xMm,
+										y: yMm,
+									})
+									setActiveRobot(mac)
 								}}
+								onMouseUp={handleRobotGestureEnd}
 							/>
 						)
 					})}
