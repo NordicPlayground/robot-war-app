@@ -4,6 +4,7 @@ on: push
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  CNAME: ${{ secrets.CNAME }}
 
 jobs:
   test-and-release:
@@ -47,10 +48,11 @@ jobs:
         run: |
           echo "machine github.com login accesskey password ${{ secrets.GITHUB_TOKEN }}" > ~/.netrc
           git config --global user.email "actions@example.com"
-          git config --global user.name "GitHub Actions"
+          git config --global user.name "github-actions[bot]"
           git config --global init.defaultBranch gh-pages
           cd build
           touch .nojekyll
+          echo ${{ env.CNAME }} > CNAME
           git init
           git add -A
           git commit -m "update web app"
