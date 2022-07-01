@@ -37,6 +37,7 @@ export const Admin = () => {
 
 	const [robots, setRobots] = useState<RobotFieldConfig>({})
 	const [selectedRobot, setSelectedRobot] = useState<string>()
+	//console.log(gameState)
 
 	useEffect(() => {
 		const defaultRobotConfig: RobotFieldConfig = {}
@@ -125,18 +126,19 @@ export const Admin = () => {
 					onSubmit={(e) => {
 						e.preventDefault()
 					}}
+				></form>
+			</div>
+			<div>
+				<button
+					className="btn btn-secondary"
+					type="button"
+					disabled={selectedRobot === undefined}
+					onClick={() => {
+						setSelectedRobot(undefined)
+					}}
 				>
-					<button
-						className="btn btn-secondary"
-						type="button"
-						disabled={selectedRobot === undefined}
-						onClick={() => {
-							setSelectedRobot(undefined)
-						}}
-					>
-						cancel
-					</button>
-				</form>
+					cancel
+				</button>
 			</div>
 			<div>
 				<TeamAssigner />
