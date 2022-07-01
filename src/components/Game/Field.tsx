@@ -7,16 +7,16 @@ export const Field = ({
 	widthMm,
 	onClick,
 	children,
-	onMouseMove,
-	onMouseUp,
+	onPointerMove,
+	onPointerUp,
 }: PropsWithChildren<{
 	numberOfHelperLines: number
 	startZoneSizeMm: number
 	heightMm: number
 	widthMm: number
 	onClick?: (args: { xMm: number; yMm: number }) => void
-	onMouseMove?: (args: { xMm: number; yMm: number }) => void
-	onMouseUp?: (args: { xMm: number; yMm: number }) => void
+	onPointerMove?: (args: { xMm: number; yMm: number }) => void
+	onPointerUp?: (args: { xMm: number; yMm: number }) => void
 }>) => {
 	const rectRef = useRef<SVGRectElement>(null)
 
@@ -138,13 +138,13 @@ export const Field = ({
 					if (rectRef.current === null) return
 					onClick?.(getMouseCoordinates(rectRef.current, e))
 				}}
-				onMouseMove={(e) => {
+				onPointerMove={(e) => {
 					if (rectRef.current === null) return
-					onMouseMove?.(getMouseCoordinates(rectRef.current, e))
+					onPointerMove?.(getMouseCoordinates(rectRef.current, e))
 				}}
-				onMouseUp={(e) => {
+				onPointerUp={(e) => {
 					if (rectRef.current === null) return
-					onMouseUp?.(getMouseCoordinates(rectRef.current, e))
+					onPointerUp?.(getMouseCoordinates(rectRef.current, e))
 				}}
 			/>
 			{children}

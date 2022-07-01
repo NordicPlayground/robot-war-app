@@ -16,8 +16,8 @@ export const Robot = ({
 	onClick,
 	outline,
 	desiredDriveTime,
-	onMouseDown,
-	onMouseUp,
+	onPointerDown,
+	onPointerUp,
 }: {
 	id: string
 	xMm: number
@@ -30,8 +30,8 @@ export const Robot = ({
 	colorHex: string
 	onRotate: (rotateDeg: number) => void
 	onClick?: () => void
-	onMouseDown?: (args: { x: number; y: number }) => void
-	onMouseUp?: () => void
+	onPointerDown?: (args: { x: number; y: number }) => void
+	onPointerUp?: () => void
 	outline?: boolean
 	desiredDriveTime?: number
 }) => {
@@ -66,13 +66,13 @@ export const Robot = ({
 
 	return (
 		<g
-			onMouseDown={(e) => {
+			onPointerDown={(e) => {
 				e.stopPropagation()
-				onMouseDown?.(getMouseCoordinates(e))
+				onPointerDown?.(getMouseCoordinates(e))
 			}}
-			onMouseUp={(e) => {
+			onPointerUp={(e) => {
 				e.stopPropagation()
-				onMouseUp?.()
+				onPointerUp?.()
 			}}
 		>
 			<defs>

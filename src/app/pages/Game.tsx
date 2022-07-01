@@ -74,7 +74,7 @@ export const Game = () => {
 		<>
 			<div
 				role={'presentation'}
-				onMouseMove={(e) => {
+				onPointerMove={(e) => {
 					if (activeRobot === undefined) return
 					updateRobotCommandFromGesture({
 						mac: activeRobot,
@@ -84,7 +84,7 @@ export const Game = () => {
 						}),
 					})
 				}}
-				onMouseUp={handleRobotGestureEnd}
+				onPointerUp={handleRobotGestureEnd}
 			>
 				<div>
 					<button
@@ -144,14 +144,14 @@ export const Game = () => {
 											driveTimeMs: nextRobotCommand.driveTimeMs,
 										})
 									}
-									onMouseDown={(args) => {
+									onPointerDown={(args) => {
 										startRobotGesture({
 											x: args.x,
 											y: args.y,
 										})
 										setActiveRobot(mac)
 									}}
-									onMouseUp={handleRobotGestureEnd}
+									onPointerUp={handleRobotGestureEnd}
 								/>
 							)
 						})}
