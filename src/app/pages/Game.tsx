@@ -72,93 +72,97 @@ export const Game = () => {
 
 	return (
 		<>
-			<div>
-				<button
-					type="button"
-					className="btn btn-danger"
-					onClick={() => {
-						setNextRoundCommands(robotCommands)
-					}}
-				>
-					Fight!
-				</button>
+			<div
+				role={'presentation'}
+				onMouseMove={(e) => {
+					if (activeRobot === undefined) return
+					updateRobotCommandFromGesture({
+						mac: activeRobot,
+						...updateMousePosition({
+							x: e.clientX,
+							y: e.clientY,
+						}),
+					})
+				}}
+				onMouseUp={handleRobotGestureEnd}
+			>
+				<div>
+					<button
+						type="button"
+						className="btn btn-danger"
+						onClick={() => {
+							setNextRoundCommands(robotCommands)
+						}}
+					>
+						Fight!
+					</button>
+				</div>
+				<div className={style.field}>
+					<Field
+						heightMm={fieldHeightMm}
+						widthMm={fieldWidthMm}
+						numberOfHelperLines={3}
+						startZoneSizeMm={startZoneSizeMm}
+						onClick={(position) => {
+							console.debug(`User clicked on field at`, position)
+						}}
+					>
+						{Object.values(gameState.robots).map(({ mac }) => {
+							const nextRobotCommand: RobotCommand = robotCommands[mac] ?? {
+								angleDeg: 0,
+								driveTimeMs: 0,
+							}
+
+							const { rotationDeg, xMm, yMm } = robotFieldPosition[mac] ?? {
+								rotationDeg: 0,
+								xMm: 0,
+								yMm: 0,
+							}
+
+							// FIXME: use fixed color per team
+							const colorHex = randomColor()
+
+							return (
+								<Robot
+									key={mac}
+									id={mac}
+									xMm={xMm}
+									yMm={yMm}
+									widthMm={robotWidthMM}
+									heightMm={robotLengthMm}
+									colorHex={colorHex}
+									rotationDeg={rotationDeg}
+									desiredRotationDeg={rotationDeg + nextRobotCommand.angleDeg}
+									desiredDriveTime={nextRobotCommand.driveTimeMs}
+									desiredDriveBudgetPercent={
+										(nextRobotCommand.driveTimeMs ?? 0) / 1000
+									}
+									onRotate={(angleDeg) =>
+										updateRobotCommandFromGesture({
+											mac,
+											angleDeg,
+											driveTimeMs: nextRobotCommand.driveTimeMs,
+										})
+									}
+									onMouseDown={(args) => {
+										startRobotGesture({
+											x: args.x,
+											y: args.y,
+										})
+										setActiveRobot(mac)
+									}}
+									onMouseUp={handleRobotGestureEnd}
+								/>
+							)
+						})}
+					</Field>
+				</div>
+				<Form
+					commands={robotCommands}
+					onUpdateCommands={setRobotCommands}
+					key={JSON.stringify(robotCommands)}
+				/>
 			</div>
-			<div className={style.field}>
-				<Field
-					heightMm={fieldHeightMm}
-					widthMm={fieldWidthMm}
-					numberOfHelperLines={3}
-					startZoneSizeMm={startZoneSizeMm}
-					onClick={(position) => {
-						console.debug(`User clicked on field at`, position)
-					}}
-					onMouseMove={(position) => {
-						if (activeRobot === undefined) return
-						updateRobotCommandFromGesture({
-							mac: activeRobot,
-							...updateMousePosition({
-								x: position.xMm,
-								y: position.yMm,
-							}),
-						})
-					}}
-					onMouseUp={handleRobotGestureEnd}
-				>
-					{Object.values(gameState.robots).map(({ mac }) => {
-						const nextRobotCommand: RobotCommand = robotCommands[mac] ?? {
-							angleDeg: 0,
-							driveTimeMs: 0,
-						}
-
-						const { rotationDeg, xMm, yMm } = robotFieldPosition[mac] ?? {
-							rotationDeg: 0,
-							xMm: 0,
-							yMm: 0,
-						}
-
-						// FIXME: use fixed color per team
-						const colorHex = randomColor()
-
-						return (
-							<Robot
-								key={mac}
-								id={mac}
-								xMm={xMm}
-								yMm={yMm}
-								widthMm={robotWidthMM}
-								heightMm={robotLengthMm}
-								colorHex={colorHex}
-								rotationDeg={rotationDeg}
-								desiredRotationDeg={rotationDeg + nextRobotCommand.angleDeg}
-								desiredDriveTime={nextRobotCommand.driveTimeMs}
-								desiredDriveBudgetPercent={
-									(nextRobotCommand.driveTimeMs ?? 0) / 1000
-								}
-								onRotate={(angleDeg) =>
-									updateRobotCommandFromGesture({
-										mac,
-										angleDeg,
-										driveTimeMs: nextRobotCommand.driveTimeMs,
-									})
-								}
-								onMouseDown={() => {
-									startRobotGesture({
-										x: xMm,
-										y: yMm,
-									})
-									setActiveRobot(mac)
-								}}
-								onMouseUp={handleRobotGestureEnd}
-							/>
-						)
-					})}
-				</Field>
-			</div>
-			<Form
-				commands={robotCommands}
-				onUpdateCommands={setRobotCommands}
-				key={JSON.stringify(robotCommands)}
-			/>
 		</>
 	)
 }
