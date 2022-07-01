@@ -30,7 +30,7 @@ export const Robot = ({
 	colorHex: string
 	onRotate: (rotateDeg: number) => void
 	onClick?: () => void
-	onMouseDown?: () => void
+	onMouseDown?: (args: { x: number; y: number }) => void
 	onMouseUp?: () => void
 	outline?: boolean
 	desiredDriveTime?: number
@@ -52,11 +52,23 @@ export const Robot = ({
 
 	const gradientId = nanoid()
 
+	const getMouseCoordinates = (
+		e: React.MouseEvent<SVGGElement, MouseEvent>,
+	): {
+		x: number
+		y: number
+	} => {
+		return {
+			x: e.clientX,
+			y: e.clientY,
+		}
+	}
+
 	return (
 		<g
 			onMouseDown={(e) => {
 				e.stopPropagation()
-				onMouseDown?.()
+				onMouseDown?.(getMouseCoordinates(e))
 			}}
 			onMouseUp={(e) => {
 				e.stopPropagation()
