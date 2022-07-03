@@ -4,6 +4,7 @@ import { Game } from 'app/pages/Game'
 import { GameControllers } from 'app/pages/GameControllers'
 import { Settings } from 'app/pages/Settings'
 import { Navbar } from 'components/Navbar'
+import { RedirectFrom404 } from 'components/RedirectFrom404'
 import { useAppConfig } from 'hooks/useAppConfig'
 import {
 	BrowserRouter as Router,
@@ -26,6 +27,7 @@ export const App = () => {
 				<Route path="/settings" element={<Settings />} />
 				<Route path="/about" element={<About />} />
 			</Routes>
+			<RedirectFrom404 />
 		</Router>
 	)
 }
