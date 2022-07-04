@@ -5,6 +5,7 @@ import { Robot } from 'components/Game/Robot'
 import { useGameAdmin } from 'hooks/useGameAdmin'
 import { RobotCommand, useGameController } from 'hooks/useGameController'
 import { useRobotActionGesture } from 'hooks/useRobotActionGesture'
+import { useScrollBlock } from 'hooks/useScrollBlock'
 import { useEffect, useState } from 'react'
 import { shortestRotation } from 'utils/shortestRotation'
 
@@ -62,9 +63,11 @@ export const Game = () => {
 		}))
 	}
 
+	const [blockScroll, allowScroll] = useScrollBlock()
 	const [activeRobot, setActiveRobot] = useState<string>()
 	const handleRobotGestureEnd = () => {
 		if (activeRobot === undefined) return
+		allowScroll()
 		const { angleDeg, driveTimeMs } = endRobotGesture()
 		updateRobotCommandFromGesture({ mac: activeRobot, angleDeg, driveTimeMs })
 		setActiveRobot(undefined)
@@ -74,7 +77,7 @@ export const Game = () => {
 		<>
 			<div
 				role={'presentation'}
-				onMouseMove={(e) => {
+				onPointerMove={(e) => {
 					if (activeRobot === undefined) return
 					updateRobotCommandFromGesture({
 						mac: activeRobot,
@@ -84,7 +87,7 @@ export const Game = () => {
 						}),
 					})
 				}}
-				onMouseUp={handleRobotGestureEnd}
+				onPointerUp={handleRobotGestureEnd}
 			>
 				<div>
 					<button
@@ -144,14 +147,15 @@ export const Game = () => {
 											driveTimeMs: nextRobotCommand.driveTimeMs,
 										})
 									}
-									onMouseDown={(args) => {
+									onPointerDown={(args) => {
+										blockScroll()
 										startRobotGesture({
 											x: args.x,
 											y: args.y,
 										})
 										setActiveRobot(mac)
 									}}
-									onMouseUp={handleRobotGestureEnd}
+									onPointerUp={handleRobotGestureEnd}
 								/>
 							)
 						})}
