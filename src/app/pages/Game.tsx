@@ -7,6 +7,7 @@ import { RobotCommand, useGameController } from 'hooks/useGameController'
 import { useRobotActionGesture } from 'hooks/useRobotActionGesture'
 import { useScrollBlock } from 'hooks/useScrollBlock'
 import { useEffect, useState } from 'react'
+import { helperLinesNumber } from 'utils/constants'
 import { shortestRotation } from 'utils/shortestRotation'
 
 const randomColor = () =>
@@ -104,7 +105,7 @@ export const Game = () => {
 					<Field
 						heightMm={fieldHeightMm}
 						widthMm={fieldWidthMm}
-						numberOfHelperLines={3}
+						numberOfHelperLines={helperLinesNumber}
 						startZoneSizeMm={startZoneSizeMm}
 						onClick={(position) => {
 							console.debug(`User clicked on field at`, position)

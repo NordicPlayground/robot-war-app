@@ -5,6 +5,7 @@ import { Robot } from 'components/Game/Robot'
 import { useGameAdmin } from 'hooks/useGameAdmin'
 import { useGameController } from 'hooks/useGameController'
 import { useEffect, useState } from 'react'
+import { helperLinesNumber } from 'utils/constants'
 
 const randomColor = () =>
 	`#${Math.floor(Math.random() * 16777215)
@@ -64,7 +65,7 @@ export const Admin = () => {
 				<Field
 					heightMm={fieldHeightMm}
 					widthMm={fieldWidthMm}
-					numberOfHelperLines={3}
+					numberOfHelperLines={helperLinesNumber}
 					startZoneSizeMm={startZoneSizeMm}
 					onClick={({ xMm, yMm }) => {
 						if (selectedRobot !== undefined) {
