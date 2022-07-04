@@ -7,13 +7,8 @@ import { RobotCommand, useGameController } from 'hooks/useGameController'
 import { useRobotActionGesture } from 'hooks/useRobotActionGesture'
 import { useScrollBlock } from 'hooks/useScrollBlock'
 import { useEffect, useState } from 'react'
-import { helperLinesNumber } from 'utils/constants'
+import { helperLinesNumber, randomColor } from 'utils/constants'
 import { shortestRotation } from 'utils/shortestRotation'
-
-const randomColor = () =>
-	`#${Math.floor(Math.random() * 16777215)
-		.toString(16)
-		.padEnd(6, '0')}`
 
 export const Game = () => {
 	const fieldWidthMm = 1500
