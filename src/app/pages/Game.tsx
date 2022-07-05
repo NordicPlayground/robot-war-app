@@ -2,6 +2,7 @@ import style from 'app/pages/Game.module.css'
 import { Field } from 'components/Game/Field'
 import { Form } from 'components/Game/Form'
 import { Robot } from 'components/Game/Robot'
+import { SelectTeam } from 'components/SelectTeam'
 import { useGameAdmin } from 'hooks/useGameAdmin'
 import { RobotCommand, useGameController } from 'hooks/useGameController'
 import { useRobotActionGesture } from 'hooks/useRobotActionGesture'
@@ -17,7 +18,7 @@ export const Game = () => {
 	const robotWidthMM = 65
 	const robotLengthMm = 90
 
-	const { gameState, setNextRoundCommands, nextRoundCommands } =
+	const { gameState, setNextRoundCommands, nextRoundCommands, selectedTeam } =
 		useGameController()
 	const {
 		metaData: { robotFieldPosition },
@@ -85,6 +86,8 @@ export const Game = () => {
 				}}
 				onPointerUp={handleRobotGestureEnd}
 			>
+				<>{selectedTeam !== undefined ? <SelectTeam /> : null}</>
+
 				<div>
 					<button
 						type="button"

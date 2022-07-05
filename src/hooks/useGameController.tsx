@@ -37,13 +37,16 @@ type ReportedGameStateWithMac = ReportedGameState & {
 	>
 }
 
+// TODO: Set correct types
 export const GameControllerContext = createContext<{
 	gameState: ReportedGameStateWithMac
 	nextRoundCommands: Record<string, RobotCommand>
 	teamsName: Record<'name', string>[]
+	selectedTeam: string | undefined
 	setNextRoundCommands: (commands: Record<string, RobotCommand>) => void
 	setAutoUpdate: (update: boolean) => void
-	setTeamsName: (value: Record<'name', string>[]) => void
+	setTeamsName: (value: any) => void // Record<'name', string>[]
+	setSelectedTeam: (value: string) => void
 }>({
 	gameState: {
 		round: 1,
@@ -51,9 +54,11 @@ export const GameControllerContext = createContext<{
 	},
 	nextRoundCommands: {},
 	teamsName: [],
+	selectedTeam: undefined,
 	setNextRoundCommands: () => undefined,
 	setAutoUpdate: () => undefined,
 	setTeamsName: () => undefined,
+	setSelectedTeam: () => undefined,
 })
 
 export const useGameController = () => useContext(GameControllerContext)
@@ -72,6 +77,7 @@ export const GameControllerProvider: FunctionComponent<{
 		Record<string, RobotCommand>
 	>({})
 	const [teamsName, setTeamsName] = useState<{ name: string }[]>([])
+	const [selectedTeam, setSelectedTeam] = useState<string>()
 
 	let iotDataPlaneClient: IoTDataPlaneClient | undefined = undefined
 	let commandHandler: (commands: Record<string, RobotCommand>) => void = () =>
@@ -175,12 +181,14 @@ export const GameControllerProvider: FunctionComponent<{
 				gameState,
 				nextRoundCommands,
 				teamsName,
+				selectedTeam,
 				setNextRoundCommands: (commands) => {
 					commandHandler(commands)
 					updateNextRoundCommands(commands)
 				},
 				setAutoUpdate,
 				setTeamsName,
+				setSelectedTeam,
 			}}
 		>
 			{children}
