@@ -1,0 +1,44 @@
+.modal {
+    display: block;
+    position: fixed;
+    z-index: 1;
+    padding-top: 100px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(255, 255, 255, 0.3);
+    line-height: 1;
+    backdrop-filter: blur(7px);
+}
+
+.title {
+    text-align: center;
+}
+
+.modalContent:hover {
+    background-color: rgba(255, 255, 255, 1);
+}
+
+.modalContent {
+    background-color: rgba(255, 255, 255, 0.600);
+    margin: auto;
+    padding: 20px;
+    border: 4px solid rgb(35, 47, 62);
+    width: 80%;
+}
+
+.close {
+    color: #aaaaaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
