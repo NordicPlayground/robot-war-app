@@ -14,7 +14,7 @@ import { validateGameControllerShadow } from 'api/validateGameControllerShadow.j
 export type DesiredRobot = Static<typeof DesiredRobotSchema>
 export type ReportedRobot = Static<typeof ReportedRobotSchema>
 
-export const updateGatewayController =
+export const updateGateway =
 	({
 		iotData,
 		controllerThingName,
