@@ -24,6 +24,25 @@ export const GameControllers = () => {
 		})
 	}
 
+	// TODO: explain how the user can select a game controller
+	if (gameControllerThing === undefined)
+		return (
+			<Main>
+				<div className="alert alert-danger">
+					Help! No game controller selected!
+				</div>
+			</Main>
+		)
+
+	if (iotDataPlaneClient === undefined)
+		return (
+			<Main>
+				<div className="alert alert-danger">
+					Help! No AWS credentials defined!
+				</div>
+			</Main>
+		)
+
 	return (
 		<Main>
 			<div className="card">
@@ -36,7 +55,7 @@ export const GameControllers = () => {
 								await sendReportedMessage(
 									robotCommands,
 									gameControllerThing,
-									iotDataPlaneClient,
+									iotDataPlaneClient as IoTDataPlaneClient,
 								)
 							}}
 						>
@@ -50,7 +69,7 @@ export const GameControllers = () => {
 							onClick={async () => {
 								await getReportedForSimulator(
 									gameControllerThing,
-									iotDataPlaneClient,
+									iotDataPlaneClient as IoTDataPlaneClient,
 								)
 							}}
 						>

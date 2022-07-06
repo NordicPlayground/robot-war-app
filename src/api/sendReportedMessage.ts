@@ -8,11 +8,9 @@ import type { ReportedGameState } from 'api/validateGameControllerShadow'
 
 export const sendReportedMessage = async (
 	reportedCommand: Static<typeof ReportedGameState>,
-	gameControllerThing?: string,
-	iotDataPlaneClient?: IoTDataPlaneClient,
+	gameControllerThing: string,
+	iotDataPlaneClient: IoTDataPlaneClient,
 ): Promise<void> => {
-	if (gameControllerThing === undefined) return
-	if (iotDataPlaneClient === undefined) return
 	await iotDataPlaneClient
 		.send(
 			new UpdateThingShadowCommand({

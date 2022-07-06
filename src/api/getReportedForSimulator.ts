@@ -8,12 +8,9 @@ import { sendReportedMessage } from 'api/sendReportedMessage'
 import { validateGameControllerShadow } from 'api/validateGameControllerShadow'
 
 export const getReportedForSimulator = async (
-	gameControllerThing?: string,
-	iotDataPlaneClient?: IoTDataPlaneClient,
+	gameControllerThing: string,
+	iotDataPlaneClient: IoTDataPlaneClient,
 ): Promise<void> => {
-	if (gameControllerThing === undefined) return
-	if (iotDataPlaneClient === undefined) return
-
 	const currentShadow = await iotDataPlaneClient.send(
 		new GetThingShadowCommand({
 			thingName: gameControllerThing,
