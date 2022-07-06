@@ -2,14 +2,11 @@ import style from 'app/pages/Game.module.css'
 import { TeamAssigner } from 'components/Admin/TeamAssigner'
 import { Field } from 'components/Game/Field'
 import { Robot } from 'components/Game/Robot'
+import { useAppConfig } from 'hooks/useAppConfig'
 import { useGameAdmin } from 'hooks/useGameAdmin'
 import { useGameController } from 'hooks/useGameController'
 import { useEffect, useState } from 'react'
-
-const randomColor = () =>
-	`#${Math.floor(Math.random() * 16777215)
-		.toString(16)
-		.padEnd(6, '0')}`
+import { randomColor } from 'utils/randomColor'
 
 type RobotFieldConfig = Record<
 	string,
@@ -32,6 +29,8 @@ export const Admin = () => {
 		metaData: { robotFieldPosition, robotTeamAssignment },
 		setRobotPosition,
 	} = useGameAdmin()
+
+	const { helperLinesNumber } = useAppConfig()
 
 	const { gameState } = useGameController()
 
@@ -64,7 +63,7 @@ export const Admin = () => {
 				<Field
 					heightMm={fieldHeightMm}
 					widthMm={fieldWidthMm}
-					numberOfHelperLines={3}
+					numberOfHelperLines={helperLinesNumber}
 					startZoneSizeMm={startZoneSizeMm}
 					onClick={({ xMm, yMm }) => {
 						if (selectedRobot !== undefined) {

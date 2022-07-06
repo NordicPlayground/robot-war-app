@@ -2,17 +2,14 @@ import style from 'app/pages/Game.module.css'
 import { Field } from 'components/Game/Field'
 import { Form } from 'components/Game/Form'
 import { Robot } from 'components/Game/Robot'
+import { useAppConfig } from 'hooks/useAppConfig'
 import { useGameAdmin } from 'hooks/useGameAdmin'
 import { RobotCommand, useGameController } from 'hooks/useGameController'
 import { useRobotActionGesture } from 'hooks/useRobotActionGesture'
 import { useScrollBlock } from 'hooks/useScrollBlock'
 import { useEffect, useState } from 'react'
+import { randomColor } from 'utils/randomColor'
 import { shortestRotation } from 'utils/shortestRotation'
-
-const randomColor = () =>
-	`#${Math.floor(Math.random() * 16777215)
-		.toString(16)
-		.padEnd(6, '0')}`
 
 export const Game = () => {
 	const fieldWidthMm = 1500
@@ -20,6 +17,8 @@ export const Game = () => {
 	const startZoneSizeMm = 100
 	const robotWidthMM = 65
 	const robotLengthMm = 90
+
+	const { helperLinesNumber } = useAppConfig()
 
 	const { gameState, setNextRoundCommands, nextRoundCommands } =
 		useGameController()
@@ -104,7 +103,7 @@ export const Game = () => {
 					<Field
 						heightMm={fieldHeightMm}
 						widthMm={fieldWidthMm}
-						numberOfHelperLines={3}
+						numberOfHelperLines={helperLinesNumber}
 						startZoneSizeMm={startZoneSizeMm}
 						onClick={(position) => {
 							console.debug(`User clicked on field at`, position)

@@ -21,6 +21,7 @@ export const AppConfigContext = createContext<{
 		themeColor: string
 		backgroundColor: string
 	}
+	helperLinesNumber: number
 }>({
 	basename: import.meta.env.BASE_URL ?? '/',
 	version,
@@ -31,6 +32,7 @@ export const AppConfigContext = createContext<{
 		themeColor,
 		backgroundColor,
 	},
+	helperLinesNumber: 3,
 })
 
 export const useAppConfig = () => useContext(AppConfigContext)
