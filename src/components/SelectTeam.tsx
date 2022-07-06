@@ -10,6 +10,8 @@ import { useState } from 'react'
 export const SelectTeam = () => {
 	const { teamsName, setSelectedTeam, selectedTeam } = useGameController()
 	const [isTeamSelected, setIsTeamSelected] = useState<boolean>(false)
+	// TODO: set team name on welcome message
+	// const [teamName, setTeamName] = useState<string|undefined>(undefined)
 	const [seconds, start, reset] = useTimer()
 
 	const startCountDown = (teamName: string) => {
@@ -29,8 +31,12 @@ export const SelectTeam = () => {
 			{isTeamSelected ? (
 				seconds > 0 ? (
 					<Modal>
-						<h1 className={styles.title}>WELCOME PLAYER OF TEAM </h1>
-						<h1 className={styles.title}>{selectedTeam ?? ''}</h1>
+						<h1 className={styles.title}>WELCOME!</h1>
+						{/* 
+							TODO: set team name on welcome message
+							<h2 className={styles.title}>{teamName ?? ''}</h2>
+						*/}
+
 						<h2 className={styles.title}>
 							{' '}
 							You are gonna be redirected to the game in {seconds} seconds{' '}
@@ -49,7 +55,7 @@ export const SelectTeam = () => {
 					>
 						<option value="0">Select team</option>
 						{teamsName.map((team: Record<string, string>, index: number) => (
-							<option key={index} value={team.name}>
+							<option key={index} value={index + 1}>
 								{team.name}
 							</option>
 						))}
