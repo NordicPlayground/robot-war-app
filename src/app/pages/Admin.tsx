@@ -6,7 +6,7 @@ import { useAppConfig } from 'hooks/useAppConfig'
 import { useGameAdmin } from 'hooks/useGameAdmin'
 import { useGameController } from 'hooks/useGameController'
 import { useEffect, useState } from 'react'
-import { helperLinesNumber, randomColor } from 'utils/constants'
+import { randomColor } from 'utils/randomColor'
 
 type RobotFieldConfig = Record<
 	string,

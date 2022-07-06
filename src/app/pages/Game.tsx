@@ -8,7 +8,7 @@ import { RobotCommand, useGameController } from 'hooks/useGameController'
 import { useRobotActionGesture } from 'hooks/useRobotActionGesture'
 import { useScrollBlock } from 'hooks/useScrollBlock'
 import { useEffect, useState } from 'react'
-import { helperLinesNumber, randomColor } from 'utils/constants'
+import { randomColor } from 'utils/randomColor'
 import { shortestRotation } from 'utils/shortestRotation'
 
 export const Game = () => {
