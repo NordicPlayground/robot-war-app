@@ -37,15 +37,14 @@ type ReportedGameStateWithMac = ReportedGameState & {
 	>
 }
 
-// TODO: Set correct types
 export const GameControllerContext = createContext<{
 	gameState: ReportedGameStateWithMac
 	nextRoundCommands: Record<string, RobotCommand>
-	teamsName: Record<'name', string>[]
+	teamNameOptions: Record<'name', string>[]
 	selectedTeam: string | undefined
 	setNextRoundCommands: (commands: Record<string, RobotCommand>) => void
 	setAutoUpdate: (update: boolean) => void
-	setTeamsName: (value: any) => void // Record<'name', string>[]
+	addTeamNameOption: (value: string) => void
 	setSelectedTeam: (value: string) => void
 }>({
 	gameState: {
@@ -53,11 +52,11 @@ export const GameControllerContext = createContext<{
 		robots: {},
 	},
 	nextRoundCommands: {},
-	teamsName: [],
+	teamNameOptions: [],
 	selectedTeam: undefined,
 	setNextRoundCommands: () => undefined,
 	setAutoUpdate: () => undefined,
-	setTeamsName: () => undefined,
+	addTeamNameOption: () => undefined,
 	setSelectedTeam: () => undefined,
 })
 
@@ -76,7 +75,7 @@ export const GameControllerProvider: FunctionComponent<{
 	const [nextRoundCommands, updateNextRoundCommands] = useState<
 		Record<string, RobotCommand>
 	>({})
-	const [teamsName, setTeamsName] = useState<{ name: string }[]>([])
+	const [teamNameOptions, setTeamNameOptions] = useState<{ name: string }[]>([])
 	const [selectedTeam, setSelectedTeam] = useState<string>()
 
 	let iotDataPlaneClient: IoTDataPlaneClient | undefined = undefined
@@ -100,6 +99,13 @@ export const GameControllerProvider: FunctionComponent<{
 			iotData: iotDataPlaneClient,
 			controllerThingName: gameControllerThing,
 		})
+	}
+
+	const addTeamNameOption = (newName: string) => {
+		setTeamNameOptions((teamNameOptions) => [
+			...teamNameOptions,
+			{ name: newName },
+		])
 	}
 
 	// If a game controller thing is found, fetch the robot configuration
@@ -180,14 +186,14 @@ export const GameControllerProvider: FunctionComponent<{
 			value={{
 				gameState,
 				nextRoundCommands,
-				teamsName,
+				teamNameOptions,
 				selectedTeam,
 				setNextRoundCommands: (commands) => {
 					commandHandler(commands)
 					updateNextRoundCommands(commands)
 				},
 				setAutoUpdate,
-				setTeamsName,
+				addTeamNameOption,
 				setSelectedTeam,
 			}}
 		>

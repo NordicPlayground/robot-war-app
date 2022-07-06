@@ -8,7 +8,7 @@ import { useState } from 'react'
  ** Select the team from the user perspective
  */
 export const SelectTeam = () => {
-	const { teamsName, setSelectedTeam, selectedTeam } = useGameController()
+	const { teamNameOptions, setSelectedTeam, selectedTeam } = useGameController()
 	const [isTeamSelected, setIsTeamSelected] = useState<boolean>(false)
 	// TODO: set team name on welcome message
 	// const [teamName, setTeamName] = useState<string|undefined>(undefined)
@@ -36,11 +36,13 @@ export const SelectTeam = () => {
 					}}
 				>
 					<option value="0">Select team</option>
-					{teamsName.map((team: Record<string, string>, index: number) => (
-						<option key={index} value={index + 1}>
-							{team.name}
-						</option>
-					))}
+					{teamNameOptions.map(
+						(team: Record<string, string>, index: number) => (
+							<option key={index} value={index + 1}>
+								{team.name}
+							</option>
+						),
+					)}
 				</select>
 			</Modal>
 		)

@@ -3,7 +3,7 @@ import { useGameController } from 'hooks/useGameController'
 import { FunctionComponent, useState } from 'react'
 
 export const TeamAssigner: FunctionComponent = () => {
-	const { gameState, teamsName, setTeamsName } = useGameController()
+	const { gameState, teamNameOptions, addTeamNameOption } = useGameController()
 	const {
 		metaData: { robotTeamAssignment },
 		setRobotTeam,
@@ -26,7 +26,7 @@ export const TeamAssigner: FunctionComponent = () => {
 								onChange={(e) => setRobotTeam(robot.mac, e.target.value)}
 							>
 								<option value="0">Select team</option>
-								{teamsName.map(
+								{teamNameOptions.map(
 									(option: Record<string, string>, index: number) => (
 										<option key={index} value={index + 1}>
 											{option.name}
@@ -47,9 +47,8 @@ export const TeamAssigner: FunctionComponent = () => {
 			></input>
 			<button
 				className="btn btn-success"
-				// TODO: Set correct types
 				onClick={() => {
-					setTeamsName((commands: any[]) => [...commands, { name: inputValue }])
+					addTeamNameOption(inputValue)
 				}}
 			>
 				{' '}
@@ -58,7 +57,8 @@ export const TeamAssigner: FunctionComponent = () => {
 			<button
 				className="btn btn-danger"
 				onClick={() => {
-					setTeamsName([{ name: 'A' }, { name: 'B' }])
+					addTeamNameOption('A')
+					addTeamNameOption('B')
 				}}
 			>
 				{' '}
