@@ -1,4 +1,4 @@
-import { calculateReported } from 'api/updateGateway.js'
+import { calculateReported } from 'api/calculateReported.js'
 
 describe('calculateReported()', () => {
 	it('should calculate the updated reported shadow', () =>
