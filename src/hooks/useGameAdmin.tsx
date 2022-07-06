@@ -81,16 +81,7 @@ export const GameAdminProvider: FunctionComponent<{
 }> = ({ children }) => {
 	const [gameMetaData, setGameMetaData] = useState<GameMetadata>({
 		// Sample data
-		robotTeamAssignment: {
-			'00:25:96:FF:FE:12:34:51': 'A',
-			'00:25:96:FF:FE:12:34:52': 'A',
-			'00:25:96:FF:FE:12:34:53': 'A',
-			'00:25:96:FF:FE:12:34:54': 'A',
-			'00:25:96:FF:FE:12:34:55': 'B',
-			'00:25:96:FF:FE:12:34:56': 'B',
-			'00:25:96:FF:FE:12:34:57': 'B',
-			'00:25:96:FF:FE:12:34:58': 'B',
-		},
+		robotTeamAssignment: {},
 		robotFieldPosition: {},
 	})
 	const { thingName: gameAdminThing } = useGameControllerThing()

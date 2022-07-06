@@ -21,7 +21,7 @@ export const Game = () => {
 	const { gameState, setNextRoundCommands, nextRoundCommands, selectedTeam } =
 		useGameController()
 	const {
-		metaData: { robotFieldPosition },
+		metaData: { robotFieldPosition, robotTeamAssignment },
 	} = useGameAdmin()
 	const {
 		start: startRobotGesture,
@@ -110,6 +110,8 @@ export const Game = () => {
 						}}
 					>
 						{Object.values(gameState.robots).map(({ mac }) => {
+							const isSameTeam =
+								robotTeamAssignment[`${mac}`] === selectedTeam ? true : false
 							const nextRobotCommand: RobotCommand = robotCommands[mac] ?? {
 								angleDeg: 0,
 								driveTimeMs: 0,
@@ -122,7 +124,7 @@ export const Game = () => {
 							}
 
 							// FIXME: use fixed color per team
-							const colorHex = randomColor()
+							const colorHex = isSameTeam ? randomColor() : '#000000'
 
 							return (
 								<Robot
@@ -137,7 +139,7 @@ export const Game = () => {
 									desiredRotationDeg={rotationDeg + nextRobotCommand.angleDeg}
 									desiredDriveTime={nextRobotCommand.driveTimeMs}
 									desiredDriveBudgetPercent={
-										(nextRobotCommand.driveTimeMs ?? 0) / 1000
+										isSameTeam ? (nextRobotCommand.driveTimeMs ?? 0) / 1000 : 0
 									}
 									onRotate={(angleDeg) =>
 										updateRobotCommandFromGesture({
@@ -147,12 +149,14 @@ export const Game = () => {
 										})
 									}
 									onPointerDown={(args) => {
-										blockScroll()
-										startRobotGesture({
-											x: args.x,
-											y: args.y,
-										})
-										setActiveRobot(mac)
+										if (isSameTeam) {
+											blockScroll()
+											startRobotGesture({
+												x: args.x,
+												y: args.y,
+											})
+											setActiveRobot(mac)
+										}
 									}}
 									onPointerUp={handleRobotGestureEnd}
 								/>
