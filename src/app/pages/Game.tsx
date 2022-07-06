@@ -2,6 +2,7 @@ import style from 'app/pages/Game.module.css'
 import { Field } from 'components/Game/Field'
 import { Form } from 'components/Game/Form'
 import { Robot } from 'components/Game/Robot'
+import { useAppConfig } from 'hooks/useAppConfig'
 import { useGameAdmin } from 'hooks/useGameAdmin'
 import { RobotCommand, useGameController } from 'hooks/useGameController'
 import { useRobotActionGesture } from 'hooks/useRobotActionGesture'
@@ -15,11 +16,13 @@ const randomColor = () =>
 		.padEnd(6, '0')}`
 
 export const Game = () => {
-	const fieldWidthMm = 1500
-	const fieldHeightMm = 1000
-	const startZoneSizeMm = 100
-	const robotWidthMM = 65
-	const robotLengthMm = 90
+	const {
+		robotWidthMm,
+		robotLengthMm,
+		fieldHeightMm,
+		fieldWidthMm,
+		startZoneSizeMm,
+	} = useAppConfig()
 
 	const { gameState, setNextRoundCommands, nextRoundCommands } =
 		useGameController()
@@ -131,7 +134,7 @@ export const Game = () => {
 									id={mac}
 									xMm={xMm}
 									yMm={yMm}
-									widthMm={robotWidthMM}
+									widthMm={robotWidthMm}
 									heightMm={robotLengthMm}
 									colorHex={colorHex}
 									rotationDeg={rotationDeg}

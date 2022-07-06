@@ -21,6 +21,11 @@ export const AppConfigContext = createContext<{
 		themeColor: string
 		backgroundColor: string
 	}
+	robotWidthMm: number
+	robotLengthMm: number
+	fieldWidthMm: number
+	fieldHeightMm: number
+	startZoneSizeMm: number
 }>({
 	basename: import.meta.env.BASE_URL ?? '/',
 	version,
@@ -31,6 +36,11 @@ export const AppConfigContext = createContext<{
 		themeColor,
 		backgroundColor,
 	},
+	robotWidthMm: 100,
+	robotLengthMm: 120,
+	fieldWidthMm: 1500,
+	fieldHeightMm: 1000,
+	startZoneSizeMm: 100,
 })
 
 export const useAppConfig = () => useContext(AppConfigContext)

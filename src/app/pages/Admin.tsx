@@ -2,6 +2,7 @@ import style from 'app/pages/Game.module.css'
 import { TeamAssigner } from 'components/Admin/TeamAssigner'
 import { Field } from 'components/Game/Field'
 import { Robot } from 'components/Game/Robot'
+import { useAppConfig } from 'hooks/useAppConfig'
 import { useGameAdmin } from 'hooks/useGameAdmin'
 import { useGameController } from 'hooks/useGameController'
 import { useEffect, useState } from 'react'
@@ -22,14 +23,16 @@ type RobotFieldConfig = Record<
 >
 
 export const Admin = () => {
-	const fieldWidthMm = 1500
-	const fieldHeightMm = 1000
-	const startZoneSizeMm = 100
-	const robotWidthMM = 65
-	const robotLengthMm = 90
+	const {
+		robotWidthMm,
+		robotLengthMm,
+		fieldHeightMm,
+		fieldWidthMm,
+		startZoneSizeMm,
+	} = useAppConfig()
 
 	const {
-		metaData: { robotFieldPosition, robotTeamAssignment },
+		metaData: { robotFieldPosition },
 		setRobotPosition,
 	} = useGameAdmin()
 
@@ -56,7 +59,7 @@ export const Admin = () => {
 			}
 		}
 		setRobots(defaultRobotConfig)
-	}, [gameState, robotFieldPosition])
+	}, [gameState, robotFieldPosition, fieldHeightMm, fieldWidthMm])
 
 	return (
 		<div>
@@ -92,7 +95,7 @@ export const Admin = () => {
 								id={mac}
 								xMm={xMm}
 								yMm={yMm}
-								widthMm={robotWidthMM}
+								widthMm={robotWidthMm}
 								heightMm={robotLengthMm}
 								colorHex={colorHex}
 								outline={
