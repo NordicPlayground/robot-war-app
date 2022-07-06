@@ -19,7 +19,7 @@ export const Game = () => {
 	const robotWidthMM = 65
 	const robotLengthMm = 90
 
-	const { helperLinesNumber } = useAppConfig()
+	const { helperLinesNumber, defaultOponentColor } = useAppConfig()
 	const { gameState, setNextRoundCommands, nextRoundCommands, selectedTeam } =
 		useGameController()
 	const {
@@ -126,7 +126,7 @@ export const Game = () => {
 							}
 
 							// FIXME: use fixed color per team
-							const colorHex = isSameTeam ? randomColor() : '#000000'
+							const colorHex = isSameTeam ? randomColor() : defaultOponentColor
 
 							return (
 								<Robot
