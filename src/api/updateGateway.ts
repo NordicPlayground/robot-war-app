@@ -6,20 +6,15 @@ import {
 import { fromUtf8, toUtf8 } from '@aws-sdk/util-utf8-browser'
 import type { Static } from '@sinclair/typebox'
 import type {
-	DesiredGameState as DesiredGameStateSchema,
 	DesiredRobot as DesiredRobotSchema,
-	ReportedGameState as ReportedGameStateSchema,
 	ReportedRobot as ReportedRobotSchema,
 } from 'api/validateGameControllerShadow'
-import { validateGameControllerShadow } from 'api/validateGameControllerShadow'
-import type { RobotCommand } from 'hooks/useGameController'
+import { validateGameControllerShadow } from 'api/validateGameControllerShadow.js'
 
 export type DesiredRobot = Static<typeof DesiredRobotSchema>
 export type ReportedRobot = Static<typeof ReportedRobotSchema>
-export type ReportedGameState = Static<typeof ReportedGameStateSchema>
-export type DesiredGameState = Static<typeof DesiredGameStateSchema>
 
-export const updateGameController =
+export const updateGateway =
 	({
 		iotData,
 		controllerThingName,
@@ -27,7 +22,7 @@ export const updateGameController =
 		iotData: IoTDataPlaneClient
 		controllerThingName: string
 	}) =>
-	async (commands: Record<string, RobotCommand>): Promise<void> => {
+	async (): Promise<void> => {
 		const currentShadow = await iotData.send(
 			new GetThingShadowCommand({
 				thingName: controllerThingName,
@@ -56,32 +51,12 @@ export const updateGameController =
 		console.debug('Current desired', desired)
 		console.debug('Current reported', reported)
 
-		const reportedGameState = reported
 		const desiredGameState = desired ?? {
 			robots: {},
 		}
 
-		for (const [robotMac, command] of Object.entries(commands)) {
-			//commands is the commands we have sent, but how is it retrived?
-			console.log('commands: ', commands)
-			console.log('reportedGameState: ', reportedGameState.robots[robotMac])
-			const robot = reportedGameState.robots[robotMac]
-			if (robot === undefined) {
-				console.debug(`Robot ${robotMac} unknown!`)
-				continue
-			}
-			const updatedRobot: DesiredRobot = {
-				...robot,
-				angleDeg: robot.angleDeg + command.angleDeg,
-				driveTimeMs: command.driveTimeMs,
-			}
-			desiredGameState.robots = {
-				...(desiredGameState.robots ?? {}),
-				[robotMac]: updatedRobot,
-			}
-		}
-
 		console.debug('Updated desired', desiredGameState)
+		console.log('desired:', desiredGameState)
 
 		await iotData
 			.send(
@@ -90,7 +65,7 @@ export const updateGameController =
 					payload: fromUtf8(
 						JSON.stringify({
 							state: {
-								desired: desiredGameState,
+								reported: desiredGameState,
 							},
 						}),
 					),
