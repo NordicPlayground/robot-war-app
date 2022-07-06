@@ -37,3 +37,32 @@ allow re-use when changing the UI framework.
 You can then run the tests using
 
     npm test
+
+# Configurations to run the application
+
+The application relies on cloud communication and updates from actual robots to
+work correctly.
+
+1. First of all you need an AWS account, and you need to create a user to get an
+   AWS Access Key ID, AWS Secret Access Key and region.
+
+2. Then you need to clone and deploy the backend,
+   https://github.com/NordicPlayground/robot-war-cloud
+
+3. Then you can go to the Settings page on this application, and enter your AWS
+   Access Key ID and AWS Secret Access Key.
+
+4. To display the robots on the app, you need actual robots communicating with
+   the cloud. To get around this, you can simulate robots by following the next
+   steps
+
+#### To be able to run the application without robots:
+
+1. Go to the Game Controller page on the application, and send the first
+   reported message. This will simulate the existence of robots in the cloud,
+   which will display robots on the Admin page and Game page.
+
+2. If you want to continue the simulation and get feedback from the simulated
+   robots, press "SEND REPORTED" on the settings page. This will just update the
+   reported state of the robots with the desired robot commands that are set in
+   the game page after pressing the "Fight!" button.
