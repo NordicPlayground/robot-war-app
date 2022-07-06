@@ -24,44 +24,44 @@ export const SelectTeam = () => {
 		reset()
 	}
 
-	// TODO: remove nested ternary operator
+	if (!isTeamSelected) {
+		return (
+			<Modal>
+				<h1 className={styles.title}>SELECT YOUR TEAM</h1>
+				<select
+					className="form-select"
+					id={'teamSelection'}
+					onChange={(e) => {
+						startCountDown(e.target.value)
+					}}
+				>
+					<option value="0">Select team</option>
+					{teamsName.map((team: Record<string, string>, index: number) => (
+						<option key={index} value={index + 1}>
+							{team.name}
+						</option>
+					))}
+				</select>
+			</Modal>
+		)
+	}
 
 	return (
 		<>
-			{isTeamSelected ? (
-				seconds > 0 ? (
-					<Modal>
-						<h1 className={styles.title}>WELCOME!</h1>
-						{/* 
-							TODO: set team name on welcome message
-							<h2 className={styles.title}>{teamName ?? ''}</h2>
-						*/}
-
-						<h2 className={styles.title}>
-							{' '}
-							You are gonna be redirected to the game in {seconds} seconds{' '}
-						</h2>
-					</Modal>
-				) : null
-			) : (
+			{seconds > 0 ? (
 				<Modal>
-					<h1 className={styles.title}>SELECT YOUR TEAM</h1>
-					<select
-						className="form-select"
-						id={'teamSelection'}
-						onChange={(e) => {
-							startCountDown(e.target.value)
-						}}
-					>
-						<option value="0">Select team</option>
-						{teamsName.map((team: Record<string, string>, index: number) => (
-							<option key={index} value={index + 1}>
-								{team.name}
-							</option>
-						))}
-					</select>
+					<h1 className={styles.title}>WELCOME!</h1>
+					{/* 
+						TODO: set team name on welcome message
+						<h2 className={styles.title}>{teamName ?? ''}</h2>
+					*/}
+
+					<h2 className={styles.title}>
+						{' '}
+						You are gonna be redirected to the game in {seconds} seconds{' '}
+					</h2>
 				</Modal>
-			)}
+			) : null}
 		</>
 	)
 }
