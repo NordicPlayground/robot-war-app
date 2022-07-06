@@ -88,7 +88,7 @@ export const Game = () => {
 				}}
 				onPointerUp={handleRobotGestureEnd}
 			>
-				<>{selectedTeam !== undefined ? <SelectTeam /> : null}</>
+				<>{selectedTeam === undefined ? <SelectTeam /> : null}</>
 
 				<div>
 					<button
