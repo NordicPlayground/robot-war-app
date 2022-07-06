@@ -2,6 +2,7 @@ import style from 'app/pages/Game.module.css'
 import { TeamAssigner } from 'components/Admin/TeamAssigner'
 import { Field } from 'components/Game/Field'
 import { Robot } from 'components/Game/Robot'
+import { useAppConfig } from 'hooks/useAppConfig'
 import { useGameAdmin } from 'hooks/useGameAdmin'
 import { useGameController } from 'hooks/useGameController'
 import { useEffect, useState } from 'react'
@@ -28,6 +29,8 @@ export const Admin = () => {
 		metaData: { robotFieldPosition, robotTeamAssignment },
 		setRobotPosition,
 	} = useGameAdmin()
+
+	const { helperLinesNumber } = useAppConfig()
 
 	const { gameState } = useGameController()
 

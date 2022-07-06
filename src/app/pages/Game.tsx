@@ -2,6 +2,7 @@ import style from 'app/pages/Game.module.css'
 import { Field } from 'components/Game/Field'
 import { Form } from 'components/Game/Form'
 import { Robot } from 'components/Game/Robot'
+import { useAppConfig } from 'hooks/useAppConfig'
 import { useGameAdmin } from 'hooks/useGameAdmin'
 import { RobotCommand, useGameController } from 'hooks/useGameController'
 import { useRobotActionGesture } from 'hooks/useRobotActionGesture'
@@ -16,6 +17,8 @@ export const Game = () => {
 	const startZoneSizeMm = 100
 	const robotWidthMM = 65
 	const robotLengthMm = 90
+
+	const { helperLinesNumber } = useAppConfig()
 
 	const { gameState, setNextRoundCommands, nextRoundCommands } =
 		useGameController()
