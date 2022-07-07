@@ -33,6 +33,7 @@ export const Game = () => {
 
 	const [robotCommands, setRobotCommands] =
 		useState<Record<string, RobotCommand>>(nextRoundCommands)
+	const [selectedRobot, setSelectedRobot] = useState<string>()
 
 	useEffect(() => {
 		setRobotCommands(nextRoundCommands)
@@ -71,6 +72,7 @@ export const Game = () => {
 		updateRobotCommandFromGesture({ mac: activeRobot, angleDeg, driveTimeMs })
 		setActiveRobot(undefined)
 	}
+	const onPointerUp = {}
 
 	return (
 		<>
@@ -143,14 +145,15 @@ export const Game = () => {
 									desiredDriveBudgetPercent={
 										isSameTeam ? (nextRobotCommand.driveTimeMs ?? 0) / 1000 : 0
 									}
-									onRotate={(angleDeg) =>
-										updateRobotCommandFromGesture({
-											mac,
-											angleDeg,
-											driveTimeMs: nextRobotCommand.driveTimeMs,
-										})
+									outline={
+										selectedRobot !== undefined &&
+										selectedRobot !== mac &&
+										isSameTeam
+											? true
+											: false
 									}
 									onPointerDown={(args) => {
+										setSelectedRobot(mac)
 										if (isSameTeam) {
 											blockScroll()
 											startRobotGesture({
@@ -160,7 +163,13 @@ export const Game = () => {
 											setActiveRobot(mac)
 										}
 									}}
-									onPointerUp={handleRobotGestureEnd}
+									onRotate={() => {
+										console.log('onRotate')
+									}}
+									onPointerUp={() => {
+										handleRobotGestureEnd()
+										setSelectedRobot(undefined)
+									}}
 								/>
 							)
 						})}

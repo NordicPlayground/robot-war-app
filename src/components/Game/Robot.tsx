@@ -136,6 +136,23 @@ export const Robot = ({
 			)}
 			<g transform={`rotate(${rotationDeg}, ${xMm}, ${yMm})`}>
 				<polygon
+					style={{
+						fill: '#FF0000',
+						stroke: colorHex,
+						strokeWidth: 4,
+						opacity: 0,
+					}}
+					points={points.map((pointDef) => pointDef.join(',')).join(' ')}
+					onWheel={(e) => {
+						e.stopPropagation()
+						onRotate(e.deltaY > 0 ? 5 : -5)
+					}}
+					onClick={(e) => {
+						e.stopPropagation()
+						onClick?.()
+					}}
+				/>
+				<polygon
 					style={
 						outline ?? false
 							? {
@@ -149,7 +166,6 @@ export const Robot = ({
 									stroke: 'none',
 							  }
 					}
-					points={points.map((pointDef) => pointDef.join(',')).join(' ')}
 					onWheel={(e) => {
 						e.stopPropagation()
 						onRotate(e.deltaY > 0 ? 5 : -5)
@@ -158,6 +174,7 @@ export const Robot = ({
 						e.stopPropagation()
 						onClick?.()
 					}}
+					points={points.map((pointDef) => pointDef.join(',')).join(' ')}
 				/>
 			</g>
 			<text
