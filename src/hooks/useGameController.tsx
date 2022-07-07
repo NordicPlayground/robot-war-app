@@ -75,7 +75,10 @@ export const GameControllerProvider: FunctionComponent<{
 	const [nextRoundCommands, updateNextRoundCommands] = useState<
 		Record<string, RobotCommand>
 	>({})
-	const [teamNameOptions, setTeamNameOptions] = useState<{ name: string }[]>([])
+	const [teamNameOptions, setTeamNameOptions] = useState<{ name: string }[]>([
+		{ name: 'A' },
+		{ name: 'B' },
+	])
 	const [selectedTeam, setSelectedTeam] = useState<string>()
 
 	let iotDataPlaneClient: IoTDataPlaneClient | undefined = undefined
