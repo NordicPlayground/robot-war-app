@@ -46,6 +46,7 @@ export const GameControllerContext = createContext<{
 	setAutoUpdate: (update: boolean) => void
 	addTeamNameOption: (value: string) => void
 	setSelectedTeam: (value: string) => void
+	resetTeamNameOption: () => void
 }>({
 	gameState: {
 		round: 1,
@@ -58,6 +59,7 @@ export const GameControllerContext = createContext<{
 	setAutoUpdate: () => undefined,
 	addTeamNameOption: () => undefined,
 	setSelectedTeam: () => undefined,
+	resetTeamNameOption: () => undefined,
 })
 
 export const useGameController = () => useContext(GameControllerContext)
@@ -109,6 +111,10 @@ export const GameControllerProvider: FunctionComponent<{
 			...teamNameOptions,
 			{ name: newName },
 		])
+		console.log('!!! ', teamNameOptions)
+	}
+	const resetTeamNameOption = () => {
+		setTeamNameOptions([{ name: 'A' }, { name: 'B' }])
 	}
 
 	// If a game controller thing is found, fetch the robot configuration
@@ -198,6 +204,7 @@ export const GameControllerProvider: FunctionComponent<{
 				setAutoUpdate,
 				addTeamNameOption,
 				setSelectedTeam,
+				resetTeamNameOption,
 			}}
 		>
 			{children}

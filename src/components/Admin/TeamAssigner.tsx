@@ -3,11 +3,9 @@ import { useGameController } from 'hooks/useGameController'
 import { FunctionComponent, useState } from 'react'
 
 export const TeamAssigner: FunctionComponent = () => {
-	const { gameState, teamNameOptions, addTeamNameOption } = useGameController()
-	const {
-		metaData: { robotTeamAssignment },
-		setRobotTeam,
-	} = useGameAdmin()
+	const { gameState, teamNameOptions, addTeamNameOption, resetTeamNameOption } =
+		useGameController()
+	const { setRobotTeam } = useGameAdmin()
 	const [inputValue, setInputValue] = useState('')
 	const handleTeamInput = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setInputValue(e.target.value)
@@ -23,12 +21,14 @@ export const TeamAssigner: FunctionComponent = () => {
 							<select
 								className="form-select"
 								id={robot.mac}
-								onChange={(e) => setRobotTeam(robot.mac, e.target.value)}
+								onChange={(e) => {
+									setRobotTeam(robot.mac, e.target.value)
+								}}
 							>
 								<option value="0">Select team</option>
 								{teamNameOptions.map(
 									(option: Record<string, string>, index: number) => (
-										<option key={index} value={index + 1}>
+										<option key={index} value={option.name}>
 											{option.name}
 										</option>
 									),
@@ -57,8 +57,7 @@ export const TeamAssigner: FunctionComponent = () => {
 			<button
 				className="btn btn-danger"
 				onClick={() => {
-					addTeamNameOption('A')
-					addTeamNameOption('B')
+					resetTeamNameOption()
 				}}
 			>
 				{' '}
