@@ -2,7 +2,7 @@ import style from 'app/pages/Game.module.css'
 import { Field } from 'components/Game/Field'
 import { Form } from 'components/Game/Form'
 import { Robot } from 'components/Game/Robot'
-import { SelectTeam } from 'components/SelectTeam'
+import { TeamSelectionUser } from 'components/Game/TeamSelectionUser'
 import { useAppConfig } from 'hooks/useAppConfig'
 import { useGameAdmin } from 'hooks/useGameAdmin'
 import { RobotCommand, useGameController } from 'hooks/useGameController'
@@ -88,7 +88,7 @@ export const Game = () => {
 				}}
 				onPointerUp={handleRobotGestureEnd}
 			>
-				<>{selectedTeam === undefined ? <SelectTeam /> : null}</>
+				<>{selectedTeam === undefined ? <TeamSelectionUser /> : null}</>
 
 				<div>
 					<button
