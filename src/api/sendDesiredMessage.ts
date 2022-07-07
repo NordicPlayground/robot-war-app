@@ -6,7 +6,7 @@ import { fromUtf8 } from '@aws-sdk/util-utf8-browser'
 import type { Static } from '@sinclair/typebox'
 import type { ReportedGameState } from 'api/validateGameControllerShadow'
 
-export const sendReportedMessage = async (
+export const sendDesiredMessage = async (
 	reportedCommand: Static<typeof ReportedGameState> | null,
 	gameControllerThing: string,
 	iotDataPlaneClient: IoTDataPlaneClient,
@@ -18,7 +18,7 @@ export const sendReportedMessage = async (
 				payload: fromUtf8(
 					JSON.stringify({
 						state: {
-							reported: reportedCommand,
+							desired: reportedCommand,
 						},
 					}),
 				),

@@ -82,7 +82,6 @@ export const updateGameController =
 		}
 
 		console.debug('Updated desired', desiredGameState)
-
 		await iotData
 			.send(
 				new UpdateThingShadowCommand({
