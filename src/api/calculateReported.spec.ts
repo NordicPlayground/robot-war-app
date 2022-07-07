@@ -39,7 +39,6 @@ describe('calculateReported()', () => {
 					},
 				},
 				reported: {
-					round: 0,
 					robots: {
 						'00:25:96:FF:FE:12:34:51': {
 							angleDeg: 0,
@@ -85,7 +84,6 @@ describe('calculateReported()', () => {
 				},
 			}),
 		).toEqual({
-			round: 0,
 			robots: {
 				'00:25:96:FF:FE:12:34:51': {
 					angleDeg: 1,

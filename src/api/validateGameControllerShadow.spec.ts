@@ -7,7 +7,6 @@ import {
 const goodShadow: Static<typeof gameControllerShadow> = {
 	state: {
 		reported: {
-			round: 0,
 			robots: {
 				'00:25:96:FF:FE:12:34:56': {
 					angleDeg: 0,
@@ -40,8 +39,8 @@ describe('validateGameControllerShadow()', () => {
 				...goodShadow.state,
 				reported: {
 					...goodShadow.state.reported,
-					// Invalid round number
-					round: -1,
+					//Invalid robot
+					robots: -1,
 				},
 			},
 		})

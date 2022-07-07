@@ -44,7 +44,6 @@ export const GameControllerContext = createContext<{
 	setAutoUpdate: (update: boolean) => void
 }>({
 	gameState: {
-		round: 1,
 		robots: {},
 	},
 	nextRoundCommands: {},
@@ -58,7 +57,6 @@ export const GameControllerProvider: FunctionComponent<{
 	children: ReactNode
 }> = ({ children }) => {
 	const [gameState, setGameState] = useState<ReportedGameStateWithMac>({
-		round: 1,
 		robots: {},
 	})
 	const { thingName: gameControllerThing } = useGameControllerThing()
@@ -115,7 +113,6 @@ export const GameControllerProvider: FunctionComponent<{
 					}
 					// Game shadow is valid
 					const newGameSate: ReportedGameStateWithMac = {
-						round: maybeValidShadow.state.reported.round ?? gameState.round,
 						robots: Object.entries(
 							maybeValidShadow.state.reported.robots ?? gameState.robots,
 						)

@@ -33,9 +33,6 @@ export const MacAddress = Type.String({
 })
 
 export const ReportedGameState = Type.Object({
-	round: Type.Integer({
-		minimum: 0,
-	}),
 	robots: Type.Record(MacAddress, ReportedRobot),
 })
 
