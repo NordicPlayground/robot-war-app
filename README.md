@@ -56,7 +56,7 @@ work correctly.
    the cloud. To get around this, you can simulate robots by following the next
    steps
 
-#### To be able to run the application without robots:
+#### Run application with simulated robots
 
 1. Go to the Game Controller page on the application, and send the first
    reported message. This will simulate the existence of robots in the cloud,
