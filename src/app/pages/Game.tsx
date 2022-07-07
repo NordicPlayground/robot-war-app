@@ -12,11 +12,13 @@ import { randomColor } from 'utils/randomColor'
 import { shortestRotation } from 'utils/shortestRotation'
 
 export const Game = () => {
-	const fieldWidthMm = 1500
-	const fieldHeightMm = 1000
-	const startZoneSizeMm = 100
-	const robotWidthMM = 65
-	const robotLengthMm = 90
+	const {
+		robotWidthMm,
+		robotLengthMm,
+		fieldHeightMm,
+		fieldWidthMm,
+		startZoneSizeMm,
+	} = useAppConfig()
 
 	const { helperLinesNumber } = useAppConfig()
 
@@ -130,7 +132,7 @@ export const Game = () => {
 									id={mac}
 									xMm={xMm}
 									yMm={yMm}
-									widthMm={robotWidthMM}
+									widthMm={robotWidthMm}
 									heightMm={robotLengthMm}
 									colorHex={colorHex}
 									rotationDeg={rotationDeg}
