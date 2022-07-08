@@ -9,7 +9,7 @@ import { useState } from 'react'
  ** Select the team from the user perspective
  */
 export const TeamSelectionUser = () => {
-	const { teamNameOptions, setSelectedTeam } = useGameController()
+	const { setSelectedTeam } = useGameController()
 	const [isTeamSelected, setIsTeamSelected] = useState<boolean>(false)
 	const {
 		metaData: { robotTeamAssignment },
@@ -23,6 +23,9 @@ export const TeamSelectionUser = () => {
 		start(3)
 		setIsTeamSelected(true)
 	}
+	const teamNameArray = Object.values(robotTeamAssignment).filter(
+		(item, i, ar) => ar.indexOf(item) === i,
+	)
 
 	if (seconds < 0) {
 		reset()
@@ -40,13 +43,11 @@ export const TeamSelectionUser = () => {
 					}}
 				>
 					<option value="0">Select team</option>
-					{teamNameOptions.map(
-						(team: Record<string, string>, index: number) => (
-							<option key={index} value={team.name}>
-								{team.name}
-							</option>
-						),
-					)}
+					{teamNameArray.map((team: string, index: number) => (
+						<option key={index} value={team}>
+							{team}
+						</option>
+					))}
 				</select>
 			</Popup>
 		)
