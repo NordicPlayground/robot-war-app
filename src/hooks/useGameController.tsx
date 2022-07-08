@@ -111,7 +111,6 @@ export const GameControllerProvider: FunctionComponent<{
 			...teamNameOptions,
 			{ name: newName },
 		])
-		console.log('!!! ', teamNameOptions)
 	}
 	const resetTeamNameOption = () => {
 		setTeamNameOptions([{ name: 'A' }, { name: 'B' }])
