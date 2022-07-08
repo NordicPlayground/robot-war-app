@@ -3,11 +3,9 @@ import {
 	UpdateThingShadowCommand,
 } from '@aws-sdk/client-iot-data-plane'
 import { fromUtf8 } from '@aws-sdk/util-utf8-browser'
-import type { Static } from '@sinclair/typebox'
-import type { ReportedGameState } from 'api/validateGameControllerShadow'
 
-export const sendDesiredMessage = async (
-	reportedCommand: Static<typeof ReportedGameState> | null,
+export const resetShadow = async (
+	state: { desired?: string | null; reported?: string | null },
 	gameControllerThing: string,
 	iotDataPlaneClient: IoTDataPlaneClient,
 ): Promise<void> => {
@@ -17,15 +15,13 @@ export const sendDesiredMessage = async (
 				thingName: gameControllerThing,
 				payload: fromUtf8(
 					JSON.stringify({
-						state: {
-							desired: reportedCommand,
-						},
+						state: state,
 					}),
 				),
 			}),
 		)
 		.catch((error) => {
-			console.error('Failed to write to  reported shadow')
+			console.error('Failed to write to reported shadow')
 			console.error(error)
 		})
 }

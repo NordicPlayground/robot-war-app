@@ -7,7 +7,7 @@ import type { Static } from '@sinclair/typebox'
 import type { ReportedGameState } from 'api/validateGameControllerShadow'
 
 export const sendReportedMessage = async (
-	reportedCommand: Static<typeof ReportedGameState> | null,
+	reportedCommand: Static<typeof ReportedGameState>,
 	gameControllerThing: string,
 	iotDataPlaneClient: IoTDataPlaneClient,
 ): Promise<void> => {

@@ -1,6 +1,6 @@
 import { IoTDataPlaneClient } from '@aws-sdk/client-iot-data-plane'
 import { getReportedForSimulator } from 'api/getReportedForSimulator'
-import { sendDesiredMessage } from 'api/sendDesiredMessage'
+import { resetShadow } from 'api/resetShadow'
 import { sendReportedMessage } from 'api/sendReportedMessage'
 import { Main } from 'components/Main'
 import { useCredentials } from 'hooks/useCredentials'
@@ -81,8 +81,8 @@ export const GameControllers = () => {
 					<p>Repeat step 2,3 and 4 to go through the game</p>
 					<button
 						onClick={async () => {
-							await sendReportedMessage(
-								null,
+							await resetShadow(
+								{ reported: null },
 								gameControllerThing,
 								iotDataPlaneClient as IoTDataPlaneClient,
 							)
@@ -93,8 +93,8 @@ export const GameControllers = () => {
 					<br></br>
 					<button
 						onClick={async () => {
-							await sendDesiredMessage(
-								null,
+							await resetShadow(
+								{ desired: null },
 								gameControllerThing,
 								iotDataPlaneClient as IoTDataPlaneClient,
 							)
