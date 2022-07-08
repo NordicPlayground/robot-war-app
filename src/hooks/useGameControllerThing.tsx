@@ -45,11 +45,13 @@ export const GameControllerThingProvider: FunctionComponent<{
 				}),
 			)
 			.then(({ things }) => {
-				// use the first we find, we might later want to have a selection
-				setThingName(things?.[1])
+				setThingName(things?.filter((thing) => thing === 'gameController')[0])
 			})
+
 			.catch((error) => {
-				console.error('Failed to list things in group')
+				console.error(
+					'Failed to list things in group. No thing called gameController.',
+				)
 				console.error(error)
 			})
 	}, [iotClient])
