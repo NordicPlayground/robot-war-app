@@ -3,23 +3,14 @@ import { useGameController } from 'hooks/useGameController'
 import { FunctionComponent, useState } from 'react'
 
 export const TeamAssigner: FunctionComponent = () => {
-	const { gameState } = useGameController()
-
-	const {
-		metaData: { robotTeamAssignment },
-		setRobotTeam,
-	} = useGameAdmin()
+	const { gameState, teamNameOptions, addTeamNameOption, resetTeamNameOption } =
+		useGameController()
+	const { setRobotTeam } = useGameAdmin()
 	const [inputValue, setInputValue] = useState('')
-	const [stateOpt, setStateOpt] = useState<{ name: string }[]>([
-		{ name: 'A' },
-		{ name: 'B' },
-	])
-
 	const handleTeamInput = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setInputValue(e.target.value)
 	}
-	//console.log(robotTeamAssignment)
-	//console.log('hei')
+
 	return (
 		<div>
 			<ul>
@@ -30,14 +21,18 @@ export const TeamAssigner: FunctionComponent = () => {
 							<select
 								className="form-select"
 								id={robot.mac}
-								onChange={(e) => setRobotTeam(robot.mac, e.target.value)}
+								onChange={(e) => {
+									setRobotTeam(robot.mac, e.target.value)
+								}}
 							>
 								<option value="0">Select team</option>
-								{stateOpt.map((option, index) => (
-									<option key={index} value={index + 1}>
-										{option.name}
-									</option>
-								))}
+								{teamNameOptions.map(
+									(option: Record<string, string>, index: number) => (
+										<option key={index} value={option.name}>
+											{option.name}
+										</option>
+									),
+								)}
 							</select>
 						</li>
 					)
@@ -53,7 +48,7 @@ export const TeamAssigner: FunctionComponent = () => {
 			<button
 				className="btn btn-success"
 				onClick={() => {
-					setStateOpt((commands) => [...commands, { name: inputValue }])
+					addTeamNameOption(inputValue)
 				}}
 			>
 				{' '}
@@ -62,7 +57,7 @@ export const TeamAssigner: FunctionComponent = () => {
 			<button
 				className="btn btn-danger"
 				onClick={() => {
-					setStateOpt([{ name: 'A' }, { name: 'B' }])
+					resetTeamNameOption()
 				}}
 			>
 				{' '}

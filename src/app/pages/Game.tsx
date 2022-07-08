@@ -2,6 +2,7 @@ import style from 'app/pages/Game.module.css'
 import { Field } from 'components/Game/Field'
 import { Form } from 'components/Game/Form'
 import { Robot } from 'components/Game/Robot'
+import { TeamSelectionUser } from 'components/Game/TeamSelectionUser'
 import { useAppConfig } from 'hooks/useAppConfig'
 import { useGameAdmin } from 'hooks/useGameAdmin'
 import { RobotCommand, useGameController } from 'hooks/useGameController'
@@ -20,12 +21,11 @@ export const Game = () => {
 		startZoneSizeMm,
 	} = useAppConfig()
 
-	const { helperLinesNumber } = useAppConfig()
-
-	const { gameState, setNextRoundCommands, nextRoundCommands } =
+	const { helperLinesNumber, defaultOponentColor } = useAppConfig()
+	const { gameState, setNextRoundCommands, nextRoundCommands, selectedTeam } =
 		useGameController()
 	const {
-		metaData: { robotFieldPosition },
+		metaData: { robotFieldPosition, robotTeamAssignment },
 	} = useGameAdmin()
 	const {
 		start: startRobotGesture,
@@ -35,6 +35,7 @@ export const Game = () => {
 
 	const [robotCommands, setRobotCommands] =
 		useState<Record<string, RobotCommand>>(nextRoundCommands)
+	const [selectedRobot, setSelectedRobot] = useState<string>()
 
 	useEffect(() => {
 		setRobotCommands(nextRoundCommands)
@@ -73,6 +74,7 @@ export const Game = () => {
 		updateRobotCommandFromGesture({ mac: activeRobot, angleDeg, driveTimeMs })
 		setActiveRobot(undefined)
 	}
+	const onPointerUp = {}
 
 	return (
 		<>
@@ -90,6 +92,8 @@ export const Game = () => {
 				}}
 				onPointerUp={handleRobotGestureEnd}
 			>
+				<>{selectedTeam === undefined ? <TeamSelectionUser /> : null}</>
+
 				<div>
 					<button
 						type="button"
@@ -112,6 +116,8 @@ export const Game = () => {
 						}}
 					>
 						{Object.values(gameState.robots).map(({ mac }) => {
+							const isSameTeam =
+								robotTeamAssignment[`${mac}`] === selectedTeam ? true : false
 							const nextRobotCommand: RobotCommand = robotCommands[mac] ?? {
 								angleDeg: 0,
 								driveTimeMs: 0,
@@ -124,7 +130,7 @@ export const Game = () => {
 							}
 
 							// FIXME: use fixed color per team
-							const colorHex = randomColor()
+							const colorHex = isSameTeam ? randomColor() : defaultOponentColor
 
 							return (
 								<Robot
@@ -139,24 +145,33 @@ export const Game = () => {
 									desiredRotationDeg={rotationDeg + nextRobotCommand.angleDeg}
 									desiredDriveTime={nextRobotCommand.driveTimeMs}
 									desiredDriveBudgetPercent={
-										(nextRobotCommand.driveTimeMs ?? 0) / 1000
+										isSameTeam ? (nextRobotCommand.driveTimeMs ?? 0) / 1000 : 0
 									}
-									onRotate={(angleDeg) =>
-										updateRobotCommandFromGesture({
-											mac,
-											angleDeg,
-											driveTimeMs: nextRobotCommand.driveTimeMs,
-										})
+									outline={
+										selectedRobot !== undefined &&
+										selectedRobot !== mac &&
+										isSameTeam
+											? true
+											: false
 									}
 									onPointerDown={(args) => {
-										blockScroll()
-										startRobotGesture({
-											x: args.x,
-											y: args.y,
-										})
-										setActiveRobot(mac)
+										setSelectedRobot(mac)
+										if (isSameTeam) {
+											blockScroll()
+											startRobotGesture({
+												x: args.x,
+												y: args.y,
+											})
+											setActiveRobot(mac)
+										}
 									}}
-									onPointerUp={handleRobotGestureEnd}
+									onRotate={() => {
+										console.log('onRotate')
+									}}
+									onPointerUp={() => {
+										handleRobotGestureEnd()
+										setSelectedRobot(undefined)
+									}}
 								/>
 							)
 						})}

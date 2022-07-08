@@ -27,6 +27,7 @@ export const AppConfigContext = createContext<{
 	fieldHeightMm: number
 	startZoneSizeMm: number
 	helperLinesNumber: number
+	defaultOponentColor: string
 }>({
 	basename: import.meta.env.BASE_URL ?? '/',
 	version,
@@ -43,6 +44,7 @@ export const AppConfigContext = createContext<{
 	fieldHeightMm: 1000,
 	startZoneSizeMm: 100,
 	helperLinesNumber: 3,
+	defaultOponentColor: '#000000',
 })
 
 export const useAppConfig = () => useContext(AppConfigContext)
