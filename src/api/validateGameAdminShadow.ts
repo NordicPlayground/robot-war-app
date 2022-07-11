@@ -8,18 +8,24 @@ import {
 export const TeamId = Type.String({
 	minLength: 1,
 })
-const DistanceInMm = Type.Number({ minimum: 0, title: 'Distance in MM' })
-const RotationDeg = Type.Number({
-	minimum: -180,
-	maximum: 180,
-	title: 'Rotation in degrees',
-})
-
 export const Position = Type.Object(
 	{
-		xMm: DistanceInMm,
-		yMm: DistanceInMm,
-		rotationDeg: RotationDeg,
+		xMm: Type.Integer({
+			minimum: 0,
+			title:
+				'X-Position (top to bottom) on the field in mm from the top left corner',
+		}),
+		yMm: Type.Integer({
+			minimum: 0,
+			title:
+				'Y-Position (left to right) on the field in mm from the top left corner',
+		}),
+		rotationDeg: Type.Number({
+			minimum: 0,
+			maximum: 359,
+			title:
+				'Rotation in degrees, 0 facing North on the field, 90 facing east, 180 facing south, 270 facing west',
+		}),
 	},
 	{ title: 'Position on the field' },
 )

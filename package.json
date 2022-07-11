@@ -97,6 +97,7 @@
     ],
     "moduleNameMapper": {
       "^api\\/(.*)\\.js$": "<rootDir>/src/api/$1",
+      "^core\\/(.*)\\.js$": "<rootDir>/src/core/$1",
       "^utils\\/(.*)\\.js$": "<rootDir>/src/utils/$1"
     },
     "transform": {
