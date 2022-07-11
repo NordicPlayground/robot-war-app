@@ -94,7 +94,7 @@ export const Robot = ({
 				</linearGradient>
 			</defs>
 			{desiredRotationDeg !== undefined && (
-				<g transform={`rotate(${desiredRotationDeg}, ${xMm}, ${yMm})`}>
+				<g transform={`rotate(${desiredRotationDeg + 180}, ${xMm}, ${yMm})`}>
 					<path
 						d={`M${xMm} ${yMm} L${xMm} ${
 							yMm + widthMm * 4 * (desiredDriveBudgetPercent ?? 1)
@@ -115,7 +115,7 @@ export const Robot = ({
 			)}
 
 			{desiredRotationDeg !== undefined && (
-				<g transform={`rotate(${desiredRotationDeg}, ${xMm}, ${yMm})`}>
+				<g transform={`rotate(${desiredRotationDeg + 180}, ${xMm}, ${yMm})`}>
 					<path
 						d={`M${xMm} ${yMm} L${xMm} ${
 							yMm + widthMm * 4 * (desiredDriveBudgetPercent ?? 1)

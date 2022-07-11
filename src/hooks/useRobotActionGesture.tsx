@@ -32,22 +32,29 @@ export const useRobotActionGesture = () => useContext(RobotActionGesture)
 
 type Position = [number, number]
 
+const getDriveTime = (x: number, y: number) => {
+	const xs = x * x
+	const ys = y * y
+	return Math.round(Math.min(1000, Math.sqrt(xs + ys) * 5)) // FIXME: convert to percentage
+}
+
+const getAngle = (x: number, y: number) => {
+	const rad = Math.atan2(y, x) // In radians
+	const deg = rad * (180 / Math.PI) // In degrees
+	return deg
+}
+
 const result = (start: [number, number], current: [number, number]) => {
 	const deltaX = start[0] - current[0]
 	const deltaY = start[1] - current[1]
-	const rad = Math.atan2(deltaY, deltaX) // In radians
-	const deg = rad * (180 / Math.PI) // In degrees
+	const driveTime = getDriveTime(deltaX, deltaY)
+	const angle = getAngle(deltaX, deltaY)
 
-	// calculate drive time
-	let xs = deltaX
-	xs = xs * xs
-
-	let ys = deltaY
-	ys = ys * ys
+	const angleDeg = shortestRotation(angle + 90) // addint 90 because 0 degree is north
 
 	return {
-		angleDeg: shortestRotation(deg - 90), // 0 degree is north
-		driveTimeMs: Math.round(Math.min(1000, Math.sqrt(xs + ys) * 5)), // FIXME: convert to percentage
+		angleDeg,
+		driveTimeMs: driveTime,
 	}
 }
 
