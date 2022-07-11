@@ -20,7 +20,7 @@
       "asset/*": ["asset/*"],
       "hooks/*": ["hooks/*"],
       "components/*": ["components/*"],
-      "core//*": ["core//*"],
+      "core/*": ["core/*"],
       "utils/*": ["utils/*"]
     }
   },

@@ -1,6 +1,7 @@
+import { jest } from '@jest/globals'
 import type { Static } from '@sinclair/typebox'
 import type { ReportedGameState } from 'api/validateGameControllerShadow.js'
-import { gameEngine } from 'core/gameEngine.js'
+import { gameEngine, GameEngineEventType } from 'core/gameEngine.js'
 import { randomMac } from 'core/test/randomMac.js'
 import { randomRobot } from 'core/test/randomRobot.js'
 
@@ -153,6 +154,34 @@ describe('gameEngine', () => {
 							).toThrow(/Invalid angle provided: /),
 					)
 				})
+			})
+		})
+	})
+
+	describe('notifications', () => {
+		const game = simpleGame()
+		const listener = jest.fn()
+
+		describe('onAll', () => {
+			it('should notify subscribers of changes', () => {
+				game.onAll(listener)
+				game.reportDiscoveredRobots({
+					[randomMac()]: randomRobot(),
+				})
+				expect(listener).toHaveBeenCalledWith({
+					name: GameEngineEventType.robots_discovered,
+				})
+			})
+		})
+
+		describe('ofAll', () => {
+			it('should unregister subscribers', () => {
+				expect(listener).toHaveBeenCalledTimes(1)
+				game.offAll(listener)
+				game.reportDiscoveredRobots({
+					[randomMac()]: randomRobot(),
+				})
+				expect(listener).toHaveBeenCalledTimes(1)
 			})
 		})
 	})

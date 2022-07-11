@@ -4,28 +4,56 @@ import type {
 	MacAddress,
 	ReportedGameState,
 } from 'api/validateGameControllerShadow.js'
+import equal from 'fast-deep-equal'
 
-type GameEngine = {
+export enum GameEngineEventType {
+	robots_discovered = 'robots_discovered',
+}
+
+type EventListener = (event: GameEngineEvent) => void
+
+export type GameEngineEvent = {
+	name: GameEngineEventType
+}
+
+export type GameEngine = {
 	field: {
 		widthMm: number
 		heightMm: number
 	}
+	/**
+	 * Returns the list of robots and their configurations
+	 */
 	robots: () => Static<typeof ReportedGameState>['robots']
+	/**
+	 * Used by the Gateway to report discovered robots
+	 */
 	reportDiscoveredRobots: (
 		robots: Static<typeof ReportedGameState>['robots'],
 	) => void
+	/**
+	 * Used by the Admin to assign a robot to a team
+	 */
 	assignRobotToTeam: (
 		robotAddress: Static<typeof MacAddress>,
 		name: string,
 	) => void
+	/**
+	 * Used by the Admin to set the position of a robot
+	 */
 	setRobotPosition: (
 		robotAddress: Static<typeof MacAddress>,
 		position: Omit<Static<typeof Position>, 'rotationDeg'>,
 	) => void
+	/**
+	 * Used by the Admin to set the rotation of a robot
+	 */
 	setRobotRotation: (
 		robotAddress: Static<typeof MacAddress>,
 		rotationDeg: Static<typeof Position>['rotationDeg'],
 	) => void
+	onAll: (fn: EventListener) => void
+	offAll: (fn: EventListener) => void
 }
 
 export const gameEngine = ({
@@ -42,6 +70,10 @@ export const gameEngine = ({
 		Static<typeof MacAddress>,
 		Static<typeof Position>
 	> = {}
+	const listeners: EventListener[] = []
+	const notify = (event: GameEngineEvent) => {
+		listeners.forEach((fn) => fn(event))
+	}
 
 	return {
 		field,
@@ -63,7 +95,10 @@ export const gameEngine = ({
 					{},
 				),
 		reportDiscoveredRobots: (newRobots) => {
-			robots = newRobots
+			if (!equal(robots, newRobots)) {
+				robots = newRobots
+				notify({ name: GameEngineEventType.robots_discovered })
+			}
 		},
 		assignRobotToTeam: (robotAddress, name) => {
 			if (name.length === 0) {
@@ -90,6 +125,12 @@ export const gameEngine = ({
 			)
 				throw new Error(`Invalid angle provided: ${rotationDeg}!`)
 			robotPostions[robotAddress].rotationDeg = rotationDeg
+		},
+		onAll: (listener) => {
+			listeners.push(listener)
+		},
+		offAll: (listener) => {
+			delete listeners[listeners.indexOf(listener)]
 		},
 	}
 }
