@@ -50,7 +50,7 @@ const result = (start: [number, number], current: [number, number]) => {
 	const driveTime = getDriveTime(deltaX, deltaY)
 	const angle = getAngle(deltaX, deltaY)
 
-	const angleDeg = shortestRotation(angle + 90) // addint 90 because 0 degree is north
+	const angleDeg = shortestRotation(angle + 90) // adding 90 because 0 degree is north
 
 	return {
 		angleDeg,
