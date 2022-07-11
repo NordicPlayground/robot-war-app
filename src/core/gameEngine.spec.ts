@@ -98,6 +98,7 @@ describe('gameEngine', () => {
 						},
 					})
 				})
+
 				it.each([
 					[-2, 0], // all values outside of left border of field
 					[-1, 0], // Left outside of field
@@ -111,6 +112,11 @@ describe('gameEngine', () => {
 						/Position is outside of field: /,
 					),
 				)
+
+				it('does not accept floats for positions', () =>
+					expect(() =>
+						game.setRobotPosition(robot1, { xMm: 1.234, yMm: 1.234 }),
+					).toThrow(/Invalid position provided: /))
 
 				describe('robot rotations', () => {
 					it('should give robots a default rotation based on their position', () => {

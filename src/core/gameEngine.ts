@@ -72,6 +72,8 @@ export const gameEngine = ({
 			robotTeamAssignments[robotAddress] = name
 		},
 		setRobotPosition: (robotAddress, { xMm, yMm }) => {
+			if (!Number.isInteger(xMm) || !Number.isInteger(yMm))
+				throw new Error(`Invalid position provided: ${xMm}/${yMm}!`)
 			if (xMm < 0 || xMm >= field.heightMm || yMm < 0 || yMm >= field.widthMm)
 				throw new Error(`'Position is outside of field: ${xMm}/${yMm}!`)
 			robotPostions[robotAddress] = {
