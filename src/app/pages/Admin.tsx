@@ -7,6 +7,7 @@ import { useGameAdmin } from 'hooks/useGameAdmin'
 import { useGameController } from 'hooks/useGameController'
 import { useEffect, useState } from 'react'
 import { randomColor } from 'utils/randomColor'
+import { shortestRotation } from 'utils/shortestRotation'
 
 type RobotFieldConfig = Record<
 	string,
@@ -106,13 +107,13 @@ export const Admin = () => {
 										...robots,
 										[mac]: {
 											...robots[mac],
-											rotationDeg: rotationDeg + rotation,
+											rotationDeg: shortestRotation(rotationDeg + rotation),
 										},
 									}))
 									setRobotPosition(mac, {
 										xMm: robots[mac].xMm,
 										yMm: robots[mac].yMm,
-										rotationDeg: rotationDeg + rotation,
+										rotationDeg: shortestRotation(rotationDeg + rotation),
 									})
 								}}
 								onClick={() => {
