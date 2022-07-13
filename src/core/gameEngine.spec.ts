@@ -1,4 +1,3 @@
-import { jest } from '@jest/globals'
 import type { Static } from '@sinclair/typebox'
 import type { ReportedGameState } from 'api/validateGameControllerShadow.js'
 import { gameEngine, GameEngineEventType } from 'core/gameEngine.js'
