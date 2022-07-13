@@ -3,14 +3,7 @@ import type { ReportedGameState } from 'api/validateGameControllerShadow.js'
 import { gameEngine, GameEngineEventType } from 'core/gameEngine.js'
 import { randomMac } from 'core/test/randomMac.js'
 import { randomRobot } from 'core/test/randomRobot.js'
-
-const simpleGame = () =>
-	gameEngine({
-		field: {
-			heightMm: 1000,
-			widthMm: 1500,
-		},
-	})
+import { simpleGame } from 'core/test/simpleGame.js'
 
 describe('gameEngine', () => {
 	it('can instantiate a new game with field dimensions', () => {
