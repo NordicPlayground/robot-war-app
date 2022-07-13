@@ -8,12 +8,16 @@ import equal from 'fast-deep-equal'
 
 export enum GameEngineEventType {
 	robots_discovered = 'robots_discovered',
+	robot_team_assigned = 'robot_team_assigned',
+	robot_position_set = 'robot_position_set',
+	robot_rotation_set = 'robot_rotation_set',
 }
 
 type EventListener = (event: GameEngineEvent) => void
 
 export type GameEngineEvent = {
 	name: GameEngineEventType
+	[key: string]: any
 }
 
 export type GameEngine = {
@@ -105,6 +109,11 @@ export const gameEngine = ({
 				throw new Error(`Name cannot be blank!`)
 			}
 			robotTeamAssignments[robotAddress] = name
+			notify({
+				name: GameEngineEventType.robot_team_assigned,
+				address: robotAddress,
+				team: name,
+			})
 		},
 		setRobotPosition: (robotAddress, { xMm, yMm }) => {
 			if (!Number.isInteger(xMm) || !Number.isInteger(yMm))
@@ -116,6 +125,14 @@ export const gameEngine = ({
 				yMm,
 				rotationDeg: yMm < field.widthMm / 2 ? 90 : 270,
 			}
+			notify({
+				name: GameEngineEventType.robot_position_set,
+				address: robotAddress,
+				position: {
+					xMm,
+					yMm,
+				},
+			})
 		},
 		setRobotRotation: (robotAddress, rotationDeg) => {
 			if (
@@ -125,6 +142,13 @@ export const gameEngine = ({
 			)
 				throw new Error(`Invalid angle provided: ${rotationDeg}!`)
 			robotPostions[robotAddress].rotationDeg = rotationDeg
+			notify({
+				name: GameEngineEventType.robot_rotation_set,
+				address: robotAddress,
+				position: {
+					rotationDeg,
+				},
+			})
 		},
 		onAll: (listener) => {
 			listeners.push(listener)

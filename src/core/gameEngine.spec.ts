@@ -184,5 +184,64 @@ describe('gameEngine', () => {
 				expect(listener).toHaveBeenCalledTimes(1)
 			})
 		})
+
+		describe('admin notifications', () => {
+			const game = simpleGame()
+
+			const address = randomMac()
+			game.reportDiscoveredRobots({
+				[address]: randomRobot(),
+			})
+
+			it('should emit an event when the robot is assigned to a team', () => {
+				const listener = jest.fn()
+				game.onAll(listener)
+
+				// Admin assigns team
+				game.assignRobotToTeam(address, 'Team A')
+
+				expect(listener).toHaveBeenCalledWith({
+					name: GameEngineEventType.robot_team_assigned,
+					address,
+					team: 'Team A',
+				})
+			})
+
+			it('should emit an event when the robot position is changed', () => {
+				const listener = jest.fn()
+				game.onAll(listener)
+
+				// Admin assigns a position
+				game.setRobotPosition(address, {
+					xMm: 17,
+					yMm: 42,
+				})
+
+				expect(listener).toHaveBeenCalledWith({
+					name: GameEngineEventType.robot_position_set,
+					address,
+					position: {
+						xMm: 17,
+						yMm: 42,
+					},
+				})
+			})
+
+			it('should emit an event when the robot rotation is changed', () => {
+				const listener = jest.fn()
+				game.onAll(listener)
+
+				// Admin assigns a position
+				game.setRobotRotation(address, 135)
+
+				expect(listener).toHaveBeenCalledWith({
+					name: GameEngineEventType.robot_rotation_set,
+					address,
+					position: {
+						rotationDeg: 135,
+					},
+				})
+			})
+		})
 	})
 })
