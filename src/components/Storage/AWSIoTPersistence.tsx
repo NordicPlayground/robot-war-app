@@ -12,7 +12,7 @@ export const AWSIoTPersistenceContext = createContext(undefined)
 export const AWSIoTPersistenceProvider: FunctionComponent<{
 	children: ReactNode
 }> = ({ children }) => {
-	const gameInstance = useCore()
+	const { game: gameInstance } = useCore()
 	const { region, accessKeyId, secretAccessKey } = useCredentials()
 	const { thingName } = useGameControllerThing()
 

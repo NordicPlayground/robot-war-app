@@ -2,14 +2,17 @@ import { useCore } from 'hooks/useCore'
 import { useState } from 'react'
 
 export const GameEngineDemo = () => {
-	const { assignRobotToTeam, robots } = useCore()
+	const {
+		game: { assignRobotToTeam },
+		robots,
+	} = useCore()
 
 	return (
 		<>
 			<h1>Game Engine Demo</h1>
 
 			<ul>
-				{Object.entries(robots()).map(([address, robot]) => (
+				{Object.entries(robots).map(([address, robot]) => (
 					<li key={address}>
 						{address}
 						<RobotTeam

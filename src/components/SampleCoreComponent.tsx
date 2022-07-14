@@ -4,7 +4,7 @@ import type { FunctionComponent } from 'react'
 export const SampleCoreComponent: FunctionComponent = () => {
 	const { robots: visibleRobots } = useCore()
 
-	const robots = Object.entries(visibleRobots())
+	const robots = Object.entries(visibleRobots)
 
 	if (robots.length === 0)
 		return <p className="alert alert-warning">No robots discovered!</p>
