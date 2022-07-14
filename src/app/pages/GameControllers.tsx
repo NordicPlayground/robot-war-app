@@ -1,10 +1,12 @@
 import { IoTDataPlaneClient } from '@aws-sdk/client-iot-data-plane'
 import { getReportedForSimulator } from 'api/getReportedForSimulator'
+import { resetAdminShadow } from 'api/resetAdminShadow'
 import { resetShadow } from 'api/resetShadow'
 import { sendReportedMessage } from 'api/sendReportedMessage'
 import { Main } from 'components/Main'
 import { useCredentials } from 'hooks/useCredentials'
 import { useGameControllerThing } from 'hooks/useGameControllerThing'
+import { adminShadow } from 'utils/initialAdminShadow'
 import { robotCommands } from 'utils/initialReportedState'
 
 export const GameControllers = () => {
@@ -101,6 +103,18 @@ export const GameControllers = () => {
 						}}
 					>
 						RESET DESIRED SHADOW
+					</button>
+					<br></br>
+					<button
+						onClick={async () => {
+							await resetAdminShadow(
+								{ reported: adminShadow },
+								gameControllerThing,
+								iotDataPlaneClient as IoTDataPlaneClient,
+							)
+						}}
+					>
+						RESET ADMIN SHADOW
 					</button>
 				</div>
 			</div>
