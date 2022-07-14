@@ -1,22 +1,15 @@
-import { randomMac } from 'core/test/randomMac'
-import { randomRobot } from 'core/test/randomRobot'
 import { useCore } from 'hooks/useCore'
 import { useState } from 'react'
 
 export const GameEngineDemo = () => {
-	const { assignRobotToTeam } = useCore()
-
-	// TODO: robots are not loaded yet from storage
-	const robots = {
-		[randomMac()]: randomRobot(),
-	}
+	const { assignRobotToTeam, robots } = useCore()
 
 	return (
 		<>
 			<h1>Game Engine Demo</h1>
 
 			<ul>
-				{Object.entries(robots).map(([address, robot]) => (
+				{Object.entries(robots()).map(([address, robot]) => (
 					<li key={address}>
 						{address}
 						<RobotTeam

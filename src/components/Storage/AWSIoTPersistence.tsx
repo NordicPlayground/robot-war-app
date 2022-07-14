@@ -1,10 +1,11 @@
 import { IoTDataPlaneClient } from '@aws-sdk/client-iot-data-plane'
+import { loadGatewayStateIoT } from 'api/loadGatewayStateIoT'
 import { persistAdminChangeIoT } from 'api/persistAdminChangeIoT.js'
 import { persistAdminChanges } from 'core/persistAdminChanges.js'
 import { useCore } from 'hooks/useCore.js'
 import { useCredentials } from 'hooks/useCredentials.js'
 import { useGameControllerThing } from 'hooks/useGameControllerThing.js'
-import { createContext, FunctionComponent, ReactNode } from 'react'
+import { createContext, FunctionComponent, ReactNode, useEffect } from 'react'
 
 export const AWSIoTPersistenceContext = createContext(undefined)
 
@@ -17,11 +18,35 @@ export const AWSIoTPersistenceProvider: FunctionComponent<{
 
 	if (
 		thingName !== undefined &&
-		region !== undefined &&
 		accessKeyId !== undefined &&
 		secretAccessKey !== undefined
 	) {
-		const persist = persistAdminChangeIoT({
+		// Set up persisting of admin changes to the AWS IoT game controller thing
+		persistAdminChanges({
+			game: gameInstance,
+			persist: persistAdminChangeIoT({
+				iotDataPlaneClient: new IoTDataPlaneClient({
+					credentials: {
+						accessKeyId,
+						secretAccessKey,
+					},
+					region,
+				}),
+				adminThingName: thingName,
+			}),
+		}).catch(console.error)
+	}
+
+	// Load data from AWS IoT game controller thing
+	// - reported robots: loadGatewayStateIoT() -> gameInstance.reportDiscoveredRobots()
+	// - admin configuration: loadRobotGameSettings() -> gameInstance.reportRobotGameSettings()
+	useEffect(() => {
+		if (thingName === undefined) return
+		if (accessKeyId === undefined) return
+		if (secretAccessKey === undefined) return
+
+		console.debug(`[AWSIoTPersistenceProvider]`, 'loading gateway state!')
+		loadGatewayStateIoT({
 			iotDataPlaneClient: new IoTDataPlaneClient({
 				credentials: {
 					accessKeyId,
@@ -29,14 +54,17 @@ export const AWSIoTPersistenceProvider: FunctionComponent<{
 				},
 				region,
 			}),
-			adminThingName: thingName,
+			gatewayThingName: thingName,
 		})
-
-		persistAdminChanges({
-			game: gameInstance,
-			persist,
-		}).catch(console.error)
-	}
+			.then((maybeState) => {
+				if ('error' in maybeState) {
+					console.error(`[AWSIoTPersistenceProvider]`, 'Invalid state, ignore.')
+					return
+				}
+				gameInstance.reportDiscoveredRobots(maybeState.robots)
+			})
+			.catch(console.error)
+	}, [accessKeyId, secretAccessKey, region, thingName, gameInstance])
 
 	return (
 		<AWSIoTPersistenceContext.Provider value={undefined}>
