@@ -1,43 +1,48 @@
-export const adminShadow = {
+import type { Static } from '@sinclair/typebox'
+import type { gameControllerAdminShadow } from 'api/validateGameAdminShadow'
+
+export const adminShadow: Static<
+	typeof gameControllerAdminShadow
+>['state']['reported'] = {
 	robotFieldPosition: {
 		'00:25:96:FF:FE:12:34:53': {
-			xMm: 1105.2908116277422,
-			yMm: 199.25850709613434,
+			xMm: 1105,
+			yMm: 199,
 			rotationDeg: 0,
 		},
 		'00:25:96:FF:FE:12:34:54': {
-			xMm: 625.8445010521652,
-			yMm: 401.9640417912652,
+			xMm: 625,
+			yMm: 401,
 			rotationDeg: 0,
 		},
 		'00:25:96:FF:FE:12:34:52': {
-			xMm: 942.453944696718,
-			yMm: 461.0329678443534,
+			xMm: 942,
+			yMm: 461,
 			rotationDeg: 0,
 		},
 		'00:25:96:FF:FE:12:34:51': {
-			xMm: 590.4031454203123,
-			yMm: 619.3376896666297,
+			xMm: 590,
+			yMm: 619,
 			rotationDeg: 0,
 		},
 		'00:25:96:FF:FE:12:34:56': {
-			xMm: 684.9134271052534,
-			yMm: 666.5928305091004,
+			xMm: 684,
+			yMm: 666,
 			rotationDeg: 0,
 		},
 		'00:25:96:FF:FE:12:34:57': {
-			xMm: 479.6030415377713,
-			yMm: 531.7495926511914,
+			xMm: 479,
+			yMm: 531,
 			rotationDeg: 0,
 		},
 		'00:25:96:FF:FE:12:34:55': {
-			xMm: 341.23993634150906,
-			yMm: 661.7908631342445,
+			xMm: 341,
+			yMm: 661,
 			rotationDeg: 0,
 		},
 		'00:25:96:FF:FE:12:34:58': {
-			xMm: 784.1492228744416,
-			yMm: 323.99305940118876,
+			xMm: 784,
+			yMm: 323,
 			rotationDeg: 0,
 		},
 	},
