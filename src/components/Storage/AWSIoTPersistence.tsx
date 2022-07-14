@@ -1,7 +1,8 @@
 import { IoTDataPlaneClient } from '@aws-sdk/client-iot-data-plane'
+import { gameEvent2StateUpdate } from 'api/gameEvent2StateUpdate'
 import { loadGatewayStateIoT } from 'api/loadGatewayStateIoT'
 import { persistAdminChangeIoT } from 'api/persistAdminChangeIoT.js'
-import { persistAdminChanges } from 'core/persistAdminChanges.js'
+import type { GameEngineEvent } from 'core/gameEngine'
 import { useCore } from 'hooks/useCore.js'
 import { useCredentials } from 'hooks/useCredentials.js'
 import { useGameControllerThing } from 'hooks/useGameControllerThing.js'
@@ -16,26 +17,37 @@ export const AWSIoTPersistenceProvider: FunctionComponent<{
 	const { region, accessKeyId, secretAccessKey } = useCredentials()
 	const { thingName } = useGameControllerThing()
 
-	if (
-		thingName !== undefined &&
-		accessKeyId !== undefined &&
-		secretAccessKey !== undefined
-	) {
+	useEffect(() => {
+		if (thingName === undefined) return
+		if (accessKeyId === undefined) return
+		if (secretAccessKey === undefined) return
 		// Set up persisting of admin changes to the AWS IoT game controller thing
-		persistAdminChanges({
-			game: gameInstance,
-			persist: persistAdminChangeIoT({
-				iotDataPlaneClient: new IoTDataPlaneClient({
-					credentials: {
-						accessKeyId,
-						secretAccessKey,
-					},
-					region,
-				}),
-				adminThingName: thingName,
+		console.log(`[AWSIoTPersistenceProvider]`, 'setting up connection')
+		const persistUpdate = persistAdminChangeIoT({
+			iotDataPlaneClient: new IoTDataPlaneClient({
+				credentials: {
+					accessKeyId,
+					secretAccessKey,
+				},
+				region,
 			}),
-		}).catch(console.error)
-	}
+			adminThingName: thingName,
+		})
+
+		const eventHandler = async (event: GameEngineEvent) => {
+			const update = gameEvent2StateUpdate(event)
+			if (update !== undefined) {
+				await persistUpdate(update)
+			}
+		}
+
+		gameInstance.onAll(eventHandler)
+
+		return () => {
+			console.log(`[AWSIoTPersistenceProvider]`, 'removing connection')
+			gameInstance.offAll(eventHandler)
+		}
+	}, [thingName, accessKeyId, secretAccessKey, gameInstance, region])
 
 	// Load data from AWS IoT game controller thing
 	// - reported robots: loadGatewayStateIoT() -> gameInstance.reportDiscoveredRobots()
