@@ -29,6 +29,9 @@ describe('gameEngine', () => {
 		const robot3 = randomMac()
 		const robot4 = randomMac()
 		const game = simpleGame()
+		const teamA = 'Brick Crushers!'
+		const teamB = '<L@c@ Robot>'
+		const teamsReady = []
 
 		describe('Gateway', () => {
 			it('reports the robots it sees', () => {
@@ -46,22 +49,22 @@ describe('gameEngine', () => {
 		describe('Admin', () => {
 			describe('team assignment', () => {
 				it('assigns robots to teams', () => {
-					game.assignRobotToTeam(robot1, 'Brick Crushers!')
-					game.assignRobotToTeam(robot2, 'Brick Crushers!')
-					game.assignRobotToTeam(robot3, '<L@c@ Robot>')
-					game.assignRobotToTeam(robot4, '<L@c@ Robot>')
+					game.assignRobotToTeam(robot1, teamA)
+					game.assignRobotToTeam(robot2, teamA)
+					game.assignRobotToTeam(robot3, teamB)
+					game.assignRobotToTeam(robot4, teamB)
 					expect(game.robots()).toMatchObject({
 						[robot1]: {
-							team: 'Brick Crushers!',
+							team: teamA,
 						},
 						[robot2]: {
-							team: 'Brick Crushers!',
+							team: teamA,
 						},
 						[robot3]: {
-							team: '<L@c@ Robot>',
+							team: teamB,
 						},
 						[robot4]: {
-							team: '<L@c@ Robot>',
+							team: teamB,
 						},
 					})
 				})
@@ -229,6 +232,49 @@ describe('gameEngine', () => {
 					).toThrow(/invalid angleDeg provided: .+/)
 				},
 			)
+
+			describe('Starting a round', () => {
+				test('that the user can notify the game that they are ready to fight!', () => {
+					game.fight(teamA) // First team
+
+					// After a team has marked itself ready to fight, we can read out that they are
+					expect(game.teamsReady).toContain(teamA)
+					// teamB hasn't yet marked that they are ready to fight
+					expect(game.teamsReady).not.toContain(teamB)
+				})
+
+				it('should not allow an unknown team to mark ready for fight', () => {
+					const randomTeam = 'some other team'
+
+					expect(() => {
+						game.fight(randomTeam) // this should not work
+					}).toThrow(`Unknown team provided: ${randomTeam}`)
+
+					expect(game.teamsReady).not.toContain(randomTeam)
+				})
+
+				test('that teamB can enter the fight', () => {
+					game.fight(teamB)
+					expect(game.teamsReady).toContain(teamB)
+				})
+
+				test.skip('The team should not be able to change the desired robot position', () => {
+					expect(() => {
+						game.setDesiredRobotMovement({
+							robotAdress: robot1, // robot1 belongs to teamA
+							angleDeg: 90,
+							driveTimeMs: 123,
+						})
+					}).toThrow('Robot can not move after calling fight action!')
+
+					// click
+					// test if angles keep the same
+				})
+				// A few rules to test here:
+				// - After the user is ready to fight, they cannot change their robot movements
+				// - before they can do as many changes as they want
+				// - both teams need to be ready, before the fight starts -> Game should notify the gateway only after both teams are ready to fight
+			})
 		})
 	})
 

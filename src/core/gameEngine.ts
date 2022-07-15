@@ -27,6 +27,10 @@ export type GameEngine = {
 		heightMm: number
 	}
 	/**
+	 * Returns the list of teams ready to fight
+	 */
+	teamsReady: string[]
+	/**
 	 * Returns the list of robots and their configurations
 	 */
 	robots: () => Static<typeof ReportedGameState>['robots']
@@ -65,6 +69,7 @@ export type GameEngine = {
 		angleDeg: Static<typeof Robot>['angleDeg']
 		driveTimeMs: Static<typeof Robot>['driveTimeMs']
 	}) => void
+	fight: (team: string) => void
 	onAll: (fn: EventListener) => void
 	offAll: (fn: EventListener) => void
 }
@@ -87,9 +92,11 @@ export const gameEngine = ({
 	const notify = (event: GameEngineEvent) => {
 		listeners.forEach((fn) => fn(event))
 	}
+	const teamsReady: string[] = []
 
 	return {
 		field,
+		teamsReady,
 		robots: () =>
 			Object.entries(robots)
 				.map(([address, robot]) => ({
@@ -160,7 +167,6 @@ export const gameEngine = ({
 				},
 			})
 		},
-
 		setDesiredRobotMovement: ({
 			robotAdress: address,
 			angleDeg,
@@ -178,6 +184,12 @@ export const gameEngine = ({
 				throw new Error(`invalid angleDeg provided: ${angleDeg}`)
 			robots[address].angleDeg = angleDeg
 			robots[address].driveTimeMs = driveTimeMs
+		},
+		fight: (team: string) => {
+			if (!Object.values(robotTeamAssignments).includes(team)) {
+				throw new Error(`Unknown team provided: ${team}`)
+			}
+			teamsReady.push(team)
 		},
 		onAll: (listener) => {
 			listeners.push(listener)
