@@ -3,6 +3,7 @@ import type { Position } from 'api/validateGameAdminShadow.js'
 import type {
 	MacAddress,
 	ReportedGameState,
+	Robot,
 } from 'api/validateGameControllerShadow.js'
 import equal from 'fast-deep-equal'
 
@@ -56,6 +57,14 @@ export type GameEngine = {
 		robotAddress: Static<typeof MacAddress>,
 		rotationDeg: Static<typeof Position>['rotationDeg'],
 	) => void
+	/**
+	 * Used by the User to set the desired rotation of a robot
+	 */
+	setDesiredRobotMovement: (args: {
+		robotAdress: Static<typeof MacAddress>
+		angleDeg: Static<typeof Robot>['angleDeg']
+		driveTimeMs: Static<typeof Robot>['driveTimeMs']
+	}) => void
 	onAll: (fn: EventListener) => void
 	offAll: (fn: EventListener) => void
 }
@@ -134,6 +143,7 @@ export const gameEngine = ({
 				},
 			})
 		},
+
 		setRobotRotation: (robotAddress, rotationDeg) => {
 			if (
 				rotationDeg < 0 ||
@@ -149,6 +159,25 @@ export const gameEngine = ({
 					rotationDeg,
 				},
 			})
+		},
+
+		setDesiredRobotMovement: ({
+			robotAdress: address,
+			angleDeg,
+			driveTimeMs,
+		}) => {
+			if (robots[address] === undefined)
+				throw new Error(`robotAddress not valid: ${address}`)
+			if (
+				driveTimeMs > 1000 ||
+				driveTimeMs < 0 ||
+				!Number.isInteger(driveTimeMs)
+			)
+				throw new Error(`invalid driveTimeMs provided: ${driveTimeMs}`)
+			if (angleDeg > 180 || angleDeg < -180 || !Number.isInteger(angleDeg))
+				throw new Error(`invalid angleDeg provided: ${angleDeg}`)
+			robots[address].angleDeg = angleDeg
+			robots[address].driveTimeMs = driveTimeMs
 		},
 		onAll: (listener) => {
 			listeners.push(listener)

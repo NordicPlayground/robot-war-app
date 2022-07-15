@@ -148,6 +148,88 @@ describe('gameEngine', () => {
 				})
 			})
 		})
+
+		describe('User', () => {
+			it('should set angle and drivetime for the robot', () => {
+				game.setDesiredRobotMovement({
+					robotAdress: robot1,
+					angleDeg: 90, //The robot is supposed to rotate 90 degrees clockwise
+					driveTimeMs: 500, //The robot should drive 500ms
+				})
+				game.setDesiredRobotMovement({
+					robotAdress: robot2,
+					angleDeg: 180,
+					driveTimeMs: 1000,
+				})
+				game.setDesiredRobotMovement({
+					robotAdress: robot3,
+					angleDeg: -90,
+					driveTimeMs: 250,
+				})
+				game.setDesiredRobotMovement({
+					robotAdress: robot4,
+					angleDeg: -1,
+					driveTimeMs: 750,
+				})
+				// console.log(game.robots())
+				expect(game.robots()).toMatchObject({
+					[robot1]: {
+						angleDeg: 90,
+						driveTimeMs: 500,
+					},
+					[robot2]: { angleDeg: 180, driveTimeMs: 1000 },
+					[robot3]: { angleDeg: -90, driveTimeMs: 250 },
+					[robot4]: { angleDeg: -1, driveTimeMs: 750 },
+				})
+			})
+			it.each([[1234]])(
+				'should not allow invalid robotAdress %s',
+				(invalidAddress) => {
+					expect(() =>
+						game.setDesiredRobotMovement({
+							robotAdress: invalidAddress as any,
+							angleDeg: 180,
+							driveTimeMs: 1000,
+						}),
+					).toThrow(/robotAddress not valid: /)
+				},
+			)
+
+			it.each([
+				[-1], // Run 1
+				[1450], // Run 2
+				[1.2345],
+				['Hei'],
+			])(
+				'must be integer and should not allow drivTimeMs over 1000ms or below 0ms (%s)',
+				(invalidDriveTimeMs) => {
+					expect(() =>
+						game.setDesiredRobotMovement({
+							driveTimeMs: invalidDriveTimeMs as any,
+							robotAdress: robot1,
+							angleDeg: 180,
+						}),
+					).toThrow(/invalid driveTimeMs provided: /)
+				},
+			)
+			it.each([
+				[-190], // Run 1
+				[200], // Run 2
+				[1.2345],
+				['Hei'],
+			])(
+				'should not allow angles over 180 degrees or below -180 degrees ',
+				(invalidAngleDeg) => {
+					expect(() =>
+						game.setDesiredRobotMovement({
+							angleDeg: invalidAngleDeg as any,
+							robotAdress: robot1,
+							driveTimeMs: 1000,
+						}),
+					).toThrow(/invalid angleDeg provided: .+/)
+				},
+			)
+		})
 	})
 
 	describe('notifications', () => {
