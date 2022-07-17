@@ -1,5 +1,5 @@
 import { IoTClient, ListThingsInThingGroupCommand } from '@aws-sdk/client-iot'
-import { useCredentials } from 'hooks/useCredentials'
+import { useCredentials } from 'hooks/useCredentials.js'
 import {
 	createContext,
 	FunctionComponent,

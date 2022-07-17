@@ -1,5 +1,5 @@
 import type { Static } from '@sinclair/typebox'
-import type { ReportedGameState } from 'api/validateGameControllerShadow'
+import type { ReportedGameState } from 'api/validateGameControllerShadow.js'
 import { gameEngine, GameEngine } from 'core/gameEngine.js'
 import {
 	createContext,
