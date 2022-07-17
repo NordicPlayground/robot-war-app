@@ -2,22 +2,11 @@
  * @jest-environment jsdom
  */
 import { gameEngine } from 'core/gameEngine.js'
-import { createRoot } from 'react-dom/client'
-import { act } from 'react-dom/test-utils'
+import { isolateHook } from 'isolate-react'
 
-// FIXME: make test work
-describe.skip('AWSIoTPersistence', () => {
-	let container: HTMLDivElement | null = null
-
+describe.skip('useAWSIoTPersistence', () => {
 	beforeEach(() => {
 		jest.resetModules()
-		container = document.createElement('div')
-		document.body.appendChild(container)
-	})
-
-	afterEach(() => {
-		if (container !== null) document.body.removeChild(container)
-		container = null
 	})
 
 	it('should set up the connection', async () => {
@@ -56,14 +45,12 @@ describe.skip('AWSIoTPersistence', () => {
 			}),
 		}))
 
-		const { AWSIoTPersistenceProvider } = await import(
-			'components/Storage/AWSIoTPersistence.js'
+		const { useAWSIoTPersistence } = await import(
+			'api/hooks/useAWSIoTPersistence.js'
 		)
-		const root = createRoot(container as HTMLDivElement)
 
-		act(() => {
-			root.render(<AWSIoTPersistenceProvider>null</AWSIoTPersistenceProvider>)
-		})
+		const isolated = isolateHook(useAWSIoTPersistence)
+		isolated()
 
 		expect(connect).toHaveBeenCalledWith({
 			game,
@@ -76,10 +63,8 @@ describe.skip('AWSIoTPersistence', () => {
 
 		// It should clean up
 		expect(disconnect).toHaveBeenCalledTimes(1)
-		// unmount the app
-		act(() => {
-			root.render(null)
-		})
+		// unmount
+		isolated.cleanup()
 		expect(disconnect).toHaveBeenCalledTimes(1)
 	})
 })
