@@ -31,7 +31,6 @@ describe('gameEngine', () => {
 		const game = simpleGame()
 		const teamA = 'Brick Crushers!'
 		const teamB = '<L@c@ Robot>'
-		const teamsReady = []
 
 		describe('Gateway', () => {
 			it('reports the robots it sees', () => {
@@ -258,22 +257,60 @@ describe('gameEngine', () => {
 					expect(game.teamsReady).toContain(teamB)
 				})
 
-				test.skip('The team should not be able to change the desired robot position', () => {
-					expect(() => {
-						game.setDesiredRobotMovement({
-							robotAdress: robot1, // robot1 belongs to teamA
-							angleDeg: 90,
-							driveTimeMs: 123,
-						})
-					}).toThrow('Robot can not move after calling fight action!')
-
-					// click
-					// test if angles keep the same
-				})
-				// A few rules to test here:
-				// - After the user is ready to fight, they cannot change their robot movements
-				// - before they can do as many changes as they want
+				// rules to test here:
 				// - both teams need to be ready, before the fight starts -> Game should notify the gateway only after both teams are ready to fight
+			})
+
+			describe('The team should not be able to change the desired robot positions after signalling ready to fight', () => {
+				const gameWithOneRobot = simpleGame()
+				const teamAsRobot = randomMac()
+				const teamA = 'Team A'
+				gameWithOneRobot.reportDiscoveredRobots({
+					[teamAsRobot]: randomRobot(),
+				})
+				gameWithOneRobot.assignRobotToTeam(teamAsRobot, teamA)
+
+				it('should not allow setting the position if the robot has not been placed on the field by the admin', () => {
+					expect(() =>
+						gameWithOneRobot.setRobotRotation(teamAsRobot, 135),
+					).toThrow(
+						`Robot ${teamAsRobot} has not been placed on the field, yet!`,
+					)
+					// Admin places robot
+					gameWithOneRobot.setRobotPosition(teamAsRobot, {
+						xMm: 100,
+						yMm: 100,
+					})
+				})
+
+				it('Should allow changes by the team as long as it is not ready to fight', () => {
+					const finalRotation = 45
+					gameWithOneRobot.setRobotRotation(teamAsRobot, 135)
+					gameWithOneRobot.setRobotRotation(teamAsRobot, 90)
+					gameWithOneRobot.setRobotRotation(teamAsRobot, finalRotation)
+					expect(gameWithOneRobot.robots()).toMatchObject({
+						[teamAsRobot]: {
+							position: { rotationDeg: finalRotation },
+						},
+					})
+				})
+
+				test('Should not allow changes by the team after they are ready to fight', () => {
+					const beforeFight = 45
+					gameWithOneRobot.setRobotRotation(teamAsRobot, 135)
+					gameWithOneRobot.setRobotRotation(teamAsRobot, 45)
+					gameWithOneRobot.fight(teamA)
+					expect(() => {
+						gameWithOneRobot.setRobotRotation(teamAsRobot, 90)
+					}).toThrow(
+						`Cannot move robot after team is ready to fight: ${teamAsRobot}!`,
+					)
+					expect(gameWithOneRobot.robots()).toMatchObject({
+						[teamAsRobot]: {
+							position: { rotationDeg: beforeFight },
+						},
+					})
+				})
 			})
 		})
 	})

@@ -94,6 +94,9 @@ export const gameEngine = ({
 	}
 	const teamsReady: string[] = []
 
+	const getTeamForRobot = (robotAddress: string): string | undefined =>
+		robotTeamAssignments[robotAddress]
+
 	return {
 		field,
 		teamsReady,
@@ -150,7 +153,6 @@ export const gameEngine = ({
 				},
 			})
 		},
-
 		setRobotRotation: (robotAddress, rotationDeg) => {
 			if (
 				rotationDeg < 0 ||
@@ -158,6 +160,17 @@ export const gameEngine = ({
 				!Number.isFinite(rotationDeg)
 			)
 				throw new Error(`Invalid angle provided: ${rotationDeg}!`)
+			const robotTeam = getTeamForRobot(robotAddress)
+			if (robotTeam === undefined)
+				throw new Error(`No team found for robot: ${robotAddress}!`)
+			if (teamsReady.includes(robotTeam))
+				throw new Error(
+					`Cannot move robot after team is ready to fight: ${robotAddress}!`,
+				)
+			if (robotPostions[robotAddress] === undefined)
+				throw new Error(
+					`Robot ${robotAddress} has not been placed on the field, yet!`,
+				)
 			robotPostions[robotAddress].rotationDeg = rotationDeg
 			notify({
 				name: GameEngineEventType.robot_rotation_set,
