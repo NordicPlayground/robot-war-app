@@ -155,7 +155,19 @@ export const gameEngine = ({
 		},
 		gatewayReportMovedRobots: (movement) => {
 			Object.entries(movement).forEach(([mac, { revolutionCount }]) => {
-				robots[mac].revolutionCount = revolutionCount
+				if (robots[mac] === undefined) {
+					// Gateway has reported information about a previously unknown robot
+					robots[mac] = {
+						angleDeg: 0,
+						driveTimeMs: 0,
+						revolutionCount,
+					}
+					notify({
+						name: GameEngineEventType.robots_discovered,
+					})
+				} else {
+					robots[mac].revolutionCount = revolutionCount
+				}
 			})
 			notify({
 				name: GameEngineEventType.robots_moved,

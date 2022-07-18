@@ -483,7 +483,7 @@ describe('gameEngine', () => {
 					})
 				})
 
-				test.skip('that it can report for previously undiscovered robots (message might have been lost)', () => {
+				test('that it can report for previously undiscovered robots (message might have been lost)', () => {
 					game.gatewayReportMovedRobots({
 						[randomMac()]: {
 							revolutionCount: 123,
