@@ -14,6 +14,7 @@ export enum GameEngineEventType {
 	robot_rotation_set = 'robot_rotation_set',
 	teams_ready_to_fight = 'teams_ready_to_fight',
 	robots_moved = 'robots_moved',
+	winner = 'winner',
 }
 
 type EventListener = (event: GameEngineEvent) => void
@@ -82,6 +83,10 @@ export type GameEngine = {
 	 */
 	teamFight: (team: string) => void
 	/**
+	 * Used by Admin to pick the winner.
+	 */
+	setWinner: (team: string) => void
+	/**
 	 * Notify listeners when event of the given type happens.
 	 */
 	on: (type: string, fn: EventListener) => void
@@ -120,6 +125,7 @@ export const gameEngine = ({
 		;(listenersForType[event.name] ?? []).forEach((fn) => fn(event))
 	}
 	const teamsReady: string[] = []
+	let winnerTeam: string | undefined = undefined
 
 	const getTeamForRobot = (robotAddress: string): string | undefined =>
 		robotTeamAssignments[robotAddress]
@@ -274,6 +280,24 @@ export const gameEngine = ({
 					name: GameEngineEventType.teams_ready_to_fight,
 				})
 			}
+		},
+		setWinner: (team) => {
+			if (!listOfTeams().includes(team)) {
+				throw new Error(
+					`Cannot select "${team}" as a winner because it was not playing.`,
+				)
+			}
+
+			if (winnerTeam !== undefined)
+				throw new Error(
+					`Cannot select "${team}" as a winner because a winner was already selected.`,
+				)
+
+			winnerTeam = team
+			notify({
+				name: GameEngineEventType.winner,
+				team: winnerTeam,
+			})
 		},
 		onAll: (listener) => {
 			listeners.push(listener)

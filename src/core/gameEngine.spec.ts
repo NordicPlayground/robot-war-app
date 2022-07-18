@@ -492,7 +492,45 @@ describe('gameEngine', () => {
 				})
 			})
 
-			// Next step: Admin decides
+			test('The admin updates the positions of the robots on the field', () => {
+				expect(() =>
+					game.adminSetRobotPosition(robot1, { xMm: 150, yMm: 1400 }),
+				).not.toThrow()
+			})
+
+			describe("The admin picks a winner, because one of the robots is in the opposite team's home zone", () => {
+				it('should send a winner notification', () => {
+					const listener = jest.fn()
+					game.on(GameEngineEventType.winner, listener)
+					game.setWinner(teamA)
+					expect(listener).toHaveBeenCalledWith({
+						name: GameEngineEventType.winner,
+						team: teamA,
+					})
+				})
+
+				it('should not allow to select as a winner a team that was not playing', () => {
+					const randomTeam = 'randomTeam'
+					expect(() => game.setWinner(randomTeam)).toThrow(
+						`Cannot select "${randomTeam}" as a winner because it was not playing.`,
+					)
+				})
+
+				it('should allow exactly one winner', () => {
+					expect(() => game.setWinner(teamB)).toThrow(
+						`Cannot select "${teamB}" as a winner because a winner was already selected.`,
+					)
+				})
+
+				it('should not allow to select the same winner multiple times', () => {
+					expect(() => game.setWinner(teamA)).toThrow(
+						`Cannot select "${teamA}" as a winner because a winner was already selected.`,
+					)
+				})
+			})
+
+			// Next step: Admin updates positions,
+			//  then, Admin decides
 			// 1. there is a winner -> end
 			// 2. there is another round -> update robot position
 			// 3. the game is aborted -> end
