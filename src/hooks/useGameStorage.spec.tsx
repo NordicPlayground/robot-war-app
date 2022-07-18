@@ -14,7 +14,7 @@ describe('useGameStorage', () => {
 		},
 	})
 	const robot = randomMac()
-	game.reportDiscoveredRobots({
+	game.gatewayReportDiscoveredRobots({
 		[robot]: randomRobot(),
 	})
 	const mockPersistFN: PersistAdminChangeFn = jest.fn()
@@ -27,7 +27,7 @@ describe('useGameStorage', () => {
 		})
 
 		// When an admin changes something ...
-		game.assignRobotToTeam(robot, 'Team A')
+		game.adminAssignRobotToTeam(robot, 'Team A')
 
 		// ... the persistence function should be called
 		expect(mockPersistFN).toHaveBeenCalledTimes(1)
@@ -41,7 +41,7 @@ describe('useGameStorage', () => {
 	it('should unregister the connection when disconnect() is called', () => {
 		expect(disconnect).not.toBeUndefined()
 		disconnect?.()
-		game.assignRobotToTeam(robot, 'Team B')
+		game.adminAssignRobotToTeam(robot, 'Team B')
 		// It should not call the persist function again
 		expect(mockPersistFN).toHaveBeenCalledTimes(1)
 	})

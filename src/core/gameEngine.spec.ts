@@ -40,7 +40,7 @@ describe('gameEngine', () => {
 					[robot3]: randomRobot(),
 					[robot4]: randomRobot(),
 				}
-				game.reportDiscoveredRobots(robots)
+				game.gatewayReportDiscoveredRobots(robots)
 				expect(game.robots()).toEqual(robots)
 			})
 		})
@@ -48,10 +48,10 @@ describe('gameEngine', () => {
 		describe('Admin', () => {
 			describe('team assignment', () => {
 				it('assigns robots to teams', () => {
-					game.assignRobotToTeam(robot1, teamA)
-					game.assignRobotToTeam(robot2, teamA)
-					game.assignRobotToTeam(robot3, teamB)
-					game.assignRobotToTeam(robot4, teamB)
+					game.adminAssignRobotToTeam(robot1, teamA)
+					game.adminAssignRobotToTeam(robot2, teamA)
+					game.adminAssignRobotToTeam(robot3, teamB)
+					game.adminAssignRobotToTeam(robot4, teamB)
 					expect(game.robots()).toMatchObject({
 						[robot1]: {
 							team: teamA,
@@ -68,16 +68,16 @@ describe('gameEngine', () => {
 					})
 				})
 				it('should not allow blank names', () =>
-					expect(() => game.assignRobotToTeam(robot1, '')).toThrow(
+					expect(() => game.adminAssignRobotToTeam(robot1, '')).toThrow(
 						/Name cannot be blank!/,
 					))
 			})
 			describe('robot positioning', () => {
 				it('can set the X and Y coordinate', () => {
-					game.setRobotPosition(robot1, { xMm: 250, yMm: 100 })
-					game.setRobotPosition(robot2, { xMm: 750, yMm: 100 })
-					game.setRobotPosition(robot3, { xMm: 250, yMm: 1400 })
-					game.setRobotPosition(robot4, { xMm: 750, yMm: 1400 })
+					game.adminSetRobotPosition(robot1, { xMm: 250, yMm: 100 })
+					game.adminSetRobotPosition(robot2, { xMm: 750, yMm: 100 })
+					game.adminSetRobotPosition(robot3, { xMm: 250, yMm: 1400 })
+					game.adminSetRobotPosition(robot4, { xMm: 750, yMm: 1400 })
 					expect(game.robots()).toMatchObject({
 						[robot1]: {
 							position: { xMm: 250, yMm: 100 },
@@ -103,14 +103,14 @@ describe('gameEngine', () => {
 					[1000, 0], // Bottom outside of field
 					[1001, 0], // Further bottom outside of field
 				])('cannot place it outside of the field (x: %d, y: %d)', (xMm, yMm) =>
-					expect(() => game.setRobotPosition(robot1, { xMm, yMm })).toThrow(
-						/Position is outside of field: /,
-					),
+					expect(() =>
+						game.adminSetRobotPosition(robot1, { xMm, yMm }),
+					).toThrow(/Position is outside of field: /),
 				)
 
 				it('does not accept floats for positions', () =>
 					expect(() =>
-						game.setRobotPosition(robot1, { xMm: 1.234, yMm: 1.234 }),
+						game.adminSetRobotPosition(robot1, { xMm: 1.234, yMm: 1.234 }),
 					).toThrow(/Invalid position provided: /))
 
 				describe('robot rotations', () => {
@@ -132,7 +132,7 @@ describe('gameEngine', () => {
 					})
 
 					it('should be able to update the rotation', () => {
-						game.setRobotRotation(robot1, 135)
+						game.adminSetRobotRotation(robot1, 135)
 						expect(game.robots()).toMatchObject({
 							[robot1]: {
 								position: { rotationDeg: 135 },
@@ -144,7 +144,7 @@ describe('gameEngine', () => {
 						'should not allow to set invalid rotation values (%s)',
 						(rotationDeg) =>
 							expect(() =>
-								game.setRobotRotation(robot1, rotationDeg as any),
+								game.adminSetRobotRotation(robot1, rotationDeg as any),
 							).toThrow(/Invalid angle provided: /),
 					)
 				})
@@ -153,22 +153,22 @@ describe('gameEngine', () => {
 
 		describe('User', () => {
 			it('should set angle and drivetime for the robot', () => {
-				game.setDesiredRobotMovement({
+				game.teamSetDesiredRobotMovement({
 					robotAdress: robot1,
 					angleDeg: 90, //The robot is supposed to rotate 90 degrees clockwise
 					driveTimeMs: 500, //The robot should drive 500ms
 				})
-				game.setDesiredRobotMovement({
+				game.teamSetDesiredRobotMovement({
 					robotAdress: robot2,
 					angleDeg: 180,
 					driveTimeMs: 1000,
 				})
-				game.setDesiredRobotMovement({
+				game.teamSetDesiredRobotMovement({
 					robotAdress: robot3,
 					angleDeg: -90,
 					driveTimeMs: 250,
 				})
-				game.setDesiredRobotMovement({
+				game.teamSetDesiredRobotMovement({
 					robotAdress: robot4,
 					angleDeg: -1,
 					driveTimeMs: 750,
@@ -188,7 +188,7 @@ describe('gameEngine', () => {
 				'should not allow invalid robotAdress %s',
 				(invalidAddress) => {
 					expect(() =>
-						game.setDesiredRobotMovement({
+						game.teamSetDesiredRobotMovement({
 							robotAdress: invalidAddress as any,
 							angleDeg: 180,
 							driveTimeMs: 1000,
@@ -206,7 +206,7 @@ describe('gameEngine', () => {
 				'must be integer and should not allow drivTimeMs over 1000ms or below 0ms (%s)',
 				(invalidDriveTimeMs) => {
 					expect(() =>
-						game.setDesiredRobotMovement({
+						game.teamSetDesiredRobotMovement({
 							driveTimeMs: invalidDriveTimeMs as any,
 							robotAdress: robot1,
 							angleDeg: 180,
@@ -223,7 +223,7 @@ describe('gameEngine', () => {
 				'should not allow angles over 180 degrees or below -180 degrees ',
 				(invalidAngleDeg) => {
 					expect(() =>
-						game.setDesiredRobotMovement({
+						game.teamSetDesiredRobotMovement({
 							angleDeg: invalidAngleDeg as any,
 							robotAdress: robot1,
 							driveTimeMs: 1000,
@@ -234,7 +234,7 @@ describe('gameEngine', () => {
 
 			describe('Starting a round', () => {
 				test('that the user can notify the game that they are ready to fight!', () => {
-					game.fight(teamA) // First team
+					game.teamFight(teamA) // First team
 
 					// After a team has marked itself ready to fight, we can read out that they are
 					expect(game.teamsReady).toContain(teamA)
@@ -246,14 +246,14 @@ describe('gameEngine', () => {
 					const randomTeam = 'some other team'
 
 					expect(() => {
-						game.fight(randomTeam) // this should not work
+						game.teamFight(randomTeam) // this should not work
 					}).toThrow(`Unknown team provided: ${randomTeam}`)
 
 					expect(game.teamsReady).not.toContain(randomTeam)
 				})
 
 				test('that teamB can enter the fight', () => {
-					game.fight(teamB)
+					game.teamFight(teamB)
 					expect(game.teamsReady).toContain(teamB)
 				})
 
@@ -265,14 +265,14 @@ describe('gameEngine', () => {
 				const gameWithOneRobot = simpleGame()
 				const teamAsRobot = randomMac()
 				const teamA = 'Team A'
-				gameWithOneRobot.reportDiscoveredRobots({
+				gameWithOneRobot.gatewayReportDiscoveredRobots({
 					[teamAsRobot]: randomRobot(),
 				})
-				gameWithOneRobot.assignRobotToTeam(teamAsRobot, teamA)
+				gameWithOneRobot.adminAssignRobotToTeam(teamAsRobot, teamA)
 
 				it('should not allow setting the position if the robot has not been placed on the field by the admin', () => {
 					expect(() =>
-						gameWithOneRobot.setDesiredRobotMovement({
+						gameWithOneRobot.teamSetDesiredRobotMovement({
 							robotAdress: teamAsRobot,
 							angleDeg: 135,
 							driveTimeMs: 1000,
@@ -281,7 +281,7 @@ describe('gameEngine', () => {
 						`Robot ${teamAsRobot} has not been placed on the field, yet!`,
 					)
 					// Admin places robot
-					gameWithOneRobot.setRobotPosition(teamAsRobot, {
+					gameWithOneRobot.adminSetRobotPosition(teamAsRobot, {
 						xMm: 100,
 						yMm: 100,
 					})
@@ -289,17 +289,17 @@ describe('gameEngine', () => {
 
 				it('Should allow changes by the team as long as it is not ready to fight', () => {
 					const finalRotation = 45
-					gameWithOneRobot.setDesiredRobotMovement({
+					gameWithOneRobot.teamSetDesiredRobotMovement({
 						robotAdress: teamAsRobot,
 						angleDeg: 135,
 						driveTimeMs: 1000,
 					})
-					gameWithOneRobot.setDesiredRobotMovement({
+					gameWithOneRobot.teamSetDesiredRobotMovement({
 						robotAdress: teamAsRobot,
 						angleDeg: 90,
 						driveTimeMs: 1000,
 					})
-					gameWithOneRobot.setDesiredRobotMovement({
+					gameWithOneRobot.teamSetDesiredRobotMovement({
 						robotAdress: teamAsRobot,
 						angleDeg: finalRotation,
 						driveTimeMs: 1000,
@@ -314,19 +314,19 @@ describe('gameEngine', () => {
 
 				test('Should not allow changes by the team after they are ready to fight', () => {
 					const beforeFight = 45
-					gameWithOneRobot.setDesiredRobotMovement({
+					gameWithOneRobot.teamSetDesiredRobotMovement({
 						robotAdress: teamAsRobot,
 						angleDeg: 135,
 						driveTimeMs: 1000,
 					})
-					gameWithOneRobot.setDesiredRobotMovement({
+					gameWithOneRobot.teamSetDesiredRobotMovement({
 						robotAdress: teamAsRobot,
 						angleDeg: beforeFight,
 						driveTimeMs: 1000,
 					})
-					gameWithOneRobot.fight(teamA)
+					gameWithOneRobot.teamFight(teamA)
 					expect(() => {
-						gameWithOneRobot.setDesiredRobotMovement({
+						gameWithOneRobot.teamSetDesiredRobotMovement({
 							robotAdress: teamAsRobot,
 							angleDeg: 90,
 							driveTimeMs: 1000,
@@ -352,7 +352,7 @@ describe('gameEngine', () => {
 		describe('onAll', () => {
 			it('should notify subscribers of changes', () => {
 				game.onAll(listener)
-				game.reportDiscoveredRobots({
+				game.gatewayReportDiscoveredRobots({
 					[randomMac()]: randomRobot(),
 				})
 				expect(listener).toHaveBeenCalledWith({
@@ -365,7 +365,7 @@ describe('gameEngine', () => {
 			it('should unregister subscribers', () => {
 				expect(listener).toHaveBeenCalledTimes(1)
 				game.offAll(listener)
-				game.reportDiscoveredRobots({
+				game.gatewayReportDiscoveredRobots({
 					[randomMac()]: randomRobot(),
 				})
 				expect(listener).toHaveBeenCalledTimes(1)
@@ -376,7 +376,7 @@ describe('gameEngine', () => {
 			const game = simpleGame()
 
 			const address = randomMac()
-			game.reportDiscoveredRobots({
+			game.gatewayReportDiscoveredRobots({
 				[address]: randomRobot(),
 			})
 
@@ -385,7 +385,7 @@ describe('gameEngine', () => {
 				game.onAll(listener)
 
 				// Admin assigns team
-				game.assignRobotToTeam(address, 'Team A')
+				game.adminAssignRobotToTeam(address, 'Team A')
 
 				expect(listener).toHaveBeenCalledWith({
 					name: GameEngineEventType.robot_team_assigned,
@@ -399,7 +399,7 @@ describe('gameEngine', () => {
 				game.onAll(listener)
 
 				// Admin assigns a position
-				game.setRobotPosition(address, {
+				game.adminSetRobotPosition(address, {
 					xMm: 17,
 					yMm: 42,
 				})
@@ -419,7 +419,7 @@ describe('gameEngine', () => {
 				game.onAll(listener)
 
 				// Admin assigns a position
-				game.setRobotRotation(address, 135)
+				game.adminSetRobotRotation(address, 135)
 
 				expect(listener).toHaveBeenCalledWith({
 					name: GameEngineEventType.robot_rotation_set,

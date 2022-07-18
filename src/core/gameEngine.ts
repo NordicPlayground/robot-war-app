@@ -37,39 +37,42 @@ export type GameEngine = {
 	/**
 	 * Used by the Gateway to report discovered robots
 	 */
-	reportDiscoveredRobots: (
+	gatewayReportDiscoveredRobots: (
 		robots: Static<typeof ReportedGameState>['robots'],
 	) => void
 	/**
 	 * Used by the Admin to assign a robot to a team
 	 */
-	assignRobotToTeam: (
+	adminAssignRobotToTeam: (
 		robotAddress: Static<typeof MacAddress>,
 		name: string,
 	) => void
 	/**
 	 * Used by the Admin to set the position of a robot
 	 */
-	setRobotPosition: (
+	adminSetRobotPosition: (
 		robotAddress: Static<typeof MacAddress>,
 		position: Omit<Static<typeof Position>, 'rotationDeg'>,
 	) => void
 	/**
 	 * Used by the Admin to set the rotation of a robot
 	 */
-	setRobotRotation: (
+	adminSetRobotRotation: (
 		robotAddress: Static<typeof MacAddress>,
 		rotationDeg: Static<typeof Position>['rotationDeg'],
 	) => void
 	/**
-	 * Used by the User to set the desired rotation of a robot
+	 * Used by the Team to set the desired rotation of a robot
 	 */
-	setDesiredRobotMovement: (args: {
+	teamSetDesiredRobotMovement: (args: {
 		robotAdress: Static<typeof MacAddress>
 		angleDeg: Static<typeof Robot>['angleDeg']
 		driveTimeMs: Static<typeof Robot>['driveTimeMs']
 	}) => void
-	fight: (team: string) => void
+	/**
+	 * Used by the Team to signal that they are ready for the next round.
+	 */
+	teamFight: (team: string) => void
 	onAll: (fn: EventListener) => void
 	offAll: (fn: EventListener) => void
 }
@@ -117,13 +120,13 @@ export const gameEngine = ({
 					}),
 					{},
 				),
-		reportDiscoveredRobots: (newRobots) => {
+		gatewayReportDiscoveredRobots: (newRobots) => {
 			if (!equal(robots, newRobots)) {
 				robots = newRobots
 				notify({ name: GameEngineEventType.robots_discovered })
 			}
 		},
-		assignRobotToTeam: (robotAddress, name) => {
+		adminAssignRobotToTeam: (robotAddress, name) => {
 			if (name.length === 0) {
 				throw new Error(`Name cannot be blank!`)
 			}
@@ -134,7 +137,7 @@ export const gameEngine = ({
 				team: name,
 			})
 		},
-		setRobotPosition: (robotAddress, { xMm, yMm }) => {
+		adminSetRobotPosition: (robotAddress, { xMm, yMm }) => {
 			if (!Number.isInteger(xMm) || !Number.isInteger(yMm))
 				throw new Error(`Invalid position provided: ${xMm}/${yMm}!`)
 			if (xMm < 0 || xMm >= field.heightMm || yMm < 0 || yMm >= field.widthMm)
@@ -153,7 +156,7 @@ export const gameEngine = ({
 				},
 			})
 		},
-		setRobotRotation: (robotAddress, rotationDeg) => {
+		adminSetRobotRotation: (robotAddress, rotationDeg) => {
 			if (
 				rotationDeg < 0 ||
 				rotationDeg >= 360 ||
@@ -173,7 +176,7 @@ export const gameEngine = ({
 				},
 			})
 		},
-		setDesiredRobotMovement: ({
+		teamSetDesiredRobotMovement: ({
 			robotAdress: address,
 			angleDeg,
 			driveTimeMs,
@@ -203,7 +206,7 @@ export const gameEngine = ({
 			robots[address].angleDeg = angleDeg
 			robots[address].driveTimeMs = driveTimeMs
 		},
-		fight: (team: string) => {
+		teamFight: (team: string) => {
 			if (!Object.values(robotTeamAssignments).includes(team)) {
 				throw new Error(`Unknown team provided: ${team}`)
 			}

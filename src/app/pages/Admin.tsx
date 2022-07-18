@@ -28,7 +28,7 @@ export const Admin = () => {
 	} = useAppConfig()
 	const {
 		metaData: { robotFieldPosition },
-		setRobotPosition,
+		adminSetRobotPosition,
 	} = useGameAdmin()
 
 	const { helperLinesNumber } = useAppConfig()
@@ -77,7 +77,7 @@ export const Admin = () => {
 									yMm,
 								},
 							}))
-							setRobotPosition(selectedRobot, {
+							adminSetRobotPosition(selectedRobot, {
 								xMm,
 								yMm,
 								rotationDeg: robots[selectedRobot].rotationDeg,
@@ -109,7 +109,7 @@ export const Admin = () => {
 											rotationDeg: rotationDeg + rotation,
 										},
 									}))
-									setRobotPosition(mac, {
+									adminSetRobotPosition(mac, {
 										xMm: robots[mac].xMm,
 										yMm: robots[mac].yMm,
 										rotationDeg: rotationDeg + rotation,

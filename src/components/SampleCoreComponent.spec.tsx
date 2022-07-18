@@ -49,7 +49,7 @@ describe('A component that uses the core', () => {
 		const robotAddress1 = randomMac()
 		const robotAddress2 = randomMac()
 		act(() => {
-			game.reportDiscoveredRobots({
+			game.gatewayReportDiscoveredRobots({
 				[robotAddress1]: randomRobot(),
 				[robotAddress2]: randomRobot(),
 			})

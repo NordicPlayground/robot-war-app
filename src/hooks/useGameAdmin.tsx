@@ -34,7 +34,7 @@ export const GameAdminContext = createContext<{
 		robot: Static<typeof MacAddress>,
 		teamId: Static<typeof TeamId>,
 	) => void
-	setRobotPosition: (
+	adminSetRobotPosition: (
 		robot: Static<typeof MacAddress>,
 		position: Static<typeof Position>,
 	) => void
@@ -45,7 +45,7 @@ export const GameAdminContext = createContext<{
 		robotTeamAssignment: {},
 	},
 	setRobotTeam: () => undefined,
-	setRobotPosition: () => undefined,
+	adminSetRobotPosition: () => undefined,
 	setAutoUpdate: () => undefined,
 })
 
@@ -154,7 +154,7 @@ export const GameAdminProvider: FunctionComponent<{
 						},
 					})
 				},
-				setRobotPosition: (robot, position) => {
+				adminSetRobotPosition: (robot, position) => {
 					setGameMetaData((metadata) => ({
 						...metadata,
 						robotFieldPosition: {

@@ -6,7 +6,7 @@ import { useEffect } from 'react'
 
 /**
  * Load data from AWS IoT game controller thing
- *  - reported robots: loadGatewayStateIoT() -> gameInstance.reportDiscoveredRobots()
+ *  - reported robots: loadGatewayStateIoT() -> gameInstance.gatewayReportDiscoveredRobots()
  *  - TODO: admin configuration: loadRobotGameSettings() -> gameInstance.reportRobotGameSettings()
  */
 
@@ -29,7 +29,7 @@ export const useAWSIoTPersistenceRetrieval = () => {
 					console.error(`[AWSIoTPersistenceProvider]`, 'Invalid state, ignore.')
 					return
 				}
-				gameInstance.reportDiscoveredRobots(maybeState.robots)
+				gameInstance.gatewayReportDiscoveredRobots(maybeState.robots)
 			})
 			.catch(console.error)
 	}, [iotDataPlaneClient, thingName, gameInstance])

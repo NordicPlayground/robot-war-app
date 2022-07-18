@@ -3,7 +3,7 @@ import { useState } from 'react'
 
 export const GameEngineDemo = () => {
 	const {
-		game: { assignRobotToTeam },
+		game: { adminAssignRobotToTeam },
 		robots,
 	} = useCore()
 
@@ -18,7 +18,7 @@ export const GameEngineDemo = () => {
 						<RobotTeam
 							address={address}
 							onSave={(teamName) => {
-								assignRobotToTeam(address, teamName)
+								adminAssignRobotToTeam(address, teamName)
 							}}
 						/>
 					</li>
