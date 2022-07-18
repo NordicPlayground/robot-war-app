@@ -13,6 +13,7 @@ export enum GameEngineEventType {
 	robot_position_set = 'robot_position_set',
 	robot_rotation_set = 'robot_rotation_set',
 	teams_ready_to_fight = 'teams_ready_to_fight',
+	robots_moved = 'robots_moved',
 }
 
 type EventListener = (event: GameEngineEvent) => void
@@ -70,6 +71,12 @@ export type GameEngine = {
 		angleDeg: Static<typeof Robot>['angleDeg']
 		driveTimeMs: Static<typeof Robot>['driveTimeMs']
 	}) => void
+	/**
+	 * Used by the Gateway to report back the movement of robots
+	 */
+	gatewayReportMovedRobots: (
+		movement: Record<Static<typeof MacAddress>, Record<string, number>>,
+	) => void
 	/**
 	 * Used by the Team to signal that they are ready for the next round.
 	 */
@@ -130,6 +137,15 @@ export const gameEngine = ({
 				robots = newRobots
 				notify({ name: GameEngineEventType.robots_discovered })
 			}
+		},
+		gatewayReportMovedRobots: (movement) => {
+			Object.entries(movement).forEach(([mac, { revolutionCount }]) => {
+				robots[mac].revolutionCount = revolutionCount
+			})
+			notify({
+				name: GameEngineEventType.robots_moved,
+				movement,
+			})
 		},
 		adminAssignRobotToTeam: (robotAddress, name) => {
 			if (name.length === 0) {

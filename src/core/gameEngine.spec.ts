@@ -429,6 +429,66 @@ describe('gameEngine', () => {
 					})
 				})
 			})
+
+			describe('the Gateway moves the robots and reports back', () => {
+				it('should be able to report the status back', () => {
+					const events: GameEngineEvent[] = []
+					game.onAll((event) => events.push(event))
+					game.gatewayReportMovedRobots({
+						[robot1]: {
+							revolutionCount: 123,
+						},
+						[robot2]: {
+							revolutionCount: 456,
+						},
+						[robot3]: {
+							revolutionCount: 789,
+						},
+						[robot4]: {
+							revolutionCount: 202,
+						},
+					})
+					expect(events).toContainEqual({
+						name: GameEngineEventType.robots_moved,
+						movement: {
+							[robot1]: {
+								revolutionCount: 123,
+							},
+							[robot2]: {
+								revolutionCount: 456,
+							},
+							[robot3]: {
+								revolutionCount: 789,
+							},
+							[robot4]: {
+								revolutionCount: 202,
+							},
+						},
+					})
+				})
+
+				test('that we can read the report by the Gateway', () => {
+					expect(game.robots()).toMatchObject({
+						[robot1]: {
+							revolutionCount: 123,
+						},
+						[robot2]: {
+							revolutionCount: 456,
+						},
+						[robot3]: {
+							revolutionCount: 789,
+						},
+						[robot4]: {
+							revolutionCount: 202,
+						},
+					})
+				})
+			})
+
+			// Next step: Admin decides
+			// 1. there is a winner -> end
+			// 2. there is another round -> update robot position
+			// 3. the game is aborted -> end
 		})
 	})
 
