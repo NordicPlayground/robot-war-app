@@ -75,14 +75,27 @@ export type GameEngine = {
 	 * Used by the Gateway to report back the movement of robots
 	 */
 	gatewayReportMovedRobots: (
-		movement: Record<Static<typeof MacAddress>, Record<string, number>>,
+		movement: Record<Static<typeof MacAddress>, { revolutionCount: number }>,
 	) => void
 	/**
 	 * Used by the Team to signal that they are ready for the next round.
 	 */
 	teamFight: (team: string) => void
-	// TODO: implement `on: (type: string, fn: EventListener) => void` to listeners get only notified for specific events
+	/**
+	 * Notify listeners when event of the given type happens.
+	 */
+	on: (type: string, fn: EventListener) => void
+	/**
+	 * Remove previously registered listener for the given event type
+	 */
+	off: (type: string, fn: EventListener) => void
+	/**
+	 * Notify listeners about all events
+	 */
 	onAll: (fn: EventListener) => void
+	/**
+	 * Remove previously registered listener for all events
+	 */
 	offAll: (fn: EventListener) => void
 }
 
@@ -101,8 +114,10 @@ export const gameEngine = ({
 		Static<typeof Position>
 	> = {}
 	const listeners: EventListener[] = []
+	const listenersForType: Record<string, EventListener[]> = {}
 	const notify = (event: GameEngineEvent) => {
 		listeners.forEach((fn) => fn(event))
+		;(listenersForType[event.name] ?? []).forEach((fn) => fn(event))
 	}
 	const teamsReady: string[] = []
 
@@ -253,6 +268,14 @@ export const gameEngine = ({
 		},
 		offAll: (listener) => {
 			delete listeners[listeners.indexOf(listener)]
+		},
+		on: (type, listener) => {
+			if (listenersForType[type] === undefined) listenersForType[type] = []
+			listenersForType[type].push(listener)
+		},
+		off: (type, listener) => {
+			const index = (listenersForType[type] ?? []).indexOf(listener)
+			if (index !== undefined) delete listenersForType[type][index]
 		},
 	}
 }

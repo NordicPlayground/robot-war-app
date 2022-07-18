@@ -1,6 +1,5 @@
 import type { Static } from '@sinclair/typebox'
 import type { ReportedGameState } from 'api/validateGameControllerShadow.js'
-import type { GameEngineEvent } from 'core/gameEngine.js'
 import { gameEngine, GameEngineEventType } from 'core/gameEngine.js'
 import { randomMac } from 'core/test/randomMac.js'
 import { randomRobot } from 'core/test/randomRobot.js'
@@ -369,18 +368,18 @@ describe('gameEngine', () => {
 					game.adminAssignRobotToTeam(robot1, teamA)
 					game.adminAssignRobotToTeam(robot2, teamB)
 
-					const events: GameEngineEvent[] = []
-					game.onAll((event) => events.push(event))
+					const listener = jest.fn()
+					game.on(GameEngineEventType.teams_ready_to_fight, listener)
 
 					// Team A marks ready to fight
 					game.teamFight(teamA)
-					expect(events).not.toContainEqual({
+					expect(listener).not.toHaveBeenCalledWith({
 						name: GameEngineEventType.teams_ready_to_fight,
 					})
 
 					// Team B marks ready to fight, now all teams are ready
 					game.teamFight(teamB)
-					expect(events).toContainEqual({
+					expect(listener).toHaveBeenCalledWith({
 						name: GameEngineEventType.teams_ready_to_fight,
 					})
 				})
@@ -401,8 +400,8 @@ describe('gameEngine', () => {
 
 				it('should only notify if ALL teams are ready', () => {
 					const game = simpleGame()
-					const events: GameEngineEvent[] = []
-					game.onAll((event) => events.push(event))
+					const listener = jest.fn()
+					game.on(GameEngineEventType.teams_ready_to_fight, listener)
 
 					const r1 = randomMac()
 					const r2 = randomMac()
@@ -418,13 +417,13 @@ describe('gameEngine', () => {
 
 					game.teamFight('Team A')
 					game.teamFight('Team B')
-					expect(events).not.toContainEqual({
+					expect(listener).not.toHaveBeenLastCalledWith({
 						name: GameEngineEventType.teams_ready_to_fight,
 					})
 
 					// Only when all three teams are ready!
 					game.teamFight('Team C')
-					expect(events).toContainEqual({
+					expect(listener).toHaveBeenLastCalledWith({
 						name: GameEngineEventType.teams_ready_to_fight,
 					})
 				})
@@ -432,8 +431,8 @@ describe('gameEngine', () => {
 
 			describe('the Gateway moves the robots and reports back', () => {
 				it('should be able to report the status back', () => {
-					const events: GameEngineEvent[] = []
-					game.onAll((event) => events.push(event))
+					const listener = jest.fn()
+					game.on(GameEngineEventType.robots_moved, listener)
 					game.gatewayReportMovedRobots({
 						[robot1]: {
 							revolutionCount: 123,
@@ -448,7 +447,7 @@ describe('gameEngine', () => {
 							revolutionCount: 202,
 						},
 					})
-					expect(events).toContainEqual({
+					expect(listener).toHaveBeenCalledWith({
 						name: GameEngineEventType.robots_moved,
 						movement: {
 							[robot1]: {
@@ -480,6 +479,14 @@ describe('gameEngine', () => {
 						},
 						[robot4]: {
 							revolutionCount: 202,
+						},
+					})
+				})
+
+				test.skip('that it can report for previously undiscovered robots (message might have been lost)', () => {
+					game.gatewayReportMovedRobots({
+						[randomMac()]: {
+							revolutionCount: 123,
 						},
 					})
 				})
@@ -575,6 +582,57 @@ describe('gameEngine', () => {
 						rotationDeg: 135,
 					},
 				})
+			})
+		})
+
+		describe('on', () => {
+			it('should notify about a specific event', () => {
+				const game = simpleGame()
+
+				const typedListener = jest.fn()
+				game.on(GameEngineEventType.robots_discovered, typedListener)
+
+				const robot = randomMac()
+
+				game.gatewayReportDiscoveredRobots({
+					[robot]: randomRobot(),
+				})
+
+				game.gatewayReportMovedRobots({
+					[robot]: {
+						revolutionCount: 123,
+					},
+				})
+
+				expect(typedListener).toHaveBeenCalledTimes(1)
+				expect(typedListener).toHaveBeenCalledWith({
+					name: GameEngineEventType.robots_discovered,
+				})
+			})
+		})
+
+		describe('off', () => {
+			it('should not call a listener for a specific event it it has been disabled', () => {
+				const game = simpleGame()
+
+				const typedListener = jest.fn()
+				game.on(GameEngineEventType.robots_discovered, typedListener)
+
+				const robot = randomMac()
+
+				game.gatewayReportDiscoveredRobots({
+					[robot]: randomRobot(),
+				})
+
+				expect(typedListener).toHaveBeenCalledTimes(1)
+
+				game.off(GameEngineEventType.robots_discovered, typedListener)
+
+				game.gatewayReportDiscoveredRobots({
+					[robot]: randomRobot(),
+				})
+
+				expect(typedListener).toHaveBeenCalledTimes(1)
 			})
 		})
 	})
