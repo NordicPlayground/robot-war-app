@@ -1,5 +1,6 @@
 import type { Static } from '@sinclair/typebox'
 import type { ReportedGameState } from 'api/validateGameControllerShadow.js'
+import type { GameEngineEvent } from 'core/gameEngine.js'
 import { gameEngine, GameEngineEventType } from 'core/gameEngine.js'
 import { randomMac } from 'core/test/randomMac.js'
 import { randomRobot } from 'core/test/randomRobot.js'
@@ -256,9 +257,6 @@ describe('gameEngine', () => {
 					game.teamFight(teamB)
 					expect(game.teamsReady).toContain(teamB)
 				})
-
-				// rules to test here:
-				// - both teams need to be ready, before the fight starts -> Game should notify the gateway only after both teams are ready to fight
 			})
 
 			describe('The team should not be able to change the desired robot positions after signalling ready to fight', () => {
@@ -339,6 +337,95 @@ describe('gameEngine', () => {
 							angleDeg: beforeFight,
 							driveTimeMs: 1000,
 						},
+					})
+				})
+			})
+
+			describe('Gateway should receive a notification when both teams are ready to fight', () => {
+				const teamA = 'Team A'
+				const teamB = 'Team B'
+				const game = simpleGame()
+				// Game has two robots
+				const robot1 = randomMac()
+				const robot2 = randomMac()
+
+				beforeAll(() => {
+					// Game has two robots
+					game.gatewayReportDiscoveredRobots({
+						[robot1]: randomRobot(),
+						[robot2]: randomRobot(),
+					})
+				})
+
+				it.each([[teamA], [teamB]])(
+					'should not be possible for team %s to be ready to fight without robots',
+					(team) => {
+						expect(() => game.teamFight(team)).toThrow()
+					},
+				)
+
+				it('should notify the Gateway that both teams are ready', () => {
+					// Assign robots to teams
+					game.adminAssignRobotToTeam(robot1, teamA)
+					game.adminAssignRobotToTeam(robot2, teamB)
+
+					const events: GameEngineEvent[] = []
+					game.onAll((event) => events.push(event))
+
+					// Team A marks ready to fight
+					game.teamFight(teamA)
+					expect(events).not.toContainEqual({
+						name: GameEngineEventType.teams_ready_to_fight,
+					})
+
+					// Team B marks ready to fight, now all teams are ready
+					game.teamFight(teamB)
+					expect(events).toContainEqual({
+						name: GameEngineEventType.teams_ready_to_fight,
+					})
+				})
+
+				it('teams should not mark themselves ready to fight multiple times', () => {
+					const game = simpleGame()
+					const r1 = randomMac()
+					game.gatewayReportDiscoveredRobots({
+						[r1]: randomRobot(),
+					})
+					game.adminAssignRobotToTeam(r1, 'Team A')
+
+					game.teamFight('Team A')
+					expect(() => game.teamFight('Team A')).toThrow(
+						`"Team A" is already ready to fight!`,
+					)
+				})
+
+				it('should only notify if ALL teams are ready', () => {
+					const game = simpleGame()
+					const events: GameEngineEvent[] = []
+					game.onAll((event) => events.push(event))
+
+					const r1 = randomMac()
+					const r2 = randomMac()
+					const r3 = randomMac()
+					game.gatewayReportDiscoveredRobots({
+						[r1]: randomRobot(),
+						[r2]: randomRobot(),
+						[r3]: randomRobot(),
+					})
+					game.adminAssignRobotToTeam(r1, 'Team A')
+					game.adminAssignRobotToTeam(r2, 'Team B')
+					game.adminAssignRobotToTeam(r3, 'Team C')
+
+					game.teamFight('Team A')
+					game.teamFight('Team B')
+					expect(events).not.toContainEqual({
+						name: GameEngineEventType.teams_ready_to_fight,
+					})
+
+					// Only when all three teams are ready!
+					game.teamFight('Team C')
+					expect(events).toContainEqual({
+						name: GameEngineEventType.teams_ready_to_fight,
 					})
 				})
 			})

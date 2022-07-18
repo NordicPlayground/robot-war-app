@@ -12,6 +12,7 @@ export enum GameEngineEventType {
 	robot_team_assigned = 'robot_team_assigned',
 	robot_position_set = 'robot_position_set',
 	robot_rotation_set = 'robot_rotation_set',
+	teams_ready_to_fight = 'teams_ready_to_fight',
 }
 
 type EventListener = (event: GameEngineEvent) => void
@@ -73,6 +74,7 @@ export type GameEngine = {
 	 * Used by the Team to signal that they are ready for the next round.
 	 */
 	teamFight: (team: string) => void
+	// TODO: implement `on: (type: string, fn: EventListener) => void` to listeners get only notified for specific events
 	onAll: (fn: EventListener) => void
 	offAll: (fn: EventListener) => void
 }
@@ -100,6 +102,9 @@ export const gameEngine = ({
 	const getTeamForRobot = (robotAddress: string): string | undefined =>
 		robotTeamAssignments[robotAddress]
 
+	const listOfTeams = () => Object.values(robotTeamAssignments)
+	const areAllTeamsReady = () => teamsReady.length === listOfTeams().length
+	const hasTeamRobots = (team: string) => listOfTeams().includes(team)
 	return {
 		field,
 		teamsReady,
@@ -207,10 +212,25 @@ export const gameEngine = ({
 			robots[address].driveTimeMs = driveTimeMs
 		},
 		teamFight: (team: string) => {
-			if (!Object.values(robotTeamAssignments).includes(team)) {
+			if (teamsReady.includes(team)) {
+				throw new Error(`"${team}" is already ready to fight!`)
+			}
+			if (!listOfTeams().includes(team)) {
 				throw new Error(`Unknown team provided: ${team}`)
 			}
+
+			const teamHasRobots = hasTeamRobots(team)
+			if (teamHasRobots === false) {
+				throw new Error(`Team has no robots: ${team}`)
+			}
+
 			teamsReady.push(team)
+			const allReady = areAllTeamsReady()
+			if (allReady) {
+				notify({
+					name: GameEngineEventType.teams_ready_to_fight,
+				})
+			}
 		},
 		onAll: (listener) => {
 			listeners.push(listener)
