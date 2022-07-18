@@ -160,13 +160,6 @@ export const gameEngine = ({
 				!Number.isFinite(rotationDeg)
 			)
 				throw new Error(`Invalid angle provided: ${rotationDeg}!`)
-			const robotTeam = getTeamForRobot(robotAddress)
-			if (robotTeam === undefined)
-				throw new Error(`No team found for robot: ${robotAddress}!`)
-			if (teamsReady.includes(robotTeam))
-				throw new Error(
-					`Cannot move robot after team is ready to fight: ${robotAddress}!`,
-				)
 			if (robotPostions[robotAddress] === undefined)
 				throw new Error(
 					`Robot ${robotAddress} has not been placed on the field, yet!`,
@@ -195,6 +188,18 @@ export const gameEngine = ({
 				throw new Error(`invalid driveTimeMs provided: ${driveTimeMs}`)
 			if (angleDeg > 180 || angleDeg < -180 || !Number.isInteger(angleDeg))
 				throw new Error(`invalid angleDeg provided: ${angleDeg}`)
+			const robotTeam = getTeamForRobot(address)
+			if (robotTeam === undefined)
+				throw new Error(`No team found for robot: ${address}!`)
+			if (teamsReady.includes(robotTeam))
+				throw new Error(
+					`Cannot move robot after team is ready to fight: ${address}!`,
+				)
+			// Users can only modify robots that have been placed on the field by an admin
+			if (robotPostions[address] === undefined)
+				throw new Error(
+					`Robot ${address} has not been placed on the field, yet!`,
+				)
 			robots[address].angleDeg = angleDeg
 			robots[address].driveTimeMs = driveTimeMs
 		},

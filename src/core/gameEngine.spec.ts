@@ -272,7 +272,11 @@ describe('gameEngine', () => {
 
 				it('should not allow setting the position if the robot has not been placed on the field by the admin', () => {
 					expect(() =>
-						gameWithOneRobot.setRobotRotation(teamAsRobot, 135),
+						gameWithOneRobot.setDesiredRobotMovement({
+							robotAdress: teamAsRobot,
+							angleDeg: 135,
+							driveTimeMs: 1000,
+						}),
 					).toThrow(
 						`Robot ${teamAsRobot} has not been placed on the field, yet!`,
 					)
@@ -285,29 +289,55 @@ describe('gameEngine', () => {
 
 				it('Should allow changes by the team as long as it is not ready to fight', () => {
 					const finalRotation = 45
-					gameWithOneRobot.setRobotRotation(teamAsRobot, 135)
-					gameWithOneRobot.setRobotRotation(teamAsRobot, 90)
-					gameWithOneRobot.setRobotRotation(teamAsRobot, finalRotation)
+					gameWithOneRobot.setDesiredRobotMovement({
+						robotAdress: teamAsRobot,
+						angleDeg: 135,
+						driveTimeMs: 1000,
+					})
+					gameWithOneRobot.setDesiredRobotMovement({
+						robotAdress: teamAsRobot,
+						angleDeg: 90,
+						driveTimeMs: 1000,
+					})
+					gameWithOneRobot.setDesiredRobotMovement({
+						robotAdress: teamAsRobot,
+						angleDeg: finalRotation,
+						driveTimeMs: 1000,
+					})
 					expect(gameWithOneRobot.robots()).toMatchObject({
 						[teamAsRobot]: {
-							position: { rotationDeg: finalRotation },
+							angleDeg: finalRotation,
+							driveTimeMs: 1000,
 						},
 					})
 				})
 
 				test('Should not allow changes by the team after they are ready to fight', () => {
 					const beforeFight = 45
-					gameWithOneRobot.setRobotRotation(teamAsRobot, 135)
-					gameWithOneRobot.setRobotRotation(teamAsRobot, 45)
+					gameWithOneRobot.setDesiredRobotMovement({
+						robotAdress: teamAsRobot,
+						angleDeg: 135,
+						driveTimeMs: 1000,
+					})
+					gameWithOneRobot.setDesiredRobotMovement({
+						robotAdress: teamAsRobot,
+						angleDeg: beforeFight,
+						driveTimeMs: 1000,
+					})
 					gameWithOneRobot.fight(teamA)
 					expect(() => {
-						gameWithOneRobot.setRobotRotation(teamAsRobot, 90)
+						gameWithOneRobot.setDesiredRobotMovement({
+							robotAdress: teamAsRobot,
+							angleDeg: 90,
+							driveTimeMs: 1000,
+						})
 					}).toThrow(
 						`Cannot move robot after team is ready to fight: ${teamAsRobot}!`,
 					)
 					expect(gameWithOneRobot.robots()).toMatchObject({
 						[teamAsRobot]: {
-							position: { rotationDeg: beforeFight },
+							angleDeg: beforeFight,
+							driveTimeMs: 1000,
 						},
 					})
 				})
