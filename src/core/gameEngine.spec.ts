@@ -237,9 +237,9 @@ describe('gameEngine', () => {
 					game.teamFight(teamA) // First team
 
 					// After a team has marked itself ready to fight, we can read out that they are
-					expect(game.teamsReady).toContain(teamA)
+					expect(game.teamsReady()).toContain(teamA)
 					// teamB hasn't yet marked that they are ready to fight
-					expect(game.teamsReady).not.toContain(teamB)
+					expect(game.teamsReady()).not.toContain(teamB)
 				})
 
 				it('should not allow an unknown team to mark ready for fight', () => {
@@ -249,12 +249,12 @@ describe('gameEngine', () => {
 						game.teamFight(randomTeam) // this should not work
 					}).toThrow(`Unknown team provided: ${randomTeam}`)
 
-					expect(game.teamsReady).not.toContain(randomTeam)
+					expect(game.teamsReady()).not.toContain(randomTeam)
 				})
 
 				test('that teamB can enter the fight', () => {
 					game.teamFight(teamB)
-					expect(game.teamsReady).toContain(teamB)
+					expect(game.teamsReady()).toContain(teamB)
 				})
 			})
 
@@ -498,32 +498,76 @@ describe('gameEngine', () => {
 				).not.toThrow()
 			})
 
+			describe("Next round starts because there isn't a winner yet", () => {
+				test("Admin starts the next round and then game should not have a winner and no teams should be 'ready to fight'", () => {
+					const listener = jest.fn()
+					game.on(GameEngineEventType.next_round, listener)
+					game.adminNextRound()
+					expect(game.teamsReady()).toEqual([])
+					expect(game.winnerTeam).toBeUndefined()
+					expect(listener).toHaveBeenCalledWith({
+						name: GameEngineEventType.next_round,
+					})
+				})
+
+				it('should not be possible to start the next round before the teams are ready to fight', () =>
+					expect(() => game.adminNextRound()).toThrow(
+						/Round is already in progress!/,
+					))
+
+				test('that teams can set the desired movement for the next round', () => {
+					game.teamSetDesiredRobotMovement({
+						robotAdress: robot1,
+						angleDeg: 45,
+						driveTimeMs: 675,
+					})
+					expect(game.robots()).toMatchObject({
+						[robot1]: {
+							angleDeg: 45,
+							driveTimeMs: 675,
+						},
+					})
+				})
+
+				test('that teams can set themselves ready for round 2', () => {
+					game.teamFight(teamA)
+					game.teamFight(teamB)
+					expect(game.teamsReady()).toContain(teamA)
+					expect(game.teamsReady()).toContain(teamB)
+				})
+			})
+
 			describe("The admin picks a winner, because one of the robots is in the opposite team's home zone", () => {
 				it('should send a winner notification', () => {
 					const listener = jest.fn()
 					game.on(GameEngineEventType.winner, listener)
-					game.setWinner(teamA)
+					game.adminSetWinner(teamA)
 					expect(listener).toHaveBeenCalledWith({
 						name: GameEngineEventType.winner,
 						team: teamA,
 					})
 				})
 
+				it('should not be possible to start the next round after a winner has been picked', () =>
+					expect(() => game.adminNextRound()).toThrow(
+						/Game is already finished!/,
+					))
+
 				it('should not allow to select as a winner a team that was not playing', () => {
 					const randomTeam = 'randomTeam'
-					expect(() => game.setWinner(randomTeam)).toThrow(
+					expect(() => game.adminSetWinner(randomTeam)).toThrow(
 						`Cannot select "${randomTeam}" as a winner because it was not playing.`,
 					)
 				})
 
 				it('should allow exactly one winner', () => {
-					expect(() => game.setWinner(teamB)).toThrow(
+					expect(() => game.adminSetWinner(teamB)).toThrow(
 						`Cannot select "${teamB}" as a winner because a winner was already selected.`,
 					)
 				})
 
 				it('should not allow to select the same winner multiple times', () => {
-					expect(() => game.setWinner(teamA)).toThrow(
+					expect(() => game.adminSetWinner(teamA)).toThrow(
 						`Cannot select "${teamA}" as a winner because a winner was already selected.`,
 					)
 				})

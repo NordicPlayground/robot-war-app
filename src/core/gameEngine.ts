@@ -15,6 +15,7 @@ export enum GameEngineEventType {
 	teams_ready_to_fight = 'teams_ready_to_fight',
 	robots_moved = 'robots_moved',
 	winner = 'winner',
+	next_round = 'next_round',
 }
 
 type EventListener = (event: GameEngineEvent) => void
@@ -32,7 +33,11 @@ export type GameEngine = {
 	/**
 	 * Returns the list of teams ready to fight
 	 */
-	teamsReady: string[]
+	teamsReady: () => string[]
+	/**
+	 * Returns the name of winner team
+	 */
+	winnerTeam: string | undefined
 	/**
 	 * Returns the list of robots and their configurations
 	 */
@@ -85,7 +90,11 @@ export type GameEngine = {
 	/**
 	 * Used by Admin to pick the winner.
 	 */
-	setWinner: (team: string) => void
+	adminNextRound: () => void
+	/**
+	 * Used by Admin to pick the winner.
+	 */
+	adminSetWinner: (team: string) => void
 	/**
 	 * Notify listeners when event of the given type happens.
 	 */
@@ -124,7 +133,7 @@ export const gameEngine = ({
 		listeners.forEach((fn) => fn(event))
 		;(listenersForType[event.name] ?? []).forEach((fn) => fn(event))
 	}
-	const teamsReady: string[] = []
+	let teamsReady: string[] = []
 	let winnerTeam: string | undefined = undefined
 
 	const getTeamForRobot = (robotAddress: string): string | undefined =>
@@ -135,7 +144,8 @@ export const gameEngine = ({
 	const hasTeamRobots = (team: string) => listOfTeams().includes(team)
 	return {
 		field,
-		teamsReady,
+		teamsReady: () => teamsReady,
+		winnerTeam,
 		robots: () =>
 			Object.entries(robots)
 				.map(([address, robot]) => ({
@@ -281,7 +291,19 @@ export const gameEngine = ({
 				})
 			}
 		},
-		setWinner: (team) => {
+		adminNextRound: () => {
+			if (winnerTeam !== undefined) {
+				throw new Error(`Game is already finished!`)
+			}
+			if (teamsReady.length === 0) {
+				throw new Error(`Round is already in progress!`)
+			}
+			teamsReady = []
+			notify({
+				name: GameEngineEventType.next_round,
+			})
+		},
+		adminSetWinner: (team) => {
 			if (!listOfTeams().includes(team)) {
 				throw new Error(
 					`Cannot select "${team}" as a winner because it was not playing.`,
