@@ -233,8 +233,6 @@ export const gameEngine = ({
 			angleDeg,
 			driveTimeMs,
 		}) => {
-			if (robots[address] === undefined)
-				throw new Error(`robotAddress not valid: ${address}`)
 			if (
 				driveTimeMs > 1000 ||
 				driveTimeMs < 0 ||
@@ -243,6 +241,8 @@ export const gameEngine = ({
 				throw new Error(`invalid driveTimeMs provided: ${driveTimeMs}`)
 			if (angleDeg > 180 || angleDeg < -180 || !Number.isInteger(angleDeg))
 				throw new Error(`invalid angleDeg provided: ${angleDeg}`)
+			if (robots[address] === undefined)
+				throw new Error(`robotAddress not valid: ${address}`)
 			const robotTeam = getTeamForRobot(address)
 			if (robotTeam === undefined)
 				throw new Error(`No team found for robot: ${address}!`)
