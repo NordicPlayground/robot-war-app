@@ -11,6 +11,7 @@ export enum GameEngineEventType {
 	robots_discovered = 'robots_discovered',
 	robot_team_assigned = 'robot_team_assigned',
 	robot_position_set = 'robot_position_set',
+	robot_positions_set = 'robot_positions_set',
 	teams_ready_to_fight = 'teams_ready_to_fight',
 	winner = 'winner',
 	next_round = 'next_round',
@@ -61,7 +62,7 @@ export type GameEngine = {
 		name: string,
 	) => void
 	/**
-	 * Used by the Admin to set the position and rotation of a robot on the field
+	 * Used by the Admin to set the position and rotation on the field of a robot
 	 */
 	adminSetRobotPosition: (
 		robotAddress: Static<typeof MacAddress>,
@@ -69,6 +70,12 @@ export type GameEngine = {
 			| Static<typeof Position>
 			| Pick<Static<typeof Position>, 'rotationDeg'>
 			| Omit<Static<typeof Position>, 'rotationDeg'>,
+	) => void
+	/**
+	 * Used by the Admin to set the position and rotation on the field for all robots at once
+	 */
+	adminSetRobotPositions: (
+		positions: Record<Static<typeof MacAddress>, Static<typeof Position>>,
 	) => void
 	/**
 	 * Used by the Team to set the desired rotation of a robot
@@ -226,6 +233,15 @@ export const gameEngine = ({
 				name: GameEngineEventType.robot_position_set,
 				address: robotAddress,
 				position: positionUpdate,
+			})
+		},
+		adminSetRobotPositions: (positions) => {
+			Object.entries(positions).forEach(([robotAddress, position]) => {
+				updatePosition(robotAddress, position)
+				updateRotationDeg(robotAddress, position)
+			})
+			notify({
+				name: GameEngineEventType.robot_positions_set,
 			})
 		},
 		teamSetDesiredRobotMovement: ({

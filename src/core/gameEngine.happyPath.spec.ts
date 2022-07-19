@@ -126,7 +126,6 @@ describe('Test a full game', () => {
 				angleDeg: -1,
 				driveTimeMs: 750,
 			})
-			// console.log(game.robots())
 			expect(game.robots()).toMatchObject({
 				[robot1]: {
 					angleDeg: 90,

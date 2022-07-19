@@ -1,4 +1,6 @@
+import { GameEngineEventType } from 'core/gameEngine.js'
 import { randomMac } from 'core/test/randomMac.js'
+import { randomRobot } from 'core/test/randomRobot.js'
 import { simpleGame } from 'core/test/simpleGame.js'
 
 describe('Admin', () => {
@@ -77,5 +79,62 @@ describe('Admin', () => {
 			expect(() => game.adminSetWinner(teamA)).toThrow(
 				`Cannot select "${teamA}" as a winner because a winner was already selected.`,
 			))
+	})
+
+	describe('load a game that was already in progress', () => {
+		it('should allow to provide existing robot positions', () => {
+			const listener = jest.fn()
+			const gameInProgress = simpleGame()
+			gameInProgress.on(GameEngineEventType.robot_positions_set, listener)
+			const robot1 = randomMac()
+			const robot2 = randomMac()
+			const robot3 = randomMac()
+			const robot4 = randomMac()
+			gameInProgress.gatewayReportDiscoveredRobots({
+				[robot1]: randomRobot(),
+				[robot2]: randomRobot(),
+				[robot3]: randomRobot(),
+				[robot4]: randomRobot(),
+			})
+			gameInProgress.adminSetRobotPositions({
+				[robot1]: {
+					xMm: 250,
+					yMm: 100,
+					rotationDeg: 123,
+				},
+				[robot2]: {
+					xMm: 750,
+					yMm: 100,
+					rotationDeg: 236,
+				},
+				[robot3]: {
+					xMm: 250,
+					yMm: 1400,
+					rotationDeg: 17,
+				},
+				[robot4]: {
+					xMm: 750,
+					yMm: 1400,
+					rotationDeg: 42,
+				},
+			})
+			expect(gameInProgress.robots()).toMatchObject({
+				[robot1]: {
+					position: { xMm: 250, yMm: 100, rotationDeg: 123 },
+				},
+				[robot2]: {
+					position: { xMm: 750, yMm: 100, rotationDeg: 236 },
+				},
+				[robot3]: {
+					position: { xMm: 250, yMm: 1400, rotationDeg: 17 },
+				},
+				[robot4]: {
+					position: { xMm: 750, yMm: 1400, rotationDeg: 42 },
+				},
+			})
+			expect(listener).toHaveBeenCalledWith({
+				name: GameEngineEventType.robot_positions_set,
+			})
+		})
 	})
 })
