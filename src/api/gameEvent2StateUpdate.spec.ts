@@ -24,7 +24,7 @@ describe('gameEvent2StateUpdate()', () => {
 
 		const robotRotationSet: GameEngineEvent = {
 			address,
-			name: GameEngineEventType.robot_rotation_set,
+			name: GameEngineEventType.robot_position_set,
 			position: {
 				rotationDeg: 42,
 			},

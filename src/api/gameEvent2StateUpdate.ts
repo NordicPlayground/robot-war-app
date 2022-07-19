@@ -33,13 +33,6 @@ export const gameEvent2StateUpdate = (
 					[event.address]: {
 						xMm: event.position.xMm,
 						yMm: event.position.yMm,
-					},
-				},
-			}
-		case GameEngineEventType.robot_rotation_set:
-			return {
-				robotFieldPosition: {
-					[event.address]: {
 						rotationDeg: event.position.rotationDeg,
 					},
 				},

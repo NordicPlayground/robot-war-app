@@ -154,7 +154,9 @@ describe('gameEngine', () => {
 					})
 
 					it('should be able to update the rotation', () => {
-						game.adminSetRobotRotation(robot1, 135)
+						game.adminSetRobotPosition(robot1, {
+							rotationDeg: 135,
+						})
 						expect(game.robots()).toMatchObject({
 							[robot1]: {
 								position: { rotationDeg: 135 },
@@ -166,7 +168,9 @@ describe('gameEngine', () => {
 						'should not allow to set invalid rotation values (%s)',
 						(rotationDeg) =>
 							expect(() =>
-								game.adminSetRobotRotation(robot1, rotationDeg as any),
+								game.adminSetRobotPosition(robot1, {
+									rotationDeg: rotationDeg as any,
+								}),
 							).toThrow(/Invalid angle provided: /),
 					)
 				})
@@ -655,10 +659,12 @@ describe('gameEngine', () => {
 				game.onAll(listener)
 
 				// Admin assigns a position
-				game.adminSetRobotRotation(address, 135)
+				game.adminSetRobotPosition(address, {
+					rotationDeg: 135,
+				})
 
 				expect(listener).toHaveBeenCalledWith({
-					name: GameEngineEventType.robot_rotation_set,
+					name: GameEngineEventType.robot_position_set,
 					address,
 					position: {
 						rotationDeg: 135,

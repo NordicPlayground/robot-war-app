@@ -11,7 +11,6 @@ export enum GameEngineEventType {
 	robots_discovered = 'robots_discovered',
 	robot_team_assigned = 'robot_team_assigned',
 	robot_position_set = 'robot_position_set',
-	robot_rotation_set = 'robot_rotation_set',
 	teams_ready_to_fight = 'teams_ready_to_fight',
 	winner = 'winner',
 	next_round = 'next_round',
@@ -62,18 +61,14 @@ export type GameEngine = {
 		name: string,
 	) => void
 	/**
-	 * Used by the Admin to set the position of a robot
+	 * Used by the Admin to set the position and rotation of a robot on the field
 	 */
 	adminSetRobotPosition: (
 		robotAddress: Static<typeof MacAddress>,
-		position: Omit<Static<typeof Position>, 'rotationDeg'>,
-	) => void
-	/**
-	 * Used by the Admin to set the rotation of a robot
-	 */
-	adminSetRobotRotation: (
-		robotAddress: Static<typeof MacAddress>,
-		rotationDeg: Static<typeof Position>['rotationDeg'],
+		position:
+			| Static<typeof Position>
+			| Pick<Static<typeof Position>, 'rotationDeg'>
+			| Omit<Static<typeof Position>, 'rotationDeg'>,
 	) => void
 	/**
 	 * Used by the Team to set the desired rotation of a robot
@@ -142,6 +137,35 @@ export const gameEngine = ({
 	const listOfTeams = () => Object.values(robotTeamAssignments)
 	const areAllTeamsReady = () => teamsReady.length === listOfTeams().length
 	const hasTeamRobots = (team: string) => listOfTeams().includes(team)
+
+	const updatePosition = (
+		robotAddress: string,
+		{ xMm, yMm }: Omit<Static<typeof Position>, 'rotationDeg'>,
+	) => {
+		if (!Number.isInteger(xMm) || !Number.isInteger(yMm))
+			throw new Error(`Invalid position provided: ${xMm}/${yMm}!`)
+		if (xMm < 0 || xMm >= field.heightMm || yMm < 0 || yMm >= field.widthMm)
+			throw new Error(`'Position is outside of field: ${xMm}/${yMm}!`)
+		robotPostions[robotAddress] = {
+			xMm,
+			yMm,
+			rotationDeg: yMm < field.widthMm / 2 ? 90 : 270,
+		}
+	}
+
+	const updateRotationDeg = (
+		robotAddress: string,
+		{ rotationDeg }: Pick<Static<typeof Position>, 'rotationDeg'>,
+	) => {
+		if (rotationDeg < 0 || rotationDeg >= 360 || !Number.isFinite(rotationDeg))
+			throw new Error(`Invalid angle provided: ${rotationDeg}!`)
+		if (robotPostions[robotAddress] === undefined)
+			throw new Error(
+				`Robot ${robotAddress} has not been placed on the field, yet!`,
+			)
+		robotPostions[robotAddress].rotationDeg = rotationDeg
+	}
+
 	return {
 		field,
 		teamsReady: () => teamsReady,
@@ -193,43 +217,15 @@ export const gameEngine = ({
 				team: name,
 			})
 		},
-		adminSetRobotPosition: (robotAddress, { xMm, yMm }) => {
-			if (!Number.isInteger(xMm) || !Number.isInteger(yMm))
-				throw new Error(`Invalid position provided: ${xMm}/${yMm}!`)
-			if (xMm < 0 || xMm >= field.heightMm || yMm < 0 || yMm >= field.widthMm)
-				throw new Error(`'Position is outside of field: ${xMm}/${yMm}!`)
-			robotPostions[robotAddress] = {
-				xMm,
-				yMm,
-				rotationDeg: yMm < field.widthMm / 2 ? 90 : 270,
-			}
+		adminSetRobotPosition: (robotAddress, positionUpdate) => {
+			if ('rotationDeg' in positionUpdate)
+				updateRotationDeg(robotAddress, positionUpdate)
+			if ('xMm' in positionUpdate && 'yMm' in positionUpdate)
+				updatePosition(robotAddress, positionUpdate)
 			notify({
 				name: GameEngineEventType.robot_position_set,
 				address: robotAddress,
-				position: {
-					xMm,
-					yMm,
-				},
-			})
-		},
-		adminSetRobotRotation: (robotAddress, rotationDeg) => {
-			if (
-				rotationDeg < 0 ||
-				rotationDeg >= 360 ||
-				!Number.isFinite(rotationDeg)
-			)
-				throw new Error(`Invalid angle provided: ${rotationDeg}!`)
-			if (robotPostions[robotAddress] === undefined)
-				throw new Error(
-					`Robot ${robotAddress} has not been placed on the field, yet!`,
-				)
-			robotPostions[robotAddress].rotationDeg = rotationDeg
-			notify({
-				name: GameEngineEventType.robot_rotation_set,
-				address: robotAddress,
-				position: {
-					rotationDeg,
-				},
+				position: positionUpdate,
 			})
 		},
 		teamSetDesiredRobotMovement: ({
