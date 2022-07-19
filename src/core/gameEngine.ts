@@ -3,9 +3,9 @@ import type { Position } from 'api/validateGameAdminShadow.js'
 import type {
 	MacAddress,
 	ReportedGameState,
+	ReportedRobot,
 	Robot,
 } from 'api/validateGameControllerShadow.js'
-import equal from 'fast-deep-equal'
 
 export enum GameEngineEventType {
 	robots_discovered = 'robots_discovered',
@@ -13,7 +13,6 @@ export enum GameEngineEventType {
 	robot_position_set = 'robot_position_set',
 	robot_rotation_set = 'robot_rotation_set',
 	teams_ready_to_fight = 'teams_ready_to_fight',
-	robots_moved = 'robots_moved',
 	winner = 'winner',
 	next_round = 'next_round',
 }
@@ -43,10 +42,17 @@ export type GameEngine = {
 	 */
 	robots: () => Static<typeof ReportedGameState>['robots']
 	/**
-	 * Used by the Gateway to report discovered robots
+	 * Used by the Gateway to report discovered robots and report back the
+	 * movement of robots.
+	 * The update must always include the complete list of robots, however
+	 * robots may have no, because initially the gatway only knows the robot
+	 * addresses and nothing more.
 	 */
 	gatewayReportDiscoveredRobots: (
-		robots: Static<typeof ReportedGameState>['robots'],
+		robots: Record<
+			Static<typeof MacAddress>,
+			Partial<Static<typeof ReportedRobot>>
+		>,
 	) => void
 	/**
 	 * Used by the Admin to assign a robot to a team
@@ -77,12 +83,6 @@ export type GameEngine = {
 		angleDeg: Static<typeof Robot>['angleDeg']
 		driveTimeMs: Static<typeof Robot>['driveTimeMs']
 	}) => void
-	/**
-	 * Used by the Gateway to report back the movement of robots
-	 */
-	gatewayReportMovedRobots: (
-		movement: Record<Static<typeof MacAddress>, { revolutionCount: number }>,
-	) => void
 	/**
 	 * Used by the Team to signal that they are ready for the next round.
 	 */
@@ -121,7 +121,7 @@ export const gameEngine = ({
 		widthMm: number
 	}
 }): GameEngine => {
-	let robots: Static<typeof ReportedGameState>['robots'] = {}
+	const robots: Static<typeof ReportedGameState>['robots'] = {}
 	const robotTeamAssignments: Record<Static<typeof MacAddress>, string> = {}
 	const robotPostions: Record<
 		Static<typeof MacAddress>,
@@ -164,31 +164,23 @@ export const gameEngine = ({
 					{},
 				),
 		gatewayReportDiscoveredRobots: (newRobots) => {
-			if (!equal(robots, newRobots)) {
-				robots = newRobots
-				notify({ name: GameEngineEventType.robots_discovered })
-			}
-		},
-		gatewayReportMovedRobots: (movement) => {
-			Object.entries(movement).forEach(([mac, { revolutionCount }]) => {
-				if (robots[mac] === undefined) {
-					// Gateway has reported information about a previously unknown robot
-					robots[mac] = {
+			const existingRobots = Object.keys(robots)
+			Object.entries(newRobots).forEach(([mac, robot]) => {
+				robots[mac] = {
+					...(robots[mac] ?? {
 						angleDeg: 0,
 						driveTimeMs: 0,
-						revolutionCount,
-					}
-					notify({
-						name: GameEngineEventType.robots_discovered,
-					})
-				} else {
-					robots[mac].revolutionCount = revolutionCount
+						revolutionCount: 0,
+					}),
+					...robot,
 				}
+				if (existingRobots.includes(mac))
+					delete existingRobots[existingRobots.indexOf(mac)]
 			})
-			notify({
-				name: GameEngineEventType.robots_moved,
-				movement,
-			})
+			for (const oldRobotMac of existingRobots) {
+				delete robots[oldRobotMac]
+			}
+			notify({ name: GameEngineEventType.robots_discovered })
 		},
 		adminAssignRobotToTeam: (robotAddress, name) => {
 			if (name.length === 0) {

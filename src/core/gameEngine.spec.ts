@@ -43,6 +43,28 @@ describe('gameEngine', () => {
 				game.gatewayReportDiscoveredRobots(robots)
 				expect(game.robots()).toEqual(robots)
 			})
+
+			it('can also report robots without properties', () => {
+				const gameWithOneBlankRobot = simpleGame()
+				gameWithOneBlankRobot.gatewayReportDiscoveredRobots({
+					[randomMac()]: {},
+				})
+				expect(Object.values(gameWithOneBlankRobot.robots())).toHaveLength(1)
+			})
+
+			test('that robots that are not reported get removed', () => {
+				const gameWithChangingRobots = simpleGame()
+				const r1 = randomMac()
+				const r2 = randomMac()
+				gameWithChangingRobots.gatewayReportDiscoveredRobots({
+					[r1]: {},
+				})
+				gameWithChangingRobots.gatewayReportDiscoveredRobots({
+					[r2]: {},
+				})
+				expect(gameWithChangingRobots.robots()).not.toHaveProperty(r1)
+				expect(gameWithChangingRobots.robots()).toHaveProperty(r2)
+			})
 		})
 
 		describe('Admin', () => {
@@ -432,8 +454,8 @@ describe('gameEngine', () => {
 			describe('the Gateway moves the robots and reports back', () => {
 				it('should be able to report the status back', () => {
 					const listener = jest.fn()
-					game.on(GameEngineEventType.robots_moved, listener)
-					game.gatewayReportMovedRobots({
+					game.on(GameEngineEventType.robots_discovered, listener)
+					game.gatewayReportDiscoveredRobots({
 						[robot1]: {
 							revolutionCount: 123,
 						},
@@ -448,21 +470,7 @@ describe('gameEngine', () => {
 						},
 					})
 					expect(listener).toHaveBeenCalledWith({
-						name: GameEngineEventType.robots_moved,
-						movement: {
-							[robot1]: {
-								revolutionCount: 123,
-							},
-							[robot2]: {
-								revolutionCount: 456,
-							},
-							[robot3]: {
-								revolutionCount: 789,
-							},
-							[robot4]: {
-								revolutionCount: 202,
-							},
-						},
+						name: GameEngineEventType.robots_discovered,
 					})
 				})
 
@@ -479,14 +487,6 @@ describe('gameEngine', () => {
 						},
 						[robot4]: {
 							revolutionCount: 202,
-						},
-					})
-				})
-
-				test('that it can report for previously undiscovered robots (message might have been lost)', () => {
-					game.gatewayReportMovedRobots({
-						[randomMac()]: {
-							revolutionCount: 123,
 						},
 					})
 				})
@@ -680,10 +680,9 @@ describe('gameEngine', () => {
 					[robot]: randomRobot(),
 				})
 
-				game.gatewayReportMovedRobots({
-					[robot]: {
-						revolutionCount: 123,
-					},
+				game.adminSetRobotPosition(robot, {
+					xMm: 123,
+					yMm: 567,
 				})
 
 				expect(typedListener).toHaveBeenCalledTimes(1)
