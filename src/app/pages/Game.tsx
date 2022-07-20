@@ -9,6 +9,10 @@ import { RobotCommand, useGameController } from 'hooks/useGameController'
 import { useRobotActionGesture } from 'hooks/useRobotActionGesture'
 import { useScrollBlock } from 'hooks/useScrollBlock'
 import { useEffect, useState } from 'react'
+import {
+	angleAfterFullRotation,
+	convertToPositiveAngle,
+} from 'utils/degreeConversion.js'
 import { randomColor } from 'utils/randomColor'
 import { shortestRotation } from 'utils/shortestRotation'
 
@@ -142,7 +146,11 @@ export const Game = () => {
 									heightMm={robotLengthMm}
 									colorHex={colorHex}
 									rotationDeg={rotationDeg}
-									desiredRotationDeg={rotationDeg + nextRobotCommand.angleDeg}
+									desiredRotationDeg={convertToPositiveAngle(
+										angleAfterFullRotation(
+											rotationDeg + nextRobotCommand.angleDeg,
+										),
+									)}
 									desiredDriveTime={nextRobotCommand.driveTimeMs}
 									desiredDriveBudgetPercent={
 										isSameTeam ? (nextRobotCommand.driveTimeMs ?? 0) / 1000 : 0

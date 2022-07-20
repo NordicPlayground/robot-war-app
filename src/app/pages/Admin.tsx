@@ -6,6 +6,10 @@ import { useAppConfig } from 'hooks/useAppConfig'
 import { useGameAdmin } from 'hooks/useGameAdmin'
 import { useGameController } from 'hooks/useGameController'
 import { useEffect, useState } from 'react'
+import {
+	angleAfterFullRotation,
+	convertToPositiveAngle,
+} from 'utils/degreeConversion.js'
 import { randomColor } from 'utils/randomColor'
 
 type RobotFieldConfig = Record<
@@ -102,17 +106,20 @@ export const Admin = () => {
 								}
 								rotationDeg={rotationDeg}
 								onRotate={(rotation) => {
+									const nextRotationDeg = convertToPositiveAngle(
+										angleAfterFullRotation(rotationDeg + rotation),
+									)
 									setRobots((robots) => ({
 										...robots,
 										[mac]: {
 											...robots[mac],
-											rotationDeg: rotationDeg + rotation,
+											rotationDeg: nextRotationDeg,
 										},
 									}))
 									adminSetRobotPosition(mac, {
 										xMm: robots[mac].xMm,
 										yMm: robots[mac].yMm,
-										rotationDeg: rotationDeg + rotation,
+										rotationDeg: nextRotationDeg,
 									})
 								}}
 								onClick={() => {
