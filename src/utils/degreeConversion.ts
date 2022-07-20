@@ -1,8 +1,8 @@
 /**
- * Convert a degree from 180 format to 360
+ * Given an angle between [-360, 360], place it in range [0, 360]
  */
-export const degreeConversion = (degree: number): number => {
-	if (degree > 180 || degree < -180)
+export const convertToPositiveAngle = (degree: number): number => {
+	if (degree > 360 || degree < -360)
 		throw new Error(`Degree is out of range: ${degree}.`)
 	return (degree + 360) % 360
 }
