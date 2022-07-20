@@ -76,7 +76,7 @@ export type GameEngine = {
 	/**
 	 * Used by the Admin to set the position and rotation on the field for all robots at once
 	 */
-	adminSetRobotPositions: (
+	adminSetRobotsPosition: (
 		positions: Record<Static<typeof MacAddress>, Static<typeof Position>>,
 	) => void
 	/**
@@ -270,7 +270,7 @@ export const gameEngine = ({
 				position: positionUpdate,
 			})
 		},
-		adminSetRobotPositions: (positions) => {
+		adminSetRobotsPosition: (positions) => {
 			Object.entries(positions).forEach(([robotAddress, position]) => {
 				updatePosition(robotAddress, position)
 				updateRotationDeg(robotAddress, position)
