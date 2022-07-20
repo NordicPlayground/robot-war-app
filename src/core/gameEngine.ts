@@ -12,6 +12,8 @@ export enum GameEngineEventType {
 	robot_team_assigned = 'robot_team_assigned',
 	robot_position_set = 'robot_position_set',
 	robot_positions_set = 'robot_positions_set',
+	robot_movement_set = 'robot_movement_set',
+	robot_movements_set = 'robot_movements_set',
 	teams_ready_to_fight = 'teams_ready_to_fight',
 	winner = 'winner',
 	next_round = 'next_round',
@@ -85,6 +87,12 @@ export type GameEngine = {
 		angleDeg: Static<typeof Robot>['angleDeg']
 		driveTimeMs: Static<typeof Robot>['driveTimeMs']
 	}) => void
+	/**
+	 * Used by the Team to set the desired rotation of all robot at once
+	 */
+	teamSetDesiredRobotMovements: (
+		positions: Record<Static<typeof MacAddress>, Static<typeof Robot>>,
+	) => void
 	/**
 	 * Used by the Team to signal that they are ready for the next round.
 	 */
@@ -173,6 +181,33 @@ export const gameEngine = ({
 		robotPostions[robotAddress].rotationDeg = rotationDeg
 	}
 
+	const updateRobotMovement = (
+		robotAddress: Static<typeof MacAddress>,
+		angleDeg: Static<typeof Robot>['angleDeg'],
+		driveTimeMs: Static<typeof Robot>['driveTimeMs'],
+	) => {
+		if (driveTimeMs > 1000 || driveTimeMs < 0 || !Number.isInteger(driveTimeMs))
+			throw new Error(`invalid driveTimeMs provided: ${driveTimeMs}`)
+		if (angleDeg > 180 || angleDeg < -180 || !Number.isInteger(angleDeg))
+			throw new Error(`invalid angleDeg provided: ${angleDeg}`)
+		if (robots[robotAddress] === undefined)
+			throw new Error(`robotAddress not valid: ${robotAddress}`)
+		const robotTeam = getTeamForRobot(robotAddress)
+		if (robotTeam === undefined)
+			throw new Error(`No team found for robot: ${robotAddress}!`)
+		if (teamsReady.includes(robotTeam))
+			throw new Error(
+				`Cannot move robot after team is ready to fight: ${robotAddress}!`,
+			)
+		// Users can only modify robots that have been placed on the field by an admin
+		if (robotPostions[robotAddress] === undefined)
+			throw new Error(
+				`Robot ${robotAddress} has not been placed on the field, yet!`,
+			)
+		robots[robotAddress].angleDeg = angleDeg
+		robots[robotAddress].driveTimeMs = driveTimeMs
+	}
+
 	return {
 		field,
 		teamsReady: () => teamsReady,
@@ -249,30 +284,25 @@ export const gameEngine = ({
 			angleDeg,
 			driveTimeMs,
 		}) => {
-			if (
-				driveTimeMs > 1000 ||
-				driveTimeMs < 0 ||
-				!Number.isInteger(driveTimeMs)
+			updateRobotMovement(address, angleDeg, driveTimeMs)
+
+			notify({
+				name: GameEngineEventType.robot_movement_set,
+				address,
+				angleDeg,
+				driveTimeMs,
+			})
+		},
+		teamSetDesiredRobotMovements: (movements) => {
+			Object.entries(movements).forEach(
+				([robotAddress, { angleDeg, driveTimeMs }]) => {
+					updateRobotMovement(robotAddress, angleDeg, driveTimeMs)
+				},
 			)
-				throw new Error(`invalid driveTimeMs provided: ${driveTimeMs}`)
-			if (angleDeg > 180 || angleDeg < -180 || !Number.isInteger(angleDeg))
-				throw new Error(`invalid angleDeg provided: ${angleDeg}`)
-			if (robots[address] === undefined)
-				throw new Error(`robotAddress not valid: ${address}`)
-			const robotTeam = getTeamForRobot(address)
-			if (robotTeam === undefined)
-				throw new Error(`No team found for robot: ${address}!`)
-			if (teamsReady.includes(robotTeam))
-				throw new Error(
-					`Cannot move robot after team is ready to fight: ${address}!`,
-				)
-			// Users can only modify robots that have been placed on the field by an admin
-			if (robotPostions[address] === undefined)
-				throw new Error(
-					`Robot ${address} has not been placed on the field, yet!`,
-				)
-			robots[address].angleDeg = angleDeg
-			robots[address].driveTimeMs = driveTimeMs
+			notify({
+				name: GameEngineEventType.robot_movements_set,
+				movements,
+			})
 		},
 		teamFight: (team: string) => {
 			if (teamsReady.includes(team)) {
