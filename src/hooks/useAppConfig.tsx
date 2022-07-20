@@ -1,5 +1,11 @@
 import { fromEnv } from '@nordicsemiconductor/from-env'
-import { createContext, useContext } from 'react'
+import {
+	createContext,
+	FunctionComponent,
+	ReactNode,
+	useContext,
+	useState,
+} from 'react'
 
 const { version, homepage, shortName, name, themeColor, backgroundColor } =
 	fromEnv({
@@ -10,8 +16,7 @@ const { version, homepage, shortName, name, themeColor, backgroundColor } =
 		themeColor: 'PUBLIC_MANIFEST_THEME_COLOR',
 		backgroundColor: 'PUBLIC_MANIFEST_BACKGROUND_COLOR',
 	})(import.meta.env)
-
-export const AppConfigContext = createContext<{
+type AppConfig = {
 	basename: string
 	version: string
 	homepage: string
@@ -28,7 +33,12 @@ export const AppConfigContext = createContext<{
 	startZoneSizeMm: number
 	helperLinesNumber: number
 	defaultOponentColor: string
-}>({
+	autoUpdateEnabled: boolean
+	enableAutoUpdate: (enabled: boolean) => void
+	autoUpdateIntervalSeconds: number
+	setAutoUpdateIntervalSeconds: (seconds: number) => void
+}
+const defaultConfig: AppConfig = {
 	basename: import.meta.env.BASE_URL ?? '/',
 	version,
 	homepage,
@@ -45,6 +55,49 @@ export const AppConfigContext = createContext<{
 	startZoneSizeMm: 100,
 	helperLinesNumber: 3,
 	defaultOponentColor: '#000000',
-})
+	autoUpdateEnabled: true,
+	enableAutoUpdate: () => undefined,
+	autoUpdateIntervalSeconds: 2,
+	setAutoUpdateIntervalSeconds: () => undefined,
+}
+
+export const AppConfigContext = createContext<AppConfig>(defaultConfig)
 
 export const useAppConfig = () => useContext(AppConfigContext)
+
+export const AppConfigProvider: FunctionComponent<{
+	children: ReactNode
+}> = ({ children }) => {
+	const [autoUpdateEnabled, enableAutoUpdate] = useState<boolean>(
+		defaultConfig.autoUpdateEnabled,
+	)
+	const [autoUpdateIntervalSeconds, setAutoUpdateIntervalSeconds] =
+		useState<number>(defaultConfig.autoUpdateIntervalSeconds)
+	return (
+		<AppConfigContext.Provider
+			value={{
+				...defaultConfig,
+				autoUpdateEnabled,
+				enableAutoUpdate: (enabled) => {
+					console.debug(
+						`[AppConfig]`,
+						`${enabled ? 'enabling' : 'disabling'} auto-update`,
+					)
+					enableAutoUpdate(enabled)
+				},
+				autoUpdateIntervalSeconds,
+				setAutoUpdateIntervalSeconds: (seconds) => {
+					console.debug(
+						`[AppConfig]`,
+						`setting auto-update frequency to`,
+						seconds,
+						`seconds`,
+					)
+					setAutoUpdateIntervalSeconds(seconds)
+				},
+			}}
+		>
+			{children}
+		</AppConfigContext.Provider>
+	)
+}

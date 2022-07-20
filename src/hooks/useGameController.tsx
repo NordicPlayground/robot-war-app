@@ -12,6 +12,7 @@ import {
 	validateGameControllerShadow,
 } from 'api/validateGameControllerShadow'
 import equal from 'fast-deep-equal'
+import { useAppConfig } from 'hooks/useAppConfig.js'
 import { useCredentials } from 'hooks/useCredentials'
 import { useGameControllerThing } from 'hooks/useGameControllerThing.js'
 import {
@@ -43,7 +44,6 @@ export const GameControllerContext = createContext<{
 	teamNameOptions: Record<'name', string>[]
 	selectedTeam: string | undefined
 	setNextRoundCommands: (commands: Record<string, RobotCommand>) => void
-	setAutoUpdate: (update: boolean) => void
 	addTeamNameOption: (value: string) => void
 	setSelectedTeam: (value: string) => void
 	resetTeamNameOption: () => void
@@ -55,7 +55,6 @@ export const GameControllerContext = createContext<{
 	teamNameOptions: [],
 	selectedTeam: undefined,
 	setNextRoundCommands: () => undefined,
-	setAutoUpdate: () => undefined,
 	addTeamNameOption: () => undefined,
 	setSelectedTeam: () => undefined,
 	resetTeamNameOption: () => undefined,
@@ -66,11 +65,11 @@ export const useGameController = () => useContext(GameControllerContext)
 export const GameControllerProvider: FunctionComponent<{
 	children: ReactNode
 }> = ({ children }) => {
+	const { autoUpdateEnabled, autoUpdateIntervalSeconds } = useAppConfig()
 	const [gameState, setGameState] = useState<ReportedGameStateWithMac>({
 		robots: {},
 	})
 	const { thingName: gameControllerThing } = useGameControllerThing()
-	const [autoUpdate, setAutoUpdate] = useState<boolean>(true)
 	const { accessKeyId, secretAccessKey, region } = useCredentials()
 	const [nextRoundCommands, updateNextRoundCommands] = useState<
 		Record<string, RobotCommand>
@@ -120,7 +119,7 @@ export const GameControllerProvider: FunctionComponent<{
 		if (iotDataPlaneClient === undefined) return
 
 		const i = setInterval(() => {
-			if (!autoUpdate) return
+			if (!autoUpdateEnabled) return
 			;(iotDataPlaneClient as IoTDataPlaneClient)
 				.send(
 					new GetThingShadowCommand({
@@ -173,7 +172,7 @@ export const GameControllerProvider: FunctionComponent<{
 					console.error('Failed to get shadow')
 					console.error(error)
 				})
-		}, 2000)
+		}, autoUpdateIntervalSeconds * 1000)
 
 		return () => {
 			clearInterval(i)
@@ -181,7 +180,8 @@ export const GameControllerProvider: FunctionComponent<{
 	}, [
 		gameControllerThing,
 		gameState,
-		autoUpdate,
+		autoUpdateEnabled,
+		autoUpdateIntervalSeconds,
 		iotDataPlaneClient,
 		nextRoundCommands,
 	])
@@ -197,7 +197,6 @@ export const GameControllerProvider: FunctionComponent<{
 					commandHandler(commands)
 					updateNextRoundCommands(commands)
 				},
-				setAutoUpdate,
 				addTeamNameOption,
 				setSelectedTeam,
 				resetTeamNameOption,

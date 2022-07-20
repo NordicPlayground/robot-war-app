@@ -12,6 +12,7 @@ import {
 } from 'api/validateGameAdminShadow.js'
 import type { MacAddress } from 'api/validateGameControllerShadow.js'
 import equal from 'fast-deep-equal'
+import { useAppConfig } from 'hooks/useAppConfig.js'
 import { useCredentials } from 'hooks/useCredentials.js'
 import { useGameControllerThing } from 'hooks/useGameControllerThing.js'
 import { debounce } from 'lodash-es'
@@ -38,7 +39,6 @@ export const GameAdminContext = createContext<{
 		robot: Static<typeof MacAddress>,
 		position: Static<typeof Position>,
 	) => void
-	setAutoUpdate: (update: boolean) => void
 }>({
 	metaData: {
 		robotFieldPosition: {},
@@ -46,7 +46,6 @@ export const GameAdminContext = createContext<{
 	},
 	setRobotTeam: () => undefined,
 	adminSetRobotPosition: () => undefined,
-	setAutoUpdate: () => undefined,
 })
 
 export const useGameAdmin = () => useContext(GameAdminContext)
@@ -85,8 +84,8 @@ export const GameAdminProvider: FunctionComponent<{
 		robotFieldPosition: {},
 	})
 	const { thingName: gameAdminThing } = useGameControllerThing()
-	const [autoUpdate, setAutoUpdate] = useState<boolean>(true)
 	const { accessKeyId, secretAccessKey, region } = useCredentials()
+	const { autoUpdateEnabled, autoUpdateIntervalSeconds } = useAppConfig()
 
 	let iotDataPlaneClient: IoTDataPlaneClient | undefined = undefined
 
@@ -108,7 +107,7 @@ export const GameAdminProvider: FunctionComponent<{
 		if (iotDataPlaneClient === undefined) return
 
 		const i = setInterval(() => {
-			if (!autoUpdate) return
+			if (!autoUpdateEnabled) return
 			;(iotDataPlaneClient as IoTDataPlaneClient)
 				.send(
 					new GetThingShadowCommand({
@@ -133,18 +132,23 @@ export const GameAdminProvider: FunctionComponent<{
 					console.error('Failed to get admin shadow')
 					console.error(error)
 				})
-		}, 2000)
+		}, autoUpdateIntervalSeconds * 1000)
 
 		return () => {
 			clearInterval(i)
 		}
-	}, [gameAdminThing, gameMetaData, autoUpdate, iotDataPlaneClient])
+	}, [
+		gameAdminThing,
+		gameMetaData,
+		autoUpdateEnabled,
+		autoUpdateIntervalSeconds,
+		iotDataPlaneClient,
+	])
 
 	return (
 		<GameAdminContext.Provider
 			value={{
 				metaData: gameMetaData,
-				setAutoUpdate,
 				setRobotTeam: (robot, teamId) => {
 					if (iotDataPlaneClient === undefined) return
 					if (gameAdminThing === undefined) return
