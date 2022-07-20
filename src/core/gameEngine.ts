@@ -225,10 +225,10 @@ export const gameEngine = ({
 			})
 		},
 		adminSetRobotPosition: (robotAddress, positionUpdate) => {
-			if ('rotationDeg' in positionUpdate)
-				updateRotationDeg(robotAddress, positionUpdate)
 			if ('xMm' in positionUpdate && 'yMm' in positionUpdate)
 				updatePosition(robotAddress, positionUpdate)
+			if ('rotationDeg' in positionUpdate)
+				updateRotationDeg(robotAddress, positionUpdate)
 			notify({
 				name: GameEngineEventType.robot_position_set,
 				address: robotAddress,
