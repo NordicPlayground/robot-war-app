@@ -32,6 +32,10 @@ export type GameEngine = {
 		heightMm: number
 	}
 	/**
+	 * Returns the list of teams playing the game
+	 */
+	teams: () => string[]
+	/**
 	 * Returns the list of teams ready to fight
 	 */
 	teamsReady: () => string[]
@@ -151,7 +155,7 @@ export const gameEngine = ({
 	const getTeamForRobot = (robotAddress: string): string | undefined =>
 		robotTeamAssignments[robotAddress]
 
-	const listOfTeams = () => Object.values(robotTeamAssignments)
+	const listOfTeams = () => [...new Set(Object.values(robotTeamAssignments))]
 	const areAllTeamsReady = () => teamsReady.length === listOfTeams().length
 	const hasTeamRobots = (team: string) => listOfTeams().includes(team)
 
@@ -212,6 +216,7 @@ export const gameEngine = ({
 
 	return {
 		field,
+		teams: listOfTeams,
 		teamsReady: () => teamsReady,
 		winnerTeam,
 		robots: () =>

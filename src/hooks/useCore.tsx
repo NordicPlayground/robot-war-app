@@ -1,5 +1,3 @@
-import type { Static } from '@sinclair/typebox'
-import type { ReportedGameState } from 'api/validateGameControllerShadow.js'
 import { gameEngine, GameEngine } from 'core/gameEngine.js'
 import {
 	createContext,
@@ -18,10 +16,12 @@ const defaultGame = gameEngine({
 
 export const CoreContext = createContext<{
 	game: GameEngine
-	robots: Static<typeof ReportedGameState>['robots']
+	robots: ReturnType<GameEngine['robots']>
+	teams: ReturnType<GameEngine['teams']>
 }>({
 	game: defaultGame,
 	robots: {},
+	teams: [],
 })
 
 export const useCore = () => useContext(CoreContext)
@@ -37,10 +37,16 @@ export const CoreProvider: FunctionComponent<{
 		gameInstance.robots(),
 	)
 
+	// Maintain a copy of the teams for components
+	const [teams, setTeams] = useState<ReturnType<GameEngine['teams']>>(
+		gameInstance.teams(),
+	)
+
 	// Update the state that holds the robots
 	gameInstance.onAll(({ name }) => {
 		console.debug(`[core]`, name)
 		setRobots(gameInstance.robots())
+		setTeams(gameInstance.teams)
 	})
 
 	return (
@@ -48,6 +54,7 @@ export const CoreProvider: FunctionComponent<{
 			value={{
 				game: gameInstance,
 				robots,
+				teams,
 			}}
 		>
 			{children}

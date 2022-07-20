@@ -145,4 +145,26 @@ describe('The team should not be able to change the desired robot positions afte
 			expect(listener).toHaveBeenCalled()
 		})
 	})
+
+	describe('teams()', () => {
+		it('should return a blank list of teams on a new game', () =>
+			expect(simpleGame().teams()).toEqual([]))
+		describe('should return the name of the teams that have been assigned robots', () => {
+			test('one team, two robots', () => {
+				const gameWithOneTeam = simpleGame()
+				gameWithOneTeam.adminAssignRobotToTeam(randomMac(), 'Bot Busters')
+				gameWithOneTeam.adminAssignRobotToTeam(randomMac(), 'Bot Busters')
+				expect(gameWithOneTeam.teams()).toEqual(['Bot Busters'])
+			})
+			test('two teams, one robot each', () => {
+				const gameWithTwoTeams = simpleGame()
+				gameWithTwoTeams.adminAssignRobotToTeam(randomMac(), 'Bot Busters')
+				gameWithTwoTeams.adminAssignRobotToTeam(randomMac(), 'Gear Grinders')
+				expect(gameWithTwoTeams.teams()).toEqual([
+					'Bot Busters',
+					'Gear Grinders',
+				])
+			})
+		})
+	})
 })

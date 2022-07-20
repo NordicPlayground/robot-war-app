@@ -2,12 +2,13 @@ import style from 'app/pages/Game.module.css'
 import { Field } from 'components/Game/Field'
 import { Form } from 'components/Game/Form'
 import { Robot } from 'components/Game/Robot'
-import { TeamSelectionUser } from 'components/Game/TeamSelectionUser'
+import { SelectTeam } from 'components/Team/SelectTeam'
 import { useAppConfig } from 'hooks/useAppConfig'
 import { useGameAdmin } from 'hooks/useGameAdmin'
 import { RobotCommand, useGameController } from 'hooks/useGameController'
 import { useRobotActionGesture } from 'hooks/useRobotActionGesture'
 import { useScrollBlock } from 'hooks/useScrollBlock'
+import { useTeam } from 'hooks/useTeam'
 import { useEffect, useState } from 'react'
 import { randomColor } from 'utils/randomColor'
 import { shortestRotation } from 'utils/shortestRotation'
@@ -22,8 +23,9 @@ export const Game = () => {
 	} = useAppConfig()
 
 	const { helperLinesNumber, defaultOponentColor } = useAppConfig()
-	const { gameState, setNextRoundCommands, nextRoundCommands, selectedTeam } =
+	const { gameState, setNextRoundCommands, nextRoundCommands } =
 		useGameController()
+	const { selectedTeam } = useTeam()
 	const {
 		metaData: { robotFieldPosition, robotTeamAssignment },
 	} = useGameAdmin()
@@ -74,7 +76,6 @@ export const Game = () => {
 		updateRobotCommandFromGesture({ mac: activeRobot, angleDeg, driveTimeMs })
 		setActiveRobot(undefined)
 	}
-	const onPointerUp = {}
 
 	return (
 		<>
@@ -92,7 +93,7 @@ export const Game = () => {
 				}}
 				onPointerUp={handleRobotGestureEnd}
 			>
-				<>{selectedTeam === undefined ? <TeamSelectionUser /> : null}</>
+				<>{selectedTeam === undefined ? <SelectTeam /> : null}</>
 
 				<div>
 					<button

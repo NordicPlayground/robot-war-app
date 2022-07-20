@@ -7,6 +7,7 @@ import { GameAdminProvider } from 'hooks/useGameAdmin'
 import { GameControllerProvider } from 'hooks/useGameController'
 import { GameControllerThingProvider } from 'hooks/useGameControllerThing'
 import { RobotActionProvider } from 'hooks/useRobotActionGesture'
+import { TeamProvider } from 'hooks/useTeam'
 import { createRoot } from 'react-dom/client'
 
 const container = document.getElementById('root') as HTMLElement
@@ -16,15 +17,17 @@ root.render(
 		<CredentialsProvider>
 			<GameControllerThingProvider>
 				<CoreProvider>
-					<AWSIoTPersistenceProvider>
-						<GameControllerProvider>
-							<GameAdminProvider>
-								<RobotActionProvider>
-									<App />
-								</RobotActionProvider>
-							</GameAdminProvider>
-						</GameControllerProvider>
-					</AWSIoTPersistenceProvider>
+					<TeamProvider>
+						<AWSIoTPersistenceProvider>
+							<GameControllerProvider>
+								<GameAdminProvider>
+									<RobotActionProvider>
+										<App />
+									</RobotActionProvider>
+								</GameAdminProvider>
+							</GameControllerProvider>
+						</AWSIoTPersistenceProvider>
+					</TeamProvider>
 				</CoreProvider>
 			</GameControllerThingProvider>
 		</CredentialsProvider>
