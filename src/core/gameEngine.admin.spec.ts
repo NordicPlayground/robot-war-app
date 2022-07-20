@@ -96,7 +96,7 @@ describe('Admin', () => {
 				[robot3]: randomRobot(),
 				[robot4]: randomRobot(),
 			})
-			gameInProgress.adminSetRobotPositions({
+			gameInProgress.adminSetRobotsPosition({
 				[robot1]: {
 					xMm: 250,
 					yMm: 100,
