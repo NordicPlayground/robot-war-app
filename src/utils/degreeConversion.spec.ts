@@ -1,4 +1,7 @@
-import { degreeConversion } from 'utils/degreeConversion.js'
+import {
+	angleAfterFullRotation,
+	degreeConversion,
+} from 'utils/degreeConversion.js'
 
 describe('degreeConversion()', () => {
 	describe('Should takes a value, which is in 180 format, and allows conversion to 360 format', () => {
@@ -45,6 +48,20 @@ describe('degreeConversion()', () => {
 			[-0, 0],
 		])('%d -> %d', (given, expected) =>
 			expect(degreeConversion(given)).toEqual(expected),
+		)
+	})
+})
+
+describe('angleAfterFullRotation()', () => {
+	describe('Should takes a value and returns it new position on the circle after rotation if happens', () => {
+		it.each([
+			[500, 140],
+			[-800, -80],
+			[90, 90],
+			[630, 270],
+			[361, 1],
+		])('%d -> %d', (given, expected) =>
+			expect(angleAfterFullRotation(given)).toEqual(expected),
 		)
 	})
 })
