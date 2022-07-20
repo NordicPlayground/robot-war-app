@@ -127,10 +127,7 @@ describe('Test a full game', () => {
 				driveTimeMs: 750,
 			})
 			expect(game.robots()).toMatchObject({
-				[robot1]: {
-					angleDeg: 90,
-					driveTimeMs: 500,
-				},
+				[robot1]: { angleDeg: 90, driveTimeMs: 500 },
 				[robot2]: { angleDeg: 180, driveTimeMs: 1000 },
 				[robot3]: { angleDeg: -90, driveTimeMs: 250 },
 				[robot4]: { angleDeg: -1, driveTimeMs: 750 },
