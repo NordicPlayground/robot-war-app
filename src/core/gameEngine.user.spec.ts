@@ -8,8 +8,7 @@ describe('User', () => {
 			'should not allow invalid robotAdress %s',
 			(invalidAddress) => {
 				expect(() =>
-					game.teamSetDesiredRobotMovement({
-						robotAdress: invalidAddress as any,
+					game.teamSetDesiredRobotMovement(invalidAddress as any, {
 						angleDeg: 180,
 						driveTimeMs: 1000,
 					}),
@@ -26,9 +25,8 @@ describe('User', () => {
 			'must be integer and should not allow drivTimeMs over 1000ms or below 0ms (%s)',
 			(invalidDriveTimeMs) => {
 				expect(() =>
-					game.teamSetDesiredRobotMovement({
+					game.teamSetDesiredRobotMovement(randomMac(), {
 						driveTimeMs: invalidDriveTimeMs as any,
-						robotAdress: randomMac(),
 						angleDeg: 180,
 					}),
 				).toThrow(/invalid driveTimeMs provided: /)
@@ -43,9 +41,8 @@ describe('User', () => {
 			'should not allow angles over 180 degrees or below -180 degrees ',
 			(invalidAngleDeg) => {
 				expect(() =>
-					game.teamSetDesiredRobotMovement({
+					game.teamSetDesiredRobotMovement(randomMac(), {
 						angleDeg: invalidAngleDeg as any,
-						robotAdress: randomMac(),
 						driveTimeMs: 1000,
 					}),
 				).toThrow(/invalid angleDeg provided: .+/)

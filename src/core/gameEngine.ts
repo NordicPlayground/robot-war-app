@@ -76,21 +76,23 @@ export type GameEngine = {
 	/**
 	 * Used by the Admin to set the position and rotation on the field for all robots at once
 	 */
-	adminSetRobotsPosition: (
+	adminSetAllRobotPositions: (
 		positions: Record<Static<typeof MacAddress>, Static<typeof Position>>,
 	) => void
 	/**
 	 * Used by the Team to set the desired rotation of a robot
 	 */
-	teamSetDesiredRobotMovement: (args: {
-		robotAdress: Static<typeof MacAddress>
-		angleDeg: Static<typeof Robot>['angleDeg']
-		driveTimeMs: Static<typeof Robot>['driveTimeMs']
-	}) => void
+	teamSetDesiredRobotMovement: (
+		robotAdress: Static<typeof MacAddress>,
+		movement: {
+			angleDeg: Static<typeof Robot>['angleDeg']
+			driveTimeMs: Static<typeof Robot>['driveTimeMs']
+		},
+	) => void
 	/**
 	 * Used by the Team to set the desired rotation of all robot at once
 	 */
-	teamSetDesiredRobotMovements: (
+	teamSetAllRobotMovements: (
 		positions: Record<Static<typeof MacAddress>, Static<typeof Robot>>,
 	) => void
 	/**
@@ -270,7 +272,7 @@ export const gameEngine = ({
 				position: positionUpdate,
 			})
 		},
-		adminSetRobotsPosition: (positions) => {
+		adminSetAllRobotPositions: (positions) => {
 			Object.entries(positions).forEach(([robotAddress, position]) => {
 				updatePosition(robotAddress, position)
 				updateRotationDeg(robotAddress, position)
@@ -279,11 +281,7 @@ export const gameEngine = ({
 				name: GameEngineEventType.robot_positions_set,
 			})
 		},
-		teamSetDesiredRobotMovement: ({
-			robotAdress: address,
-			angleDeg,
-			driveTimeMs,
-		}) => {
+		teamSetDesiredRobotMovement: (address, { angleDeg, driveTimeMs }) => {
 			updateRobotMovement(address, angleDeg, driveTimeMs)
 
 			notify({
@@ -293,7 +291,7 @@ export const gameEngine = ({
 				driveTimeMs,
 			})
 		},
-		teamSetDesiredRobotMovements: (movements) => {
+		teamSetAllRobotMovements: (movements) => {
 			Object.entries(movements).forEach(
 				([robotAddress, { angleDeg, driveTimeMs }]) => {
 					updateRobotMovement(robotAddress, angleDeg, driveTimeMs)

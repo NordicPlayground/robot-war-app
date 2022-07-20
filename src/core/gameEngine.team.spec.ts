@@ -15,8 +15,7 @@ describe('The team should not be able to change the desired robot positions afte
 
 		it('should not allow setting the position if the robot has not been placed on the field by the admin', () => {
 			expect(() =>
-				gameWithOneRobot.teamSetDesiredRobotMovement({
-					robotAdress: teamAsRobot,
+				gameWithOneRobot.teamSetDesiredRobotMovement(teamAsRobot, {
 					angleDeg: 135,
 					driveTimeMs: 1000,
 				}),
@@ -30,18 +29,15 @@ describe('The team should not be able to change the desired robot positions afte
 
 		it('Should allow changes by the team as long as it is not ready to fight', () => {
 			const finalRotation = 45
-			gameWithOneRobot.teamSetDesiredRobotMovement({
-				robotAdress: teamAsRobot,
+			gameWithOneRobot.teamSetDesiredRobotMovement(teamAsRobot, {
 				angleDeg: 135,
 				driveTimeMs: 1000,
 			})
-			gameWithOneRobot.teamSetDesiredRobotMovement({
-				robotAdress: teamAsRobot,
+			gameWithOneRobot.teamSetDesiredRobotMovement(teamAsRobot, {
 				angleDeg: 90,
 				driveTimeMs: 1000,
 			})
-			gameWithOneRobot.teamSetDesiredRobotMovement({
-				robotAdress: teamAsRobot,
+			gameWithOneRobot.teamSetDesiredRobotMovement(teamAsRobot, {
 				angleDeg: finalRotation,
 				driveTimeMs: 1000,
 			})
@@ -55,20 +51,17 @@ describe('The team should not be able to change the desired robot positions afte
 
 		test('Should not allow changes by the team after they are ready to fight', () => {
 			const beforeFight = 45
-			gameWithOneRobot.teamSetDesiredRobotMovement({
-				robotAdress: teamAsRobot,
+			gameWithOneRobot.teamSetDesiredRobotMovement(teamAsRobot, {
 				angleDeg: 135,
 				driveTimeMs: 1000,
 			})
-			gameWithOneRobot.teamSetDesiredRobotMovement({
-				robotAdress: teamAsRobot,
+			gameWithOneRobot.teamSetDesiredRobotMovement(teamAsRobot, {
 				angleDeg: beforeFight,
 				driveTimeMs: 1000,
 			})
 			gameWithOneRobot.teamFight(teamA)
 			expect(() => {
-				gameWithOneRobot.teamSetDesiredRobotMovement({
-					robotAdress: teamAsRobot,
+				gameWithOneRobot.teamSetDesiredRobotMovement(teamAsRobot, {
 					angleDeg: 90,
 					driveTimeMs: 1000,
 				})
@@ -99,8 +92,7 @@ describe('The team should not be able to change the desired robot positions afte
 
 			game.on(GameEngineEventType.robot_movement_set, listener)
 
-			game.teamSetDesiredRobotMovement({
-				robotAdress: robot1,
+			game.teamSetDesiredRobotMovement(robot1, {
 				angleDeg: 90,
 				driveTimeMs: 500,
 			})
@@ -113,7 +105,7 @@ describe('The team should not be able to change the desired robot positions afte
 		})
 	})
 
-	describe('teamSetDesiredRobotMovements()', () => {
+	describe('teamSetDesiredRobotsMovement()', () => {
 		test('that the robot desired movements can be set all at once', () => {
 			const listener = jest.fn()
 			const game = simpleGame()
@@ -125,7 +117,7 @@ describe('The team should not be able to change the desired robot positions afte
 			})
 			game.adminAssignRobotToTeam(robot1, 'Team A')
 			game.adminAssignRobotToTeam(robot2, 'Team A')
-			game.adminSetRobotPositions({
+			game.adminSetAllRobotPositions({
 				[robot1]: {
 					xMm: 17,
 					yMm: 42,
@@ -140,7 +132,7 @@ describe('The team should not be able to change the desired robot positions afte
 
 			game.on(GameEngineEventType.robot_movements_set, listener)
 
-			game.teamSetDesiredRobotMovements({
+			game.teamSetAllRobotMovements({
 				[robot1]: { angleDeg: 90, driveTimeMs: 500 },
 				[robot2]: { angleDeg: 180, driveTimeMs: 1000 },
 			})
