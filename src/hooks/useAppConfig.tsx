@@ -65,14 +65,24 @@ export const AppConfigContext = createContext<AppConfig>(defaultConfig)
 
 export const useAppConfig = () => useContext(AppConfigContext)
 
+const AUTO_UPDATE_DISABLED = 'appConfig:auto-update-enabled'
+const AUTO_UPDATE_INTERVAL = 'appConfig:auto-update-interval'
+
 export const AppConfigProvider: FunctionComponent<{
 	children: ReactNode
 }> = ({ children }) => {
 	const [autoUpdateEnabled, enableAutoUpdate] = useState<boolean>(
-		defaultConfig.autoUpdateEnabled,
+		localStorage.getItem(AUTO_UPDATE_DISABLED) === '1'
+			? false
+			: defaultConfig.autoUpdateEnabled,
 	)
 	const [autoUpdateIntervalSeconds, setAutoUpdateIntervalSeconds] =
-		useState<number>(defaultConfig.autoUpdateIntervalSeconds)
+		useState<number>(
+			parseInt(
+				localStorage.getItem(AUTO_UPDATE_INTERVAL) ??
+					defaultConfig.autoUpdateIntervalSeconds.toString(),
+			),
+		)
 	return (
 		<AppConfigContext.Provider
 			value={{
@@ -84,6 +94,11 @@ export const AppConfigProvider: FunctionComponent<{
 						`${enabled ? 'enabling' : 'disabling'} auto-update`,
 					)
 					enableAutoUpdate(enabled)
+					if (enabled) {
+						localStorage.removeItem(AUTO_UPDATE_DISABLED)
+					} else {
+						localStorage.setItem(AUTO_UPDATE_DISABLED, '1')
+					}
 				},
 				autoUpdateIntervalSeconds,
 				setAutoUpdateIntervalSeconds: (seconds) => {
@@ -94,6 +109,7 @@ export const AppConfigProvider: FunctionComponent<{
 						`seconds`,
 					)
 					setAutoUpdateIntervalSeconds(seconds)
+					localStorage.setItem(AUTO_UPDATE_INTERVAL, seconds.toString())
 				},
 			}}
 		>
