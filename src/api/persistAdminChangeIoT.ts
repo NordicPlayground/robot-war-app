@@ -3,11 +3,9 @@ import {
 	UpdateThingShadowCommand,
 } from '@aws-sdk/client-iot-data-plane'
 import type { Static } from '@sinclair/typebox'
-import type {
-	gameControllerAdminShadow,
-	Position,
-} from 'api/validateGameAdminShadow'
-import type { MacAddress } from 'api/validateGameControllerShadow'
+import type { gameControllerAdminShadow } from 'api/validateGameAdminShadow'
+import type { MacAddress } from 'core/models/MacAddress'
+import type { RobotPosition } from 'core/models/RobotPosition.js'
 
 export type PersistAdminChangeFn = (
 	update: Partial<{
@@ -17,7 +15,7 @@ export type PersistAdminChangeFn = (
 
 		robotFieldPosition: Record<
 			Static<typeof MacAddress>,
-			Partial<Static<typeof Position>>
+			Partial<Static<typeof RobotPosition>>
 		>
 	}>,
 ) => Promise<void>

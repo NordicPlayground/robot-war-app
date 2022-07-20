@@ -1,11 +1,9 @@
 import type { Static } from '@sinclair/typebox'
-import type { Position } from 'api/validateGameAdminShadow.js'
-import type {
-	MacAddress,
-	ReportedGameState,
-	ReportedRobot,
-	Robot,
-} from 'api/validateGameControllerShadow.js'
+import { Type } from '@sinclair/typebox'
+import { MacAddress } from 'core/models/MacAddress.js'
+import type { Robot } from 'core/models/Robot.js'
+import { RobotInGame } from 'core/models/RobotInGame.js'
+import type { RobotPosition } from 'core/models/RobotPosition.js'
 
 export enum GameEngineEventType {
 	robots_discovered = 'robots_discovered',
@@ -25,6 +23,8 @@ export type GameEngineEvent = {
 	name: GameEngineEventType
 	[key: string]: any
 }
+
+const Robots = Type.Record(MacAddress, RobotInGame)
 
 export type GameEngine = {
 	field: {
@@ -46,7 +46,7 @@ export type GameEngine = {
 	/**
 	 * Returns the list of robots and their configurations
 	 */
-	robots: () => Static<typeof ReportedGameState>['robots']
+	robots: () => Static<typeof Robots>
 	/**
 	 * Used by the Gateway to report discovered robots and report back the
 	 * movement of robots.
@@ -57,7 +57,7 @@ export type GameEngine = {
 	gatewayReportDiscoveredRobots: (
 		robots: Record<
 			Static<typeof MacAddress>,
-			Partial<Static<typeof ReportedRobot>>
+			Partial<Static<typeof RobotInGame>>
 		>,
 	) => void
 	/**
@@ -73,20 +73,20 @@ export type GameEngine = {
 	adminSetRobotPosition: (
 		robotAddress: Static<typeof MacAddress>,
 		position:
-			| Static<typeof Position>
-			| Pick<Static<typeof Position>, 'rotationDeg'>
-			| Omit<Static<typeof Position>, 'rotationDeg'>,
+			| Static<typeof RobotPosition>
+			| Pick<Static<typeof RobotPosition>, 'rotationDeg'>
+			| Omit<Static<typeof RobotPosition>, 'rotationDeg'>,
 	) => void
 	/**
 	 * Used by the Admin to set the position and rotation on the field for all robots at once
 	 */
 	adminSetAllRobotPositions: (
-		positions: Record<Static<typeof MacAddress>, Static<typeof Position>>,
+		positions: Record<Static<typeof MacAddress>, Static<typeof RobotPosition>>,
 	) => void
 	/**
 	 * Used by the Team to set the desired rotation of a robot
 	 */
-	teamSetDesiredRobotMovement: (
+	teamSetRobotMovement: (
 		robotAdress: Static<typeof MacAddress>,
 		movement: {
 			angleDeg: Static<typeof Robot>['angleDeg']
@@ -137,11 +137,11 @@ export const gameEngine = ({
 		widthMm: number
 	}
 }): GameEngine => {
-	const robots: Static<typeof ReportedGameState>['robots'] = {}
+	const robots: Static<typeof Robots> = {}
 	const robotTeamAssignments: Record<Static<typeof MacAddress>, string> = {}
 	const robotPostions: Record<
 		Static<typeof MacAddress>,
-		Static<typeof Position>
+		Static<typeof RobotPosition>
 	> = {}
 	const listeners: EventListener[] = []
 	const listenersForType: Record<string, EventListener[]> = {}
@@ -161,7 +161,7 @@ export const gameEngine = ({
 
 	const updatePosition = (
 		robotAddress: string,
-		{ xMm, yMm }: Omit<Static<typeof Position>, 'rotationDeg'>,
+		{ xMm, yMm }: Omit<Static<typeof RobotPosition>, 'rotationDeg'>,
 	) => {
 		if (!Number.isInteger(xMm) || !Number.isInteger(yMm))
 			throw new Error(`Invalid position provided: ${xMm}/${yMm}!`)
@@ -176,7 +176,7 @@ export const gameEngine = ({
 
 	const updateRotationDeg = (
 		robotAddress: string,
-		{ rotationDeg }: Pick<Static<typeof Position>, 'rotationDeg'>,
+		{ rotationDeg }: Pick<Static<typeof RobotPosition>, 'rotationDeg'>,
 	) => {
 		if (rotationDeg < 0 || rotationDeg >= 360 || !Number.isFinite(rotationDeg))
 			throw new Error(`Invalid angle provided: ${rotationDeg}!`)
@@ -286,7 +286,7 @@ export const gameEngine = ({
 				name: GameEngineEventType.robot_positions_set,
 			})
 		},
-		teamSetDesiredRobotMovement: (address, { angleDeg, driveTimeMs }) => {
+		teamSetRobotMovement: (address, { angleDeg, driveTimeMs }) => {
 			updateRobotMovement(address, angleDeg, driveTimeMs)
 
 			notify({

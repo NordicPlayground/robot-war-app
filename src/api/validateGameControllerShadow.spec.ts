@@ -1,10 +1,8 @@
 import type { Static } from '@sinclair/typebox'
-import {
-	gameControllerShadow,
-	validateGameControllerShadow,
-} from 'api/validateGameControllerShadow.js'
+import type { GameControllerShadow } from 'api/persistence/models/GameControllerShadow.js'
+import { validateGameControllerShadow } from 'api/validateGameControllerShadow.js'
 
-const goodShadow: Static<typeof gameControllerShadow> = {
+const goodShadow: Static<typeof GameControllerShadow> = {
 	state: {
 		reported: {
 			robots: {

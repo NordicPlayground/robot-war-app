@@ -1,5 +1,5 @@
 import type { Static } from '@sinclair/typebox'
-import type { ReportedGameState } from 'api/validateGameControllerShadow.js'
+import type { ReportedGameState } from 'api/persistence/models/ReportedGameState.js'
 import { GameEngineEventType } from 'core/gameEngine.js'
 import { randomMac } from 'core/test/randomMac.js'
 import { randomRobot } from 'core/test/randomRobot.js'
@@ -106,19 +106,19 @@ describe('Test a full game', () => {
 
 	describe('User', () => {
 		it('should set angle and drivetime for the robot', () => {
-			game.teamSetDesiredRobotMovement(robot1, {
+			game.teamSetRobotMovement(robot1, {
 				angleDeg: 90, //The robot is supposed to rotate 90 degrees clockwise
 				driveTimeMs: 500, //The robot should drive 500ms
 			})
-			game.teamSetDesiredRobotMovement(robot2, {
+			game.teamSetRobotMovement(robot2, {
 				angleDeg: 180,
 				driveTimeMs: 1000,
 			})
-			game.teamSetDesiredRobotMovement(robot3, {
+			game.teamSetRobotMovement(robot3, {
 				angleDeg: -90,
 				driveTimeMs: 250,
 			})
-			game.teamSetDesiredRobotMovement(robot4, {
+			game.teamSetRobotMovement(robot4, {
 				angleDeg: -1,
 				driveTimeMs: 750,
 			})
@@ -208,7 +208,7 @@ describe('Test a full game', () => {
 		})
 
 		test('that teams can set the desired movement for the next round', () => {
-			game.teamSetDesiredRobotMovement(robot1, {
+			game.teamSetRobotMovement(robot1, {
 				angleDeg: 45,
 				driveTimeMs: 675,
 			})

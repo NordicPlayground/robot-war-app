@@ -1,9 +1,7 @@
 import type { Static } from '@sinclair/typebox'
+import type { DesiredGameState } from 'api/persistence/models/DesiredGameState.js'
+import type { ReportedGameState } from 'api/persistence/models/ReportedGameState.js'
 import type { ReportedRobot } from 'api/updateGameController'
-import type {
-	DesiredGameState,
-	ReportedGameState,
-} from 'api/validateGameControllerShadow'
 
 export const calculateReported = ({
 	robots,

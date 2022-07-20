@@ -6,11 +6,11 @@ import {
 import type { Static } from '@sinclair/typebox'
 import {
 	gameControllerAdminShadow,
-	Position,
 	TeamId,
 	validateGameControllerAdminShadow,
 } from 'api/validateGameAdminShadow.js'
-import type { MacAddress } from 'api/validateGameControllerShadow.js'
+import type { MacAddress } from 'core/models/MacAddress.js'
+import type { RobotPosition } from 'core/models/RobotPosition'
 import equal from 'fast-deep-equal'
 import { useAppConfig } from 'hooks/useAppConfig.js'
 import { useCredentials } from 'hooks/useCredentials.js'
@@ -37,7 +37,7 @@ export const GameAdminContext = createContext<{
 	) => void
 	adminSetRobotPosition: (
 		robot: Static<typeof MacAddress>,
-		position: Static<typeof Position>,
+		position: Static<typeof RobotPosition>,
 	) => void
 }>({
 	metaData: {

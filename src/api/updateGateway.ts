@@ -5,13 +5,11 @@ import {
 } from '@aws-sdk/client-iot-data-plane'
 import { fromUtf8, toUtf8 } from '@aws-sdk/util-utf8-browser'
 import type { Static } from '@sinclair/typebox'
-import type {
-	DesiredRobot as DesiredRobotSchema,
-	ReportedRobot as ReportedRobotSchema,
-} from 'api/validateGameControllerShadow'
 import { validateGameControllerShadow } from 'api/validateGameControllerShadow.js'
+import type { Robot as RobotSchema } from 'core/models/Robot.js'
+import type { RobotInGame as ReportedRobotSchema } from 'core/models/RobotInGame.js'
 
-export type DesiredRobot = Static<typeof DesiredRobotSchema>
+export type Robot = Static<typeof RobotSchema>
 export type ReportedRobot = Static<typeof ReportedRobotSchema>
 
 export const updateGateway =

@@ -1,5 +1,5 @@
 import type { Static } from '@sinclair/typebox'
-import type { ReportedGameState } from 'api/validateGameControllerShadow'
+import type { ReportedGameState } from 'api/persistence/models/ReportedGameState.js'
 
 export const robotCommands: Static<typeof ReportedGameState> = {
 	robots: {

@@ -4,7 +4,7 @@ import {
 } from '@aws-sdk/client-iot-data-plane'
 import { fromUtf8 } from '@aws-sdk/util-utf8-browser'
 import type { Static } from '@sinclair/typebox'
-import type { ReportedGameState } from 'api/validateGameControllerShadow'
+import type { ReportedGameState } from 'api/persistence/models/ReportedGameState.js'
 
 export const sendReportedMessage = async (
 	reportedCommand: Static<typeof ReportedGameState>,

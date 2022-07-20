@@ -1,10 +1,8 @@
 import type { Static } from '@sinclair/typebox'
-import type {
-	gameControllerAdminShadow,
-	Position,
-} from 'api/validateGameAdminShadow'
-import type { MacAddress } from 'api/validateGameControllerShadow'
+import type { gameControllerAdminShadow } from 'api/validateGameAdminShadow'
 import { GameEngineEvent, GameEngineEventType } from 'core/gameEngine.js'
+import type { MacAddress } from 'core/models/MacAddress.js'
+import type { RobotPosition } from 'core/models/RobotPosition.js'
 
 export const gameEvent2StateUpdate = (
 	event: GameEngineEvent,
@@ -16,7 +14,7 @@ export const gameEvent2StateUpdate = (
 
 			robotFieldPosition: Record<
 				Static<typeof MacAddress>,
-				Partial<Static<typeof Position>>
+				Partial<Static<typeof RobotPosition>>
 			>
 	  }>
 	| undefined => {

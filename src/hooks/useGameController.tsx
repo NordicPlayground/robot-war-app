@@ -7,10 +7,8 @@ import {
 	ReportedGameState,
 	updateGameController,
 } from 'api/updateGameController'
-import {
-	MacAddress,
-	validateGameControllerShadow,
-} from 'api/validateGameControllerShadow'
+import { validateGameControllerShadow } from 'api/validateGameControllerShadow'
+import type { MacAddress } from 'core/models/MacAddress'
 import equal from 'fast-deep-equal'
 import { useAppConfig } from 'hooks/useAppConfig.js'
 import { useCredentials } from 'hooks/useCredentials'

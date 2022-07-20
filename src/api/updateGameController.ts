@@ -5,16 +5,14 @@ import {
 } from '@aws-sdk/client-iot-data-plane'
 import { fromUtf8, toUtf8 } from '@aws-sdk/util-utf8-browser'
 import type { Static } from '@sinclair/typebox'
-import type {
-	DesiredGameState as DesiredGameStateSchema,
-	DesiredRobot as DesiredRobotSchema,
-	ReportedGameState as ReportedGameStateSchema,
-	ReportedRobot as ReportedRobotSchema,
-} from 'api/validateGameControllerShadow'
+import type { DesiredGameState as DesiredGameStateSchema } from 'api/persistence/models/DesiredGameState.js'
+import type { ReportedGameState as ReportedGameStateSchema } from 'api/persistence/models/ReportedGameState'
 import { validateGameControllerShadow } from 'api/validateGameControllerShadow'
+import type { Robot as RobotSchema } from 'core/models/Robot'
+import type { RobotInGame as ReportedRobotSchema } from 'core/models/RobotInGame.js'
 import type { RobotCommand } from 'hooks/useGameController'
 
-export type DesiredRobot = Static<typeof DesiredRobotSchema>
+export type Robot = Static<typeof RobotSchema>
 export type ReportedRobot = Static<typeof ReportedRobotSchema>
 export type ReportedGameState = Static<typeof ReportedGameStateSchema>
 export type DesiredGameState = Static<typeof DesiredGameStateSchema>
@@ -70,7 +68,7 @@ export const updateGameController =
 				console.debug(`Robot ${robotMac} unknown!`)
 				continue
 			}
-			const updatedRobot: DesiredRobot = {
+			const updatedRobot: Robot = {
 				...robot,
 				angleDeg: robot.angleDeg + command.angleDeg,
 				driveTimeMs: command.driveTimeMs,

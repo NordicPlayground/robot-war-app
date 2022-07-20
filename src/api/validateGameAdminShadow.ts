@@ -1,5 +1,6 @@
 import { Static, Type } from '@sinclair/typebox'
-import { MacAddress } from 'api/validateGameControllerShadow.js'
+import { MacAddress } from 'core/models/MacAddress.js'
+import { RobotPosition } from 'core/models/RobotPosition.js'
 import {
 	validateWithJSONSchema,
 	ValidationError,
@@ -8,33 +9,11 @@ import {
 export const TeamId = Type.String({
 	minLength: 1,
 })
-export const Position = Type.Object(
-	{
-		xMm: Type.Integer({
-			minimum: 0,
-			title:
-				'X-Position (top to bottom) on the field in mm from the top left corner',
-		}),
-		yMm: Type.Integer({
-			minimum: 0,
-			title:
-				'Y-Position (left to right) on the field in mm from the top left corner',
-		}),
-		rotationDeg: Type.Number({
-			minimum: 0,
-			maximum: 359,
-			title:
-				'Rotation in degrees, 0 facing North on the field, 90 facing east, 180 facing south, 270 facing west',
-		}),
-	},
-	{ title: 'Position on the field' },
-)
-
 export const gameControllerAdminShadow = Type.Object({
 	state: Type.Object({
 		reported: Type.Object({
 			robotTeamAssignment: Type.Record(MacAddress, TeamId),
-			robotFieldPosition: Type.Record(MacAddress, Position),
+			robotFieldPosition: Type.Record(MacAddress, RobotPosition),
 			robotConfiguration: Type.Optional(
 				Type.Record(
 					MacAddress,

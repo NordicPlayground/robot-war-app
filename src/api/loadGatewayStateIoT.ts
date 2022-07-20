@@ -3,10 +3,8 @@ import {
 	IoTDataPlaneClient,
 } from '@aws-sdk/client-iot-data-plane'
 import type { Static } from '@sinclair/typebox'
-import {
-	ReportedGameState,
-	validateGameControllerShadow,
-} from 'api/validateGameControllerShadow.js'
+import type { ReportedGameState } from 'api/persistence/models/ReportedGameState'
+import { validateGameControllerShadow } from 'api/validateGameControllerShadow.js'
 
 export const loadGatewayStateIoT = async ({
 	iotDataPlaneClient,
