@@ -165,8 +165,10 @@ export const gameEngine = ({
 	) => {
 		if (!Number.isInteger(xMm) || !Number.isInteger(yMm))
 			throw new Error(`Invalid position provided: ${xMm}/${yMm}!`)
-		if (xMm < 0 || xMm >= field.heightMm || yMm < 0 || yMm >= field.widthMm)
-			throw new Error(`'Position is outside of field: ${xMm}/${yMm}!`)
+		if (xMm < 0 || xMm >= field.widthMm || yMm < 0 || yMm >= field.heightMm)
+			throw new Error(
+				`Position is outside of field: horizontal ${xMm} mm and vertical ${yMm} mm! (Field is ${field.widthMm} mm wide and ${field.heightMm} mm high.)`,
+			)
 		robotPostions[robotAddress] = {
 			xMm,
 			yMm,

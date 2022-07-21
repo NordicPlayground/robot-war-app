@@ -1,4 +1,4 @@
-import { GameEngineEventType } from 'core/gameEngine.js'
+import { gameEngine, GameEngineEventType } from 'core/gameEngine.js'
 import { randomMac } from 'core/test/randomMac.js'
 import { randomRobot } from 'core/test/randomRobot.js'
 import { simpleGame } from 'core/test/simpleGame.js'
@@ -20,14 +20,20 @@ describe('Admin', () => {
 			[-2, 0], // all values outside of left border of field
 			[-1, 0], // Left outside of field
 			[0, -1], // Top outside of field
-			[0, 1500], // Right outside of field
-			[0, 1501], // Further right outside of field
-			[1000, 0], // Bottom outside of field
-			[1001, 0], // Further bottom outside of field
+			[1500, 0], // Right outside of field
+			[1501, 0], // Further right outside of field
+			[0, 1000], // Bottom outside of field
+			[0, 1001], // Further bottom outside of field
 		])('cannot place it outside of the field (x: %d, y: %d)', (xMm, yMm) =>
-			expect(() =>
-				game.adminSetRobotPosition(randomMac(), { xMm, yMm }),
-			).toThrow(/Position is outside of field: /),
+			expect(() => {
+				const game = gameEngine({
+					field: {
+						widthMm: 1500,
+						heightMm: 1000,
+					},
+				})
+				game.adminSetRobotPosition(randomMac(), { xMm, yMm })
+			}).toThrow(/Position is outside of field: /),
 		)
 
 		it('does not accept floats for positions', () =>
@@ -109,12 +115,12 @@ describe('Admin', () => {
 				},
 				[robot3]: {
 					xMm: 250,
-					yMm: 1400,
+					yMm: 900,
 					rotationDeg: 17,
 				},
 				[robot4]: {
 					xMm: 750,
-					yMm: 1400,
+					yMm: 900,
 					rotationDeg: 42,
 				},
 			})
@@ -126,14 +132,32 @@ describe('Admin', () => {
 					position: { xMm: 750, yMm: 100, rotationDeg: 236 },
 				},
 				[robot3]: {
-					position: { xMm: 250, yMm: 1400, rotationDeg: 17 },
+					position: { xMm: 250, yMm: 900, rotationDeg: 17 },
 				},
 				[robot4]: {
-					position: { xMm: 750, yMm: 1400, rotationDeg: 42 },
+					position: { xMm: 750, yMm: 900, rotationDeg: 42 },
 				},
 			})
 			expect(listener).toHaveBeenCalledWith({
 				name: GameEngineEventType.robot_positions_set,
+			})
+		})
+
+		test('Regression: Position is outside of field: 1158/131! (Field is 1500/1000.)', () => {
+			const game = gameEngine({
+				field: {
+					heightMm: 1000,
+					widthMm: 1500,
+				},
+			})
+			const robot = randomMac()
+			game.gatewayReportDiscoveredRobots({ [robot]: randomRobot() })
+			game.adminSetAllRobotPositions({
+				[robot]: {
+					xMm: 1158,
+					yMm: 131,
+					rotationDeg: 0,
+				},
 			})
 		})
 	})
