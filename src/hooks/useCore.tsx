@@ -46,7 +46,7 @@ export const CoreProvider: FunctionComponent<{
 	gameInstance.onAll(({ name }) => {
 		console.debug(`[core]`, name)
 		setRobots(gameInstance.robots())
-		setTeams(gameInstance.teams)
+		setTeams(gameInstance.teams())
 	})
 
 	return (

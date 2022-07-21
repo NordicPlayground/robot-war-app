@@ -1,6 +1,6 @@
 import type { Static } from '@sinclair/typebox'
 import style from 'app/pages/Game.module.css'
-import { TeamAssigner } from 'components/Admin/TeamAssigner'
+import { RobotTeamAssigner } from 'components/Admin/RobotTeamAssigner'
 import { Field } from 'components/Game/Field'
 import { Robot } from 'components/Game/Robot'
 import type { RobotPosition } from 'core/models/RobotPosition'
@@ -8,7 +8,7 @@ import equal from 'fast-deep-equal'
 import { useAppConfig } from 'hooks/useAppConfig'
 import { useCore } from 'hooks/useCore'
 import { useEffect, useState } from 'react'
-import { randomColor } from 'utils/randomColor.js'
+import { teamColor } from 'utils/teamColor.js'
 
 export const Admin = () => {
 	const { robotWidthMm, robotLengthMm, startZoneSizeMm, helperLinesNumber } =
@@ -46,7 +46,7 @@ export const Admin = () => {
 		mac,
 		xMm: robot.position?.xMm ?? Math.round(field.widthMm / 2),
 		yMm: robot.position?.yMm ?? Math.round(field.heightMm / 2),
-		colorHex: randomColor(),
+		colorHex: teamColor(robot.team),
 		rotationDeg: robot.position?.rotationDeg ?? 0,
 	}))
 
@@ -112,9 +112,7 @@ export const Admin = () => {
 					cancel
 				</button>
 			</div>
-			<div>
-				<TeamAssigner />
-			</div>
+			<RobotTeamAssigner />
 		</div>
 	)
 }
