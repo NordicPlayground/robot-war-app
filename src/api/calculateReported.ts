@@ -1,7 +1,7 @@
 import type { Static } from '@sinclair/typebox'
 import type { DesiredGameState } from 'api/persistence/models/DesiredGameState.js'
 import type { ReportedGameState } from 'api/persistence/models/ReportedGameState.js'
-import type { ReportedRobot } from 'api/updateGameController'
+import type { RobotInGame } from 'core/models/RobotInGame.js'
 
 export const calculateReported = ({
 	robots,
@@ -15,7 +15,7 @@ export const calculateReported = ({
 	}
 
 	for (const [robotMac, command] of Object.entries(robots)) {
-		const updatedRobot: ReportedRobot = {
+		const updatedRobot: Static<typeof RobotInGame> = {
 			...reported.robots[robotMac],
 			angleDeg: command.angleDeg,
 			driveTimeMs: command.driveTimeMs,

@@ -18,19 +18,24 @@ export const RobotTeamAssigner = () => {
 			<fieldset>
 				<legend>Assign robots to teams </legend>
 				<ul>
-					{Object.entries(robots).map(([address, robot]) => (
-						<li key={address}>
-							{address}
-							<RobotTeam
-								address={address}
-								team={robot.team}
-								onSave={(teamName) => {
-									console.log(teamName)
-									adminAssignRobotToTeam(address, teamName)
-								}}
-							/>
-						</li>
-					))}
+					{Object.entries(robots)
+						.sort(
+							([, robotA], [, robotB]) =>
+								(robotA.position?.rotationDeg ?? 0) -
+								(robotB.position?.rotationDeg ?? 0),
+						)
+						.map(([address, robot]) => (
+							<li key={address}>
+								{address}
+								<RobotTeam
+									address={address}
+									team={robot.team}
+									onSave={(teamName) => {
+										adminAssignRobotToTeam(address, teamName)
+									}}
+								/>
+							</li>
+						))}
 				</ul>
 			</fieldset>
 		</form>

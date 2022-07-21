@@ -4,44 +4,39 @@ import { Form } from 'components/Game/Form'
 import { Robot } from 'components/Game/Robot'
 import { SelectTeam } from 'components/Team/SelectTeam'
 import { useAppConfig } from 'hooks/useAppConfig'
-import { useGameAdmin } from 'hooks/useGameAdmin'
-import { RobotCommand, useGameController } from 'hooks/useGameController'
+import { useCore } from 'hooks/useCore'
 import { useRobotActionGesture } from 'hooks/useRobotActionGesture'
 import { useScrollBlock } from 'hooks/useScrollBlock'
 import { useTeam } from 'hooks/useTeam'
-import { useEffect, useState } from 'react'
-import { randomColor } from 'utils/randomColor'
-import { shortestRotation } from 'utils/shortestRotation'
+import { useState } from 'react'
+import { teamColor } from 'utils/teamColor'
 
 export const Game = () => {
+	const { robotWidthMm, robotLengthMm, startZoneSizeMm } = useAppConfig()
 	const {
-		robotWidthMm,
-		robotLengthMm,
-		fieldHeightMm,
-		fieldWidthMm,
-		startZoneSizeMm,
-	} = useAppConfig()
-
-	const { helperLinesNumber, defaultOponentColor } = useAppConfig()
-	const { gameState, setNextRoundCommands, nextRoundCommands } =
-		useGameController()
+		robots,
+		game: { field, teamFight, teamSetRobotMovement },
+	} = useCore()
+	const { helperLinesNumber } = useAppConfig()
 	const { selectedTeam } = useTeam()
-	const {
-		metaData: { robotFieldPosition, robotTeamAssignment },
-	} = useGameAdmin()
 	const {
 		start: startRobotGesture,
 		end: endRobotGesture,
 		updateMousePosition,
 	} = useRobotActionGesture()
+	const [robotMovements, setRobotMovements] = useState<
+		Record<
+			string,
+			{
+				angleDeg: number
+				driveTimeMs: number
+			}
+		>
+	>({})
 
-	const [robotCommands, setRobotCommands] =
-		useState<Record<string, RobotCommand>>(nextRoundCommands)
 	const [selectedRobot, setSelectedRobot] = useState<string>()
-
-	useEffect(() => {
-		setRobotCommands(nextRoundCommands)
-	}, [nextRoundCommands])
+	const [blockScroll, allowScroll] = useScrollBlock()
+	const [activeRobot, setActiveRobot] = useState<string>()
 
 	const updateRobotCommandFromGesture = ({
 		mac,
@@ -52,30 +47,25 @@ export const Game = () => {
 		angleDeg: number
 		driveTimeMs: number
 	}) => {
-		const reportedAngle = robotFieldPosition[mac]?.rotationDeg ?? 0
-		const nextRobotCommand: RobotCommand = robotCommands[mac] ?? {
-			angleDeg: 0,
-			driveTimeMs: 0,
-		}
-		setRobotCommands((commands) => ({
-			...commands,
+		setRobotMovements((movements) => ({
+			...movements,
 			[mac]: {
-				...nextRobotCommand,
-				angleDeg: shortestRotation(angleDeg - reportedAngle),
+				angleDeg,
 				driveTimeMs,
 			},
 		}))
 	}
 
-	const [blockScroll, allowScroll] = useScrollBlock()
-	const [activeRobot, setActiveRobot] = useState<string>()
 	const handleRobotGestureEnd = () => {
 		if (activeRobot === undefined) return
 		allowScroll()
 		const { angleDeg, driveTimeMs } = endRobotGesture()
 		updateRobotCommandFromGesture({ mac: activeRobot, angleDeg, driveTimeMs })
+		teamSetRobotMovement(activeRobot, { angleDeg, driveTimeMs })
 		setActiveRobot(undefined)
 	}
+
+	if (selectedTeam === undefined) return <SelectTeam />
 
 	return (
 		<>
@@ -93,14 +83,12 @@ export const Game = () => {
 				}}
 				onPointerUp={handleRobotGestureEnd}
 			>
-				<>{selectedTeam === undefined ? <SelectTeam /> : null}</>
-
 				<div>
 					<button
 						type="button"
 						className="btn btn-danger"
 						onClick={() => {
-							setNextRoundCommands(robotCommands)
+							teamFight(selectedTeam)
 						}}
 					>
 						Fight!
@@ -108,45 +96,43 @@ export const Game = () => {
 				</div>
 				<div className={style.field}>
 					<Field
-						heightMm={fieldHeightMm}
-						widthMm={fieldWidthMm}
+						heightMm={field.heightMm}
+						widthMm={field.widthMm}
 						numberOfHelperLines={helperLinesNumber}
 						startZoneSizeMm={startZoneSizeMm}
 						onClick={(position) => {
 							console.debug(`User clicked on field at`, position)
 						}}
 					>
-						{Object.values(gameState.robots).map(({ mac }) => {
-							const isSameTeam =
-								robotTeamAssignment[`${mac}`] === selectedTeam ? true : false
-							const nextRobotCommand: RobotCommand = robotCommands[mac] ?? {
-								angleDeg: 0,
-								driveTimeMs: 0,
-							}
-
-							const { rotationDeg, xMm, yMm } = robotFieldPosition[mac] ?? {
-								rotationDeg: 0,
-								xMm: 0,
-								yMm: 0,
-							}
-
-							// FIXME: use fixed color per team
-							const colorHex = isSameTeam ? randomColor() : defaultOponentColor
-
+						{Object.entries(robots).map(([mac, robot]) => {
+							const { xMm, yMm, rotationDeg } = robot.position ?? {}
+							const isSameTeam = selectedTeam === robot.team
+							if (
+								xMm === undefined ||
+								yMm === undefined ||
+								rotationDeg === undefined
+							)
+								return null
+							const movement = robotMovements[mac] as
+								| {
+										angleDeg: number
+										driveTimeMs: number
+								  }
+								| undefined
 							return (
 								<Robot
 									key={mac}
 									id={mac}
-									xMm={xMm}
+									xMm={robot.position?.xMm ?? 0}
 									yMm={yMm}
 									widthMm={robotWidthMm}
 									heightMm={robotLengthMm}
-									colorHex={colorHex}
+									colorHex={teamColor(robot.team)}
 									rotationDeg={rotationDeg}
-									desiredRotationDeg={rotationDeg + nextRobotCommand.angleDeg}
-									desiredDriveTime={nextRobotCommand.driveTimeMs}
+									desiredRotationDeg={rotationDeg + (movement?.angleDeg ?? 0)}
+									desiredDriveTime={movement?.driveTimeMs}
 									desiredDriveBudgetPercent={
-										isSameTeam ? (nextRobotCommand.driveTimeMs ?? 0) / 1000 : 0
+										isSameTeam ? (movement?.driveTimeMs ?? 0) / 1000 : 0
 									}
 									outline={
 										selectedRobot !== undefined &&
@@ -179,9 +165,9 @@ export const Game = () => {
 					</Field>
 				</div>
 				<Form
-					commands={robotCommands}
-					onUpdateCommands={setRobotCommands}
-					key={JSON.stringify(robotCommands)}
+					movements={robotMovements}
+					onUpdate={setRobotMovements}
+					key={JSON.stringify(robotMovements)}
 				/>
 			</div>
 		</>
