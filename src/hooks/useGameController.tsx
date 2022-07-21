@@ -54,6 +54,10 @@ export const GameControllerContext = createContext<{
 	resetTeamNameOption: () => undefined,
 })
 
+/**
+ * @deprecated Use core
+ * FIXME: Migrate this to using the core
+ */
 export const useGameController = () => useContext(GameControllerContext)
 
 export const GameControllerProvider: FunctionComponent<{

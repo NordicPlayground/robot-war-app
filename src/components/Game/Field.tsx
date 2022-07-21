@@ -38,8 +38,8 @@ export const Field = ({
 		const relativeXPosition = (e.clientX - box.left) / box.width
 		const relativeYPosition = (e.clientY - box.top) / box.height
 		return {
-			xMm: relativeXPosition * widthMm,
-			yMm: relativeYPosition * heightMm,
+			xMm: Math.round(relativeXPosition * widthMm),
+			yMm: Math.round(relativeYPosition * heightMm),
 		}
 	}
 

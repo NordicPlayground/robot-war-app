@@ -48,6 +48,10 @@ export const GameAdminContext = createContext<{
 	adminSetRobotPosition: () => undefined,
 })
 
+/**
+ * @deprecated Use core
+ * FIXME: Migrate this to using the core
+ */
 export const useGameAdmin = () => useContext(GameAdminContext)
 
 const updateShadow = debounce(
