@@ -32,7 +32,6 @@ type AppConfig = {
 	fieldHeightMm: number
 	startZoneSizeMm: number
 	helperLinesNumber: number
-	defaultOponentColor: string
 	autoUpdateEnabled: boolean
 	enableAutoUpdate: (enabled: boolean) => void
 	autoUpdateIntervalSeconds: number
@@ -54,7 +53,6 @@ const defaultConfig: AppConfig = {
 	fieldHeightMm: 1000,
 	startZoneSizeMm: 100,
 	helperLinesNumber: 3,
-	defaultOponentColor: '#000000',
 	autoUpdateEnabled: true,
 	enableAutoUpdate: () => undefined,
 	autoUpdateIntervalSeconds: 2,

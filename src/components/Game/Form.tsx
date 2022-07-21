@@ -1,11 +1,12 @@
 import { RobotConfig } from 'components/Game/RobotConfig'
-import type { RobotCommand } from 'hooks/useGameController'
 import type { FunctionComponent } from 'react'
 
 export const Form: FunctionComponent<{
-	commands: Record<string, RobotCommand>
-	onUpdateCommands: (updatedCommands: Record<string, RobotCommand>) => void
-}> = ({ commands, onUpdateCommands }) => (
+	movements: Record<string, { angleDeg: number; driveTimeMs: number }>
+	onUpdate: (
+		updatedCommands: Record<string, { angleDeg: number; driveTimeMs: number }>,
+	) => void
+}> = ({ movements: commands, onUpdate: onUpdateCommands }) => (
 	<form>
 		{Object.entries(commands)
 			.sort(([macA], [macB]) => macA.localeCompare(macB))

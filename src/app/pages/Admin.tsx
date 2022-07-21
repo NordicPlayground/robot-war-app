@@ -42,6 +42,8 @@ export const Admin = () => {
 		if (Object.keys(updates).length > 0) adminSetAllRobotPositions(updates)
 	}, [adminSetAllRobotPositions, robots, field])
 
+	console.log(robots)
+
 	const robotRenderConfig = Object.entries(robots).map(([mac, robot]) => ({
 		mac,
 		xMm: robot.position?.xMm ?? Math.round(field.widthMm / 2),
