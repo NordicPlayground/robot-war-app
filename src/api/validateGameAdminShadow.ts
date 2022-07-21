@@ -1,14 +1,12 @@
 import { Static, Type } from '@sinclair/typebox'
 import { MacAddress } from 'core/models/MacAddress.js'
 import { RobotPosition } from 'core/models/RobotPosition.js'
+import { TeamId } from 'core/models/TeamId.js'
 import {
 	validateWithJSONSchema,
 	ValidationError,
 } from 'utils/validateWithJSONSchema.js'
 
-export const TeamId = Type.String({
-	minLength: 1,
-})
 export const gameControllerAdminShadow = Type.Object({
 	state: Type.Object({
 		reported: Type.Object({

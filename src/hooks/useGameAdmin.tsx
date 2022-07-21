@@ -6,11 +6,11 @@ import {
 import type { Static } from '@sinclair/typebox'
 import {
 	gameControllerAdminShadow,
-	TeamId,
 	validateGameControllerAdminShadow,
 } from 'api/validateGameAdminShadow.js'
 import type { MacAddress } from 'core/models/MacAddress.js'
 import type { RobotPosition } from 'core/models/RobotPosition'
+import type { TeamId } from 'core/models/TeamId.js'
 import equal from 'fast-deep-equal'
 import { useAppConfig } from 'hooks/useAppConfig.js'
 import { useCredentials } from 'hooks/useCredentials.js'
