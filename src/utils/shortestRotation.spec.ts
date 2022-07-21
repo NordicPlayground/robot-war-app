@@ -17,4 +17,22 @@ describe('shortestRotation()', () => {
 			expect(shortestRotation(targetAngle)).toEqual(expectedAngle),
 		)
 	})
+
+	it.each([
+		[0, 0],
+		[-0, -0],
+		[90, 90],
+		[180, 180],
+		[360, 0],
+		[-90, 270],
+		[-180, 180],
+		[-270, 90],
+		[-360, 0],
+		[500, 140],
+		[-800, 280],
+	])(
+		'should also normalize using custom boundaries %d => %d',
+		(angle, expected) =>
+			expect(shortestRotation(angle, 0, 360)).toEqual(expected),
+	)
 })

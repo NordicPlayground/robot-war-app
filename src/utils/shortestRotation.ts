@@ -1,5 +1,13 @@
-export const shortestRotation = (targetAngle: number): number => {
-	if (targetAngle > 180) targetAngle = ((targetAngle + 180) % 360) - 180
-	if (targetAngle < -180) targetAngle = ((targetAngle - 180) % 360) + 180
-	return Math.round(targetAngle)
+export const shortestRotation = (
+	targetAngle: number,
+	minimumAngle = -180,
+	maximumAngle = 180,
+): number => {
+	if (targetAngle > maximumAngle)
+		targetAngle = ((targetAngle + maximumAngle) % 360) + minimumAngle
+	if (targetAngle < minimumAngle)
+		targetAngle = ((targetAngle + minimumAngle) % 360) + maximumAngle
+	const result = Math.round(targetAngle)
+	if (result === 360) return 0
+	return result
 }
