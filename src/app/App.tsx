@@ -2,7 +2,7 @@ import { About } from 'app/pages/About'
 import { Admin } from 'app/pages/Admin'
 import { Game } from 'app/pages/Game'
 import { GameControllers } from 'app/pages/GameControllers'
-import { GameEngineDemo } from 'app/pages/GameEngineDemo'
+import { GameEngine } from 'app/pages/GameEngine'
 import { Settings } from 'app/pages/Settings'
 import { Navbar } from 'components/Navbar'
 import { RedirectFrom404 } from 'components/RedirectFrom404'
@@ -27,7 +27,7 @@ export const App = () => {
 				<Route path="/admin" element={<Admin />} />
 				<Route path="/settings" element={<Settings />} />
 				<Route path="/about" element={<About />} />
-				<Route path="/gameenginedemo" element={<GameEngineDemo />} />
+				<Route path="/gameengine" element={<GameEngine />} />
 			</Routes>
 			<RedirectFrom404 />
 		</Router>

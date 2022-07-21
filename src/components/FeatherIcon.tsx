@@ -332,22 +332,26 @@ export const FeatherIcon = ({
 type TypedIconOptions = Omit<IconOptions, 'title'>
 
 export const GameIcon = (options?: TypedIconOptions) => (
-	<FeatherIcon {...options} title="center" type="fast-forward" />
+	<FeatherIcon {...options} title="Game" type="fast-forward" />
 )
 
 export const GameControllerIcon = (options?: TypedIconOptions) => (
-	<FeatherIcon {...options} title="center" type="compass" />
+	<FeatherIcon {...options} title="Game Controller" type="compass" />
 )
 
 export const AdminIcon = (options?: TypedIconOptions) => (
-	<FeatherIcon {...options} title="center" type="target" />
+	<FeatherIcon {...options} title="Admin" type="target" />
 )
 export const InfoIcon = (options?: TypedIconOptions) => (
-	<FeatherIcon {...options} title="center" type="info" />
+	<FeatherIcon {...options} title="Info" type="info" />
 )
 
 export const SettingsIcon = (options?: TypedIconOptions) => (
-	<FeatherIcon {...options} title="center" type="settings" />
+	<FeatherIcon {...options} title="Settings" type="settings" />
+)
+
+export const CoreIcon = (options?: TypedIconOptions) => (
+	<FeatherIcon {...options} title="Core" type="hexagon" />
 )
 
 export const IconWithText: FunctionComponent<PropsWithChildren<any>> = ({
