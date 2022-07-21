@@ -172,7 +172,9 @@ export const gameEngine = ({
 		robotPostions[robotAddress] = {
 			xMm,
 			yMm,
-			rotationDeg: yMm < field.widthMm / 2 ? 90 : 270,
+			rotationDeg:
+				robotPostions[robotAddress]?.rotationDeg ??
+				(xMm < field.widthMm / 2 ? 90 : 270),
 		}
 	}
 

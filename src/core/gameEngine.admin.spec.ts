@@ -160,5 +160,47 @@ describe('Admin', () => {
 				},
 			})
 		})
+
+		describe('the game should provide a sensible default angle when placing a robot for the first time', () => {
+			const game = gameEngine({
+				field: {
+					heightMm: 1000,
+					widthMm: 1500,
+				},
+			})
+			const leftRobot = randomMac()
+			const rightRobot = randomMac()
+			game.gatewayReportDiscoveredRobots({
+				[leftRobot]: randomRobot(),
+				[rightRobot]: randomRobot(),
+			})
+			it('should point a robot that is placed in the left half of the field to the right', () => {
+				game.adminSetRobotPosition(leftRobot, {
+					xMm: game.field.widthMm * (1 / 4),
+					yMm: game.field.heightMm / 2,
+				})
+				expect(game.robots()[leftRobot].position?.rotationDeg).toEqual(90)
+			})
+			it('should point a robot that is placed in the right half of the field to the left', () => {
+				game.adminSetRobotPosition(rightRobot, {
+					xMm: game.field.widthMm * (3 / 4),
+					yMm: game.field.heightMm / 2,
+				})
+				expect(game.robots()[rightRobot].position?.rotationDeg).toEqual(270)
+			})
+
+			test('changing the position of a robot on the field should not change its rotationDeg', () => {
+				game.adminSetRobotPosition(leftRobot, {
+					rotationDeg: 42,
+				})
+				expect(game.robots()[leftRobot].position?.rotationDeg).toEqual(42)
+				// Place left robot in rights side of field
+				game.adminSetRobotPosition(leftRobot, {
+					xMm: game.field.widthMm * (3 / 4),
+					yMm: game.field.heightMm / 2,
+				})
+				expect(game.robots()[leftRobot].position?.rotationDeg).toEqual(42)
+			})
+		})
 	})
 })

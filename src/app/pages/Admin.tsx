@@ -11,13 +11,12 @@ import { useEffect, useState } from 'react'
 import { randomColor } from 'utils/randomColor.js'
 
 export const Admin = () => {
-	const { robotWidthMm, robotLengthMm, startZoneSizeMm } = useAppConfig()
+	const { robotWidthMm, robotLengthMm, startZoneSizeMm, helperLinesNumber } =
+		useAppConfig()
 	const {
 		robots,
 		game: { field, adminSetRobotPosition, adminSetAllRobotPositions },
 	} = useCore()
-
-	const { helperLinesNumber } = useAppConfig()
 
 	const [selectedRobot, setSelectedRobot] = useState<string>()
 
@@ -26,10 +25,15 @@ export const Admin = () => {
 		const updates: Parameters<typeof adminSetAllRobotPositions>[0] = {}
 		for (const [mac, robot] of Object.entries(robots)) {
 			const robotPosition = robot.position
+			const xMm =
+				robot.position?.xMm ?? Math.round(Math.random() * field.widthMm)
+			const yMm =
+				robot.position?.yMm ?? Math.round(Math.random() * field.heightMm)
 			const positionOnField: Static<typeof RobotPosition> = {
-				xMm: robot.position?.xMm ?? Math.round(Math.random() * field.widthMm),
-				yMm: robot.position?.yMm ?? Math.round(Math.random() * field.widthMm),
-				rotationDeg: (robot.angleDeg ?? 0) + (robot.position?.rotationDeg ?? 0),
+				xMm,
+				yMm,
+				rotationDeg:
+					robot.position?.rotationDeg ?? (xMm < field.widthMm / 2 ? 90 : 270),
 			}
 			if (!equal(robotPosition, positionOnField)) {
 				updates[mac] = positionOnField
@@ -40,10 +44,10 @@ export const Admin = () => {
 
 	const robotRenderConfig = Object.entries(robots).map(([mac, robot]) => ({
 		mac,
-		xMm: robot.position?.xMm ?? Math.random() * field.widthMm,
-		yMm: robot.position?.yMm ?? Math.random() * field.heightMm,
+		xMm: robot.position?.xMm ?? Math.round(field.widthMm / 2),
+		yMm: robot.position?.yMm ?? Math.round(field.heightMm / 2),
 		colorHex: randomColor(),
-		rotationDeg: (robot.angleDeg ?? 0) + (robot.position?.rotationDeg ?? 0),
+		rotationDeg: robot.position?.rotationDeg ?? 0,
 	}))
 
 	return (

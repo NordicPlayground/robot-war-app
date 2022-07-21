@@ -53,18 +53,18 @@ describe('Test a full game', () => {
 		describe('robot positioning', () => {
 			it('can set the X and Y coordinate', () => {
 				game.adminSetRobotPosition(robot1, { xMm: 250, yMm: 100 })
-				game.adminSetRobotPosition(robot2, { xMm: 750, yMm: 100 })
-				game.adminSetRobotPosition(robot3, { xMm: 250, yMm: 900 })
+				game.adminSetRobotPosition(robot2, { xMm: 250, yMm: 100 })
+				game.adminSetRobotPosition(robot3, { xMm: 750, yMm: 900 })
 				game.adminSetRobotPosition(robot4, { xMm: 750, yMm: 900 })
 				expect(game.robots()).toMatchObject({
 					[robot1]: {
 						position: { xMm: 250, yMm: 100 },
 					},
 					[robot2]: {
-						position: { xMm: 750, yMm: 100 },
+						position: { xMm: 250, yMm: 100 },
 					},
 					[robot3]: {
-						position: { xMm: 250, yMm: 900 },
+						position: { xMm: 750, yMm: 900 },
 					},
 					[robot4]: {
 						position: { xMm: 750, yMm: 900 },
