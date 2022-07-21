@@ -1,15 +1,34 @@
+import { randomMac } from 'core/test/randomMac.js'
+import { randomRobot } from 'core/test/randomRobot'
 import { useCore } from 'hooks/useCore'
 import { useState } from 'react'
 
 export const GameEngineDemo = () => {
 	const {
-		game: { adminAssignRobotToTeam },
+		game: { adminAssignRobotToTeam, gatewayReportDiscoveredRobots },
 		robots,
 	} = useCore()
 
 	return (
 		<>
 			<h1>Game Engine Demo</h1>
+
+			<p>
+				<button
+					type="button"
+					className="btn btn-secondary"
+					onClick={() => {
+						gatewayReportDiscoveredRobots({
+							[randomMac()]: randomRobot(),
+							[randomMac()]: randomRobot(),
+							[randomMac()]: randomRobot(),
+							[randomMac()]: randomRobot(),
+						})
+					}}
+				>
+					Gateway: Generate Robots
+				</button>
+			</p>
 
 			<ul>
 				{Object.entries(robots).map(([address, robot]) => (
@@ -24,7 +43,21 @@ export const GameEngineDemo = () => {
 					</li>
 				))}
 			</ul>
+
+			<TeamsList />
 		</>
+	)
+}
+
+const TeamsList = () => {
+	const { teams } = useCore()
+
+	return (
+		<ul>
+			{teams.map((team) => (
+				<li key={team}>{team}</li>
+			))}
+		</ul>
 	)
 }
 
