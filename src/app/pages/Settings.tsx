@@ -54,6 +54,7 @@ export const Settings = () => {
 								}
 								value={accessKeyId}
 								autoComplete={'off'}
+								className={'form-control'}
 							/>
 						</p>
 						<p>
@@ -66,6 +67,7 @@ export const Settings = () => {
 								}
 								value={secretAccessKey}
 								autoComplete={'off'}
+								className={'form-control'}
 							/>
 						</p>
 					</fieldset>
