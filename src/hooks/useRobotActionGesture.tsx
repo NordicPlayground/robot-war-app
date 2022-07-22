@@ -38,7 +38,7 @@ const getDriveTime = (x: number, y: number) => {
 	return Math.round(Math.min(1000, Math.sqrt(xs + ys) * 5)) // FIXME: convert to percentage
 }
 
-const getAngle = (x: number, y: number) => {
+export const getAngle = (x: number, y: number) => {
 	const rad = Math.atan2(y, x) // In radians
 	const deg = rad * (180 / Math.PI) // In degrees
 	return deg
