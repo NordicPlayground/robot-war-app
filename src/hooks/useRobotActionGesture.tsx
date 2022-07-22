@@ -5,7 +5,7 @@ import {
 	useContext,
 	useState,
 } from 'react'
-import { shortestRotation } from 'utils/shortestRotation'
+import { shortestRotation } from 'utils/shortestRotation.js'
 
 type Result = {
 	angleDeg: number
