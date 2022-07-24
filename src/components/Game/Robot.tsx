@@ -2,6 +2,16 @@ import Color from 'color'
 import styles from 'components/Game/Robot.module.css'
 import { nanoid } from 'nanoid'
 
+const getMouseCoordinates = (
+	e: React.MouseEvent<SVGGElement, MouseEvent>,
+): {
+	x: number
+	y: number
+} => ({
+	x: e.clientX,
+	y: e.clientY,
+})
+
 export const Robot = ({
 	id,
 	xMm,
@@ -9,13 +19,12 @@ export const Robot = ({
 	widthMm,
 	heightMm,
 	rotationDeg,
-	desiredRotationDeg,
-	desiredDriveBudgetPercent,
+	angleDeg,
+	driveTimeBudgetPercent,
 	colorHex,
 	onRotate,
 	onClick,
 	outline,
-	desiredDriveTime,
 	onPointerDown,
 	onPointerUp,
 }: {
@@ -25,15 +34,14 @@ export const Robot = ({
 	widthMm: number
 	heightMm: number
 	rotationDeg: number
-	desiredRotationDeg?: number
-	desiredDriveBudgetPercent?: number
+	angleDeg?: number
+	driveTimeBudgetPercent?: number
 	colorHex: string
 	onRotate: (rotateDeg: number) => void
 	onClick?: () => void
 	onPointerDown?: (args: { x: number; y: number }) => void
 	onPointerUp?: () => void
 	outline?: boolean
-	desiredDriveTime?: number
 }) => {
 	// Construct points for a triangle.
 	const points: [number, number][] = []
@@ -44,25 +52,7 @@ export const Robot = ({
 	// Right corner
 	points.push([xMm + widthMm / 2, yMm + heightMm / 2])
 
-	// drive time
-	const driveTimeLine: [number] = [xMm + widthMm / 2]
-	driveTimeLine.push(yMm)
-	driveTimeLine.push(xMm + widthMm / 2 + (desiredDriveTime ?? 0))
-	driveTimeLine.push(yMm)
-
 	const gradientId = nanoid()
-
-	const getMouseCoordinates = (
-		e: React.MouseEvent<SVGGElement, MouseEvent>,
-	): {
-		x: number
-		y: number
-	} => {
-		return {
-			x: e.clientX,
-			y: e.clientY,
-		}
-	}
 
 	return (
 		<g
@@ -93,49 +83,31 @@ export const Robot = ({
 					/>
 				</linearGradient>
 			</defs>
-			{desiredRotationDeg !== undefined && (
-				<g transform={`rotate(${desiredRotationDeg + 180}, ${xMm}, ${yMm})`}>
-					<path
-						d={`M${xMm} ${yMm} L${xMm} ${
-							yMm + widthMm * 4 * (desiredDriveBudgetPercent ?? 1)
-						}`}
-						style={{
-							fill: `none`,
-							stroke: 'green',
-							strokeWidth: 4,
-							strokeLinecap: 'butt',
-							strokeLinejoin: 'miter',
-							strokeOpacity: 1,
-							strokeMiterlimit: 4,
-							strokeDasharray: '4,4',
-							strokeDashoffset: 0,
-						}}
-					/>
-				</g>
-			)}
-
-			{desiredRotationDeg !== undefined && (
-				<g transform={`rotate(${desiredRotationDeg + 180}, ${xMm}, ${yMm})`}>
-					<path
-						d={`M${xMm} ${yMm} L${xMm} ${
-							yMm + widthMm * 4 * (desiredDriveBudgetPercent ?? 1)
-						}`}
-						style={{
-							fill: `none`,
-							stroke: 'green',
-							strokeWidth: 4,
-							strokeLinecap: 'butt',
-							strokeLinejoin: 'miter',
-							strokeOpacity: 1,
-							strokeMiterlimit: 4,
-							strokeDasharray: '4,4',
-							strokeDashoffset: 0,
-						}}
-					/>
-				</g>
+			{angleDeg !== undefined && (
+				<>
+					<g transform={`rotate(${rotationDeg + angleDeg}, ${xMm}, ${yMm})`}>
+						<path
+							d={`M${xMm} ${yMm} L${xMm} ${
+								yMm - widthMm * 4 * (driveTimeBudgetPercent ?? 1)
+							}`}
+							style={{
+								fill: `none`,
+								stroke: 'green',
+								strokeWidth: 4,
+								strokeLinecap: 'butt',
+								strokeLinejoin: 'miter',
+								strokeOpacity: 1,
+								strokeMiterlimit: 4,
+								strokeDasharray: '4,4',
+								strokeDashoffset: 0,
+							}}
+						/>
+					</g>
+				</>
 			)}
 			<g transform={`rotate(${rotationDeg}, ${xMm}, ${yMm})`}>
 				<polygon
+					data-test="rotation-handle"
 					style={{
 						fill: '#FF0000',
 						stroke: colorHex,

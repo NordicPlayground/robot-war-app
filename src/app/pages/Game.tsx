@@ -9,7 +9,9 @@ import { useRobotActionGesture } from 'hooks/useRobotActionGesture'
 import { useScrollBlock } from 'hooks/useScrollBlock'
 import { useTeam } from 'hooks/useTeam'
 import { useState } from 'react'
-import { teamColor } from 'utils/teamColor'
+import { mirrorAngle } from 'utils/mirrorAngle'
+import { shortestRotation } from 'utils/shortestRotation'
+import { defaultColor, teamColor } from 'utils/teamColor'
 
 export const Game = () => {
 	const { robotWidthMm, robotLengthMm, startZoneSizeMm } = useAppConfig()
@@ -34,23 +36,26 @@ export const Game = () => {
 		>
 	>({})
 
-	const [selectedRobot, setSelectedRobot] = useState<string>()
 	const [blockScroll, allowScroll] = useScrollBlock()
 	const [activeRobot, setActiveRobot] = useState<string>()
 
 	const updateRobotCommandFromGesture = ({
 		mac,
-		angleDeg,
+		rotationDeg,
 		driveTimeMs,
 	}: {
 		mac: string
-		angleDeg: number
+		rotationDeg: number
 		driveTimeMs: number
 	}) => {
 		setRobotMovements((movements) => ({
 			...movements,
 			[mac]: {
-				angleDeg,
+				angleDeg: mirrorAngle(
+					shortestRotation(
+						rotationDeg - (robots[mac]?.position?.rotationDeg ?? 0),
+					),
+				),
 				driveTimeMs,
 			},
 		}))
@@ -59,9 +64,20 @@ export const Game = () => {
 	const handleRobotGestureEnd = () => {
 		if (activeRobot === undefined) return
 		allowScroll()
-		const { angleDeg, driveTimeMs } = endRobotGesture()
-		updateRobotCommandFromGesture({ mac: activeRobot, angleDeg, driveTimeMs })
-		teamSetRobotMovement(activeRobot, { angleDeg, driveTimeMs })
+		const { rotationDeg, driveTimeMs } = endRobotGesture()
+		updateRobotCommandFromGesture({
+			mac: activeRobot,
+			rotationDeg,
+			driveTimeMs,
+		})
+		teamSetRobotMovement(activeRobot, {
+			angleDeg: mirrorAngle(
+				shortestRotation(
+					rotationDeg - (robots[activeRobot]?.position?.rotationDeg ?? 0),
+				),
+			),
+			driveTimeMs,
+		})
 		setActiveRobot(undefined)
 	}
 
@@ -106,7 +122,7 @@ export const Game = () => {
 					>
 						{Object.entries(robots).map(([mac, robot]) => {
 							const { xMm, yMm, rotationDeg } = robot.position ?? {}
-							const isSameTeam = selectedTeam === robot.team
+							const robotBelongsToTeam = selectedTeam === robot.team
 							if (
 								xMm === undefined ||
 								yMm === undefined ||
@@ -127,29 +143,23 @@ export const Game = () => {
 									yMm={yMm}
 									widthMm={robotWidthMm}
 									heightMm={robotLengthMm}
-									colorHex={teamColor(robot.team)}
+									colorHex={
+										robotBelongsToTeam ? teamColor(robot.team) : defaultColor
+									}
 									rotationDeg={rotationDeg}
-									desiredRotationDeg={rotationDeg + (movement?.angleDeg ?? 0)}
-									desiredDriveTime={movement?.driveTimeMs}
-									desiredDriveBudgetPercent={
-										isSameTeam ? (movement?.driveTimeMs ?? 0) / 1000 : 0
+									angleDeg={movement?.angleDeg}
+									driveTimeBudgetPercent={
+										robotBelongsToTeam ? (movement?.driveTimeMs ?? 0) / 1000 : 0
 									}
-									outline={
-										selectedRobot !== undefined &&
-										selectedRobot !== mac &&
-										isSameTeam
-											? true
-											: false
-									}
+									outline={activeRobot !== undefined && activeRobot !== mac}
 									onPointerDown={(args) => {
-										setSelectedRobot(mac)
-										if (isSameTeam) {
+										if (robotBelongsToTeam) {
+											setActiveRobot(mac)
 											blockScroll()
 											startRobotGesture({
 												x: args.x,
 												y: args.y,
 											})
-											setActiveRobot(mac)
 										}
 									}}
 									onRotate={() => {
@@ -157,7 +167,7 @@ export const Game = () => {
 									}}
 									onPointerUp={() => {
 										handleRobotGestureEnd()
-										setSelectedRobot(undefined)
+										setActiveRobot(undefined)
 									}}
 								/>
 							)

@@ -1,6 +1,6 @@
 import { randomColor } from 'utils/randomColor.js'
 
-const defaultColor = '#333333'
+export const defaultColor = '#333333'
 const teamColors: Record<string, string> = {}
 
 /**

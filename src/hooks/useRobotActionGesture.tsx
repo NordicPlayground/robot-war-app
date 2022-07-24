@@ -5,10 +5,9 @@ import {
 	useContext,
 	useState,
 } from 'react'
-import { shortestRotation } from 'utils/shortestRotation'
 
 type Result = {
-	angleDeg: number
+	rotationDeg: number
 	driveTimeMs: number
 }
 
@@ -19,11 +18,11 @@ export const RobotActionGesture = createContext<{
 }>({
 	start: () => undefined,
 	updateMousePosition: () => ({
-		angleDeg: 0,
+		rotationDeg: 0,
 		driveTimeMs: 0,
 	}),
 	end: () => ({
-		angleDeg: 0,
+		rotationDeg: 0,
 		driveTimeMs: 0,
 	}),
 })
@@ -38,22 +37,25 @@ const getDriveTime = (x: number, y: number) => {
 	return Math.round(Math.min(1000, Math.sqrt(xs + ys) * 5)) // FIXME: convert to percentage
 }
 
-const getAngle = (x: number, y: number) => {
+const getRotation = (x: number, y: number) => {
 	const rad = Math.atan2(y, x) // In radians
 	const deg = rad * (180 / Math.PI) // In degrees
-	return deg
+	return (
+		(deg +
+			180 + // Normalize to 360 degrees
+			90) % // North is up
+		360
+	)
 }
 
 const result = (start: [number, number], current: [number, number]) => {
 	const deltaX = start[0] - current[0]
 	const deltaY = start[1] - current[1]
 	const driveTime = getDriveTime(deltaX, deltaY)
-	const angle = getAngle(deltaX, deltaY)
-
-	const angleDeg = shortestRotation(angle + 90) // adding 90 because 0 degree is north
+	const rotation = getRotation(deltaX, deltaY)
 
 	return {
-		angleDeg,
+		rotationDeg: rotation,
 		driveTimeMs: driveTime,
 	}
 }
