@@ -1,3 +1,5 @@
 import * as n from 'nanoid'
 
-export const nanoid = () => n.default
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+export const nanoid = (): any => n.default

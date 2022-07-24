@@ -51,7 +51,7 @@ const defaultConfig: AppConfig = {
 	robotLengthMm: 120,
 	fieldWidthMm: 1500,
 	fieldHeightMm: 1000,
-	startZoneSizeMm: 100,
+	startZoneSizeMm: 150,
 	helperLinesNumber: 3,
 	autoUpdateEnabled: true,
 	enableAutoUpdate: () => undefined,
