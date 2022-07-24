@@ -103,14 +103,17 @@
       "^core\\/(.*)\\.js$": "<rootDir>/src/core/$1",
       "^hooks\\/(.*)\\.js$": "<rootDir>/src/hooks/$1",
       "^components\\/(.*)\\.js$": "<rootDir>/src/components/$1",
-      "^utils\\/(.*)\\.js$": "<rootDir>/src/utils/$1"
+      "^utils\\/(.*)\\.js$": "<rootDir>/src/utils/$1",
+      "\\.css$": "<rootDir>/src/css-mocks.ts",
+      "^nanoid$": "<rootDir>/src/nanoid-mock.ts"
     },
     "transform": {
       "^.+\\.(t|j)sx?$": "@swc/jest"
     },
     "extensionsToTreatAsEsm": [
       ".ts",
-      ".tsx"
+      ".tsx",
+      ".css"
     ],
     "globals": {
       "ts-jest": {
