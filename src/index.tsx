@@ -6,24 +6,27 @@ import { CredentialsProvider } from 'hooks/useCredentials'
 import { GameControllerThingProvider } from 'hooks/useGameControllerThing'
 import { RobotActionProvider } from 'hooks/useRobotActionGesture'
 import { TeamProvider } from 'hooks/useTeam'
+import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 
 const container = document.getElementById('root') as HTMLElement
 const root = createRoot(container)
 root.render(
-	<AppConfigProvider>
-		<CredentialsProvider>
-			<GameControllerThingProvider>
-				<CoreProvider>
-					<TeamProvider>
-						<AWSIoTPersistenceProvider>
-							<RobotActionProvider>
-								<App />
-							</RobotActionProvider>
-						</AWSIoTPersistenceProvider>
-					</TeamProvider>
-				</CoreProvider>
-			</GameControllerThingProvider>
-		</CredentialsProvider>
-	</AppConfigProvider>,
+	<StrictMode>
+		<AppConfigProvider>
+			<CredentialsProvider>
+				<GameControllerThingProvider>
+					<CoreProvider>
+						<TeamProvider>
+							<AWSIoTPersistenceProvider>
+								<RobotActionProvider>
+									<App />
+								</RobotActionProvider>
+							</AWSIoTPersistenceProvider>
+						</TeamProvider>
+					</CoreProvider>
+				</GameControllerThingProvider>
+			</CredentialsProvider>
+		</AppConfigProvider>
+	</StrictMode>,
 )
