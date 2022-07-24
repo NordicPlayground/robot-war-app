@@ -8,6 +8,7 @@ import equal from 'fast-deep-equal'
 import { useAppConfig } from 'hooks/useAppConfig'
 import { useCore } from 'hooks/useCore'
 import { useEffect, useState } from 'react'
+import { shortestRotation360 } from 'utils/shortestRotation'
 import { teamColor } from 'utils/teamColor.js'
 
 export const Admin = () => {
@@ -21,17 +22,33 @@ export const Admin = () => {
 	const [selectedRobot, setSelectedRobot] = useState<string>()
 
 	// Create inital positions and rotation on the map
+	// Distribute robots alternating in start zones of teams
 	useEffect(() => {
 		const updates: Parameters<typeof adminSetAllRobotPositions>[0] = {}
-		for (const [mac, robot] of Object.entries(robots)) {
+		const macs = Object.keys(robots)
+		for (let i = 0; i < macs.length; i++) {
+			const mac = macs[i]
+			const robot = robots[mac]
 			const robotPosition = robot.position
-			const xMm =
-				robot.position?.xMm ?? Math.round(Math.random() * field.widthMm)
-			const yMm =
-				robot.position?.yMm ?? Math.round(Math.random() * field.heightMm)
+			let xMm = robot.position?.xMm
+
+			if (xMm === undefined) {
+				if (i % 2 === 0) {
+					// Right side
+					xMm = field.widthMm - startZoneSizeMm / 2
+				} else {
+					// Left side
+					xMm = startZoneSizeMm / 2
+				}
+			}
+			let yMm = robot.position?.yMm
+			if (yMm === undefined) {
+				const step = field.heightMm / (macs.length / 2)
+				yMm = step * (Math.floor(i / 2) + 0.5)
+			}
 			const positionOnField: Static<typeof RobotPosition> = {
-				xMm,
-				yMm,
+				xMm: Math.round(xMm),
+				yMm: Math.round(yMm),
 				rotationDeg:
 					robot.position?.rotationDeg ?? (xMm < field.widthMm / 2 ? 90 : 270),
 			}
@@ -40,7 +57,7 @@ export const Admin = () => {
 			}
 		}
 		if (Object.keys(updates).length > 0) adminSetAllRobotPositions(updates)
-	}, [adminSetAllRobotPositions, robots, field])
+	}, [adminSetAllRobotPositions, robots, field, startZoneSizeMm])
 
 	console.log(robots)
 
@@ -87,7 +104,7 @@ export const Admin = () => {
 							rotationDeg={rotationDeg}
 							onRotate={(rotation) => {
 								adminSetRobotPosition(mac, {
-									rotationDeg: rotationDeg + rotation,
+									rotationDeg: shortestRotation360(rotationDeg + rotation),
 								})
 							}}
 							onClick={() => {

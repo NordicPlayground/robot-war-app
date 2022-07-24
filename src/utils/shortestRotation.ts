@@ -11,3 +11,6 @@ export const shortestRotation = (
 	if (result === 360) return 0
 	return result
 }
+
+export const shortestRotation360 = (targetAngle: number): number =>
+	shortestRotation(targetAngle, 0, 360)
