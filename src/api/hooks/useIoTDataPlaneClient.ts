@@ -4,17 +4,24 @@ import { createContext } from 'react'
 
 export const AWSIoTPersistenceContext = createContext(undefined)
 
+// Ensure clients do not change on every rerender
+const configuredClients: Record<string, IoTDataPlaneClient> = {}
+
 export const useIoTDataPlaneClient = (): IoTDataPlaneClient | undefined => {
 	const { region, accessKeyId, secretAccessKey } = useCredentials()
 
 	if (accessKeyId === undefined) return
 	if (secretAccessKey === undefined) return
 
-	return new IoTDataPlaneClient({
-		region,
-		credentials: {
-			accessKeyId,
-			secretAccessKey,
-		},
-	})
+	const hash = [region, accessKeyId, secretAccessKey].join(':')
+	if (configuredClients[hash] === undefined)
+		configuredClients[hash] = new IoTDataPlaneClient({
+			region,
+			credentials: {
+				accessKeyId,
+				secretAccessKey,
+			},
+		})
+
+	return configuredClients[hash]
 }
