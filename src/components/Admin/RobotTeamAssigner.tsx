@@ -73,7 +73,7 @@ const RobotTeam = ({
 			{teams.map((team) => (
 				<button
 					key={team}
-					className={'btn btn-secondary'}
+					className={'btn btn-secondary me-1 mt-1'}
 					title={`Assign the robot ${address} to the team ${team}...`}
 					onClick={() => {
 						onSave(team)
