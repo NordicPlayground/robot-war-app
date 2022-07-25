@@ -29,8 +29,14 @@ jobs:
       - name: Compile TypeScript
         run: npx tsc
 
-      - name: Run unit tests
-        run: npm test
+      - name: Run unit tests with coverage
+        run: npx jest --coverage
+
+      - uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: robot-war-app-coverage-${{ github.sha }}
+          path: coverage
 
       - name: Build
         env:
@@ -40,7 +46,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         if: always()
         with:
-          name: needs-assessment-${{ github.sha }}
+          name: robot-war-app-build-${{ github.sha }}
           path: build
 
       - name: Publish to GitHub pages
