@@ -1,10 +1,10 @@
-import { gameEvent2StateUpdate } from 'api/gameEvent2StateUpdate.js'
+import { gameEvent2AdminStateUpdate } from 'api/persistence/gameEvent2AdminStateUpdate.js'
 import type { GameEngineEvent } from 'core/gameEngine.js'
 import { GameEngineEventType } from 'core/gameEngine.js'
 import { randomMac } from 'core/test/randomMac.js'
 
-describe('gameEvent2StateUpdate()', () => {
-	describe('should convert a game engine event to a state update', () => {
+describe('gameEvent2AdminStateUpdate()', () => {
+	describe('should convert a game engine event to an admin state update', () => {
 		const address = randomMac()
 
 		const robotTeamAssigned: GameEngineEvent = {
@@ -30,6 +30,22 @@ describe('gameEvent2StateUpdate()', () => {
 			},
 		}
 
+		const robotPositionsSet: GameEngineEvent = {
+			name: GameEngineEventType.robot_positions_set,
+			positions: {
+				'3A:FE:50:B8:D6:FE': {
+					xMm: 1425,
+					yMm: 125,
+					rotationDeg: 270,
+				},
+				'34:7F:B3:65:24:4E': {
+					xMm: 75,
+					yMm: 125,
+					rotationDeg: 90,
+				},
+			},
+		}
+
 		it.each([
 			[
 				robotTeamAssigned,
@@ -38,6 +54,8 @@ describe('gameEvent2StateUpdate()', () => {
 						[address]: 'Team A',
 					},
 				},
+			],
+			[
 				robotPositionSet,
 				{
 					robotFieldPosition: {
@@ -47,6 +65,8 @@ describe('gameEvent2StateUpdate()', () => {
 						},
 					},
 				},
+			],
+			[
 				robotRotationSet,
 				{
 					robotFieldPosition: {
@@ -56,8 +76,25 @@ describe('gameEvent2StateUpdate()', () => {
 					},
 				},
 			],
+			[
+				robotPositionsSet,
+				{
+					robotFieldPosition: {
+						'3A:FE:50:B8:D6:FE': {
+							xMm: 1425,
+							yMm: 125,
+							rotationDeg: 270,
+						},
+						'34:7F:B3:65:24:4E': {
+							xMm: 75,
+							yMm: 125,
+							rotationDeg: 90,
+						},
+					},
+				},
+			],
 		])('should convert a %s event', (event, expectedStatus) =>
-			expect(gameEvent2StateUpdate(event)).toEqual(expectedStatus),
+			expect(gameEvent2AdminStateUpdate(event)).toEqual(expectedStatus),
 		)
 	})
 })

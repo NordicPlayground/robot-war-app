@@ -140,6 +140,28 @@ describe('Admin', () => {
 			})
 			expect(listener).toHaveBeenCalledWith({
 				name: GameEngineEventType.robot_positions_set,
+				positions: {
+					[robot1]: {
+						xMm: 250,
+						yMm: 100,
+						rotationDeg: 123,
+					},
+					[robot2]: {
+						xMm: 750,
+						yMm: 100,
+						rotationDeg: 236,
+					},
+					[robot3]: {
+						xMm: 250,
+						yMm: 900,
+						rotationDeg: 17,
+					},
+					[robot4]: {
+						xMm: 750,
+						yMm: 900,
+						rotationDeg: 42,
+					},
+				},
 			})
 		})
 
@@ -200,6 +222,39 @@ describe('Admin', () => {
 					yMm: game.field.heightMm / 2,
 				})
 				expect(game.robots()[leftRobot].position?.rotationDeg).toEqual(42)
+			})
+		})
+	})
+
+	describe('adminAssignAllRobotTeams()', () => {
+		it('should allow the admin to assign all robot teams at once', () => {
+			const listener = jest.fn()
+			const game = simpleGame()
+			const robot1 = randomMac()
+			const robot2 = randomMac()
+			game.gatewayReportDiscoveredRobots({
+				[robot1]: randomRobot(),
+				[robot2]: randomRobot(),
+			})
+			game.on(GameEngineEventType.robot_teams_assigned, listener)
+			game.adminAssignAllRobotTeams({
+				[robot1]: teamA,
+				[robot2]: teamB,
+			})
+			expect(game.robots()).toMatchObject({
+				[robot1]: {
+					team: teamA,
+				},
+				[robot2]: {
+					team: teamB,
+				},
+			})
+			expect(listener).toHaveBeenCalledWith({
+				name: GameEngineEventType.robot_teams_assigned,
+				assignments: {
+					[robot1]: teamA,
+					[robot2]: teamB,
+				},
 			})
 		})
 	})

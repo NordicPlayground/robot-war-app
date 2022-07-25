@@ -57,7 +57,7 @@ describe.skip('useAWSIoTPersistence', () => {
 			persistAdminChangeIoT,
 		})
 		expect(persistAdminChangeIoT).toHaveBeenCalledWith({
-			adminThingName: 'GameControllerThing',
+			thingName: 'GameControllerThing',
 			iotDataPlaneClient,
 		})
 

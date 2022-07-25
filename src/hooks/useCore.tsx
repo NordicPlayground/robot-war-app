@@ -1,10 +1,11 @@
-import { gameEngine, GameEngine } from 'core/gameEngine.js'
+import { EventListener, gameEngine, GameEngine } from 'core/gameEngine.js'
 import { useAppConfig } from 'hooks/useAppConfig.js'
 import {
 	createContext,
 	FunctionComponent,
 	ReactNode,
 	useContext,
+	useEffect,
 	useRef,
 	useState,
 } from 'react'
@@ -52,10 +53,18 @@ export const CoreProvider: FunctionComponent<{
 	)
 
 	// Update the state that holds the robots
-	gameInstance.current.onAll(({ name }) => {
-		console.debug(`[core]`, name)
-		setRobots(gameInstance.current.robots())
-		setTeams(gameInstance.current.teams())
+	useEffect(() => {
+		const updater: EventListener = ({ name, ...rest }) => {
+			console.debug(`[core]`, name, rest)
+			setRobots(gameInstance.current.robots())
+			setTeams(gameInstance.current.teams())
+		}
+		gameInstance.current.onAll(updater)
+
+		const instance = gameInstance.current
+		return () => {
+			instance.offAll(updater)
+		}
 	})
 
 	return (

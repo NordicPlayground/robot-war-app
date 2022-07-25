@@ -8,6 +8,7 @@ import type { RobotPosition } from 'core/models/RobotPosition.js'
 export enum GameEngineEventType {
 	robots_discovered = 'robots_discovered',
 	robot_team_assigned = 'robot_team_assigned',
+	robot_teams_assigned = 'robot_teams_assigned',
 	robot_position_set = 'robot_position_set',
 	robot_positions_set = 'robot_positions_set',
 	robot_movement_set = 'robot_movement_set',
@@ -17,7 +18,7 @@ export enum GameEngineEventType {
 	next_round = 'next_round',
 }
 
-type EventListener = (event: GameEngineEvent) => void
+export type EventListener = (event: GameEngineEvent) => void
 
 export type GameEngineEvent = {
 	name: GameEngineEventType
@@ -65,7 +66,13 @@ export type GameEngine = {
 	 */
 	adminAssignRobotToTeam: (
 		robotAddress: Static<typeof MacAddress>,
-		name: string,
+		team: string,
+	) => void
+	/**
+	 * Used by the Admin to assign the team of all robots at once
+	 */
+	adminAssignAllRobotTeams: (
+		assignments: Record<Static<typeof MacAddress>, string>,
 	) => void
 	/**
 	 * Used by the Admin to set the position and rotation on the field of a robot
@@ -259,15 +266,26 @@ export const gameEngine = ({
 			}
 			notify({ name: GameEngineEventType.robots_discovered })
 		},
-		adminAssignRobotToTeam: (robotAddress, name) => {
-			if (name.length === 0) {
-				throw new Error(`Name cannot be blank!`)
-			}
-			robotTeamAssignments[robotAddress] = name
+		adminAssignRobotToTeam: (robotAddress, team) => {
+			validateTeamName(team)
+			robotTeamAssignments[robotAddress] = team
 			notify({
 				name: GameEngineEventType.robot_team_assigned,
 				address: robotAddress,
-				team: name,
+				team,
+			})
+		},
+		adminAssignAllRobotTeams: (assignments) => {
+			// Validate names
+			for (const [, team] of Object.entries(assignments)) {
+				validateTeamName(team)
+			}
+			for (const [robotAddress, team] of Object.entries(assignments)) {
+				robotTeamAssignments[robotAddress] = team
+			}
+			notify({
+				name: GameEngineEventType.robot_teams_assigned,
+				assignments,
 			})
 		},
 		adminSetRobotPosition: (robotAddress, positionUpdate) => {
@@ -288,6 +306,7 @@ export const gameEngine = ({
 			})
 			notify({
 				name: GameEngineEventType.robot_positions_set,
+				positions,
 			})
 		},
 		teamSetRobotMovement: (address, { angleDeg, driveTimeMs }) => {
@@ -376,5 +395,10 @@ export const gameEngine = ({
 			const index = (listenersForType[type] ?? []).indexOf(listener)
 			if (index !== undefined) delete listenersForType[type][index]
 		},
+	}
+}
+function validateTeamName(name: string) {
+	if (name.length === 0) {
+		throw new Error(`Name cannot be blank!`)
 	}
 }

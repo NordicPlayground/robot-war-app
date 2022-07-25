@@ -1,17 +1,19 @@
 import type { Static } from '@sinclair/typebox'
-import { loadGatewayStateIoT } from 'api/loadGatewayStateIoT.js'
-import type { ReportedGameState } from 'api/persistence/models/ReportedGameState.js'
+import { getShadow } from 'api/persistence/getShadow.js'
+import { GameControllerShadow } from 'api/persistence/models/GameControllerShadow.js'
 import { randomMac } from 'core/test/randomMac.js'
 import { randomRobot } from 'core/test/randomRobot.js'
 
-describe('loadGatewayStateIoT()', () => {
+describe('getShadow()', () => {
 	it('should return the reported Gateway state', async () => {
-		const expectedState: Static<typeof ReportedGameState> = {
-			robots: {
-				[randomMac()]: randomRobot(),
-				[randomMac()]: randomRobot(),
-				[randomMac()]: randomRobot(),
-				[randomMac()]: randomRobot(),
+		const expectedState: Static<typeof GameControllerShadow> = {
+			reported: {
+				robots: {
+					[randomMac()]: randomRobot(),
+					[randomMac()]: randomRobot(),
+					[randomMac()]: randomRobot(),
+					[randomMac()]: randomRobot(),
+				},
 			},
 		}
 
@@ -20,9 +22,7 @@ describe('loadGatewayStateIoT()', () => {
 				Promise.resolve({
 					payload: new TextEncoder().encode(
 						JSON.stringify({
-							state: {
-								reported: expectedState,
-							},
+							state: expectedState,
 						}),
 					),
 				}),
@@ -30,10 +30,11 @@ describe('loadGatewayStateIoT()', () => {
 		} as any
 
 		expect(
-			await loadGatewayStateIoT({
+			await getShadow({
 				iotDataPlaneClient: mockIoTDataPlaneClient,
-				gatewayThingName: 'myGameController',
-			}),
+				thingName: 'myGameController',
+				schema: GameControllerShadow,
+			})(),
 		).toEqual(expectedState)
 
 		// It should use the thing name given in the argument
@@ -62,10 +63,11 @@ describe('loadGatewayStateIoT()', () => {
 			),
 		} as any
 
-		const res = await loadGatewayStateIoT({
+		const res = await getShadow({
 			iotDataPlaneClient: mockIoTDataPlaneClient,
-			gatewayThingName: 'myGameController',
-		})
+			thingName: 'myGameController',
+			schema: GameControllerShadow,
+		})()
 		expect(res).toHaveProperty('error')
 		expect((res as any).error).not.toBeUndefined()
 	})

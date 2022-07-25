@@ -14,9 +14,9 @@ const root = createRoot(container)
 root.render(
 	<StrictMode>
 		<AppConfigProvider>
-			<CredentialsProvider>
-				<GameControllerThingProvider>
-					<CoreProvider>
+			<CoreProvider>
+				<CredentialsProvider>
+					<GameControllerThingProvider>
 						<TeamProvider>
 							<AWSIoTPersistenceProvider>
 								<DragGestureProvider>
@@ -24,9 +24,9 @@ root.render(
 								</DragGestureProvider>
 							</AWSIoTPersistenceProvider>
 						</TeamProvider>
-					</CoreProvider>
-				</GameControllerThingProvider>
-			</CredentialsProvider>
+					</GameControllerThingProvider>
+				</CredentialsProvider>
+			</CoreProvider>
 		</AppConfigProvider>
 	</StrictMode>,
 )

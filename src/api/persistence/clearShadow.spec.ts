@@ -1,37 +1,30 @@
 import type { IoTDataPlaneClient } from '@aws-sdk/client-iot-data-plane'
-import { persistAdminChangeIoT } from 'api/persistAdminChangeIoT.js'
+import { clearShadow } from 'api/persistence/clearShadow.js'
 import { randomMac } from 'core/test/randomMac.js'
 
-describe('persistAdminChangeIoT()', () => {
-	it('should persist changes by admins to an AWS IoT thing shadow', async () => {
+describe('clearShadow()', () => {
+	it('should persist changes to an AWS IoT thing shadow', async () => {
 		const mockIoTDataPlaneClient: IoTDataPlaneClient = {
 			send: jest.fn(async () => Promise.resolve()),
 		} as any
 
-		const adminThingName = `adminThing${randomMac().replace(/:/g, '')}`
-		const address = randomMac()
-		await persistAdminChangeIoT({
+		const randomThingName = `thing${randomMac().replace(/:/g, '')}`
+		await clearShadow({
 			iotDataPlaneClient: mockIoTDataPlaneClient,
-			adminThingName,
-		})({
-			robotTeamAssignment: {
-				[address]: 'Team A',
-			},
-		})
+			thingName: randomThingName,
+			shadowName: 'admin',
+		})()
 
 		const { thingName, shadowName, payload } = (
 			mockIoTDataPlaneClient.send as ReturnType<typeof jest.fn>
 		).mock.calls[0][0].input
 
-		expect(thingName).toEqual(adminThingName)
+		expect(thingName).toEqual(randomThingName)
 		expect(shadowName).toEqual('admin')
 		expect(JSON.parse(new TextDecoder().decode(payload))).toEqual({
 			state: {
-				reported: {
-					robotTeamAssignment: {
-						[address]: 'Team A',
-					},
-				},
+				reported: null,
+				desired: null,
 			},
 		})
 	})

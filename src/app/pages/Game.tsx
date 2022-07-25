@@ -8,7 +8,7 @@ import { useCore } from 'hooks/useCore'
 import { useDragGesture } from 'hooks/useDragGesture'
 import { useScrollBlock } from 'hooks/useScrollBlock'
 import { useTeam } from 'hooks/useTeam'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { distanceToDriveTime } from 'utils/distanceToDriveTime'
 import { mirrorAngle } from 'utils/mirrorAngle'
 import { shortestRotation } from 'utils/shortestRotation'
@@ -81,6 +81,15 @@ export const Game = () => {
 		})
 		setActiveRobot(undefined)
 	}
+
+	useEffect(() => {
+		setRobotMovements((movements) => {
+			Object.entries(robots).forEach(([address, robot]) => {
+				movements[address] = movements[address] ?? robot
+			})
+			return movements
+		})
+	}, [robots])
 
 	if (selectedTeam === undefined) return <SelectTeam />
 

@@ -1,5 +1,6 @@
 import { useCore } from 'hooks/useCore'
 import { useState } from 'react'
+import { teamColor } from 'utils/teamColor'
 
 export const RobotTeamAssigner = () => {
 	const {
@@ -74,6 +75,7 @@ const RobotTeam = ({
 				<button
 					key={team}
 					className={'btn btn-secondary me-1 mt-1'}
+					style={{ backgroundColor: teamColor(team) }}
 					title={`Assign the robot ${address} to the team ${team}...`}
 					onClick={() => {
 						onSave(team)

@@ -1,16 +1,16 @@
 import type { Static } from '@sinclair/typebox'
-import type { gameControllerAdminShadow } from 'api/validateGameAdminShadow'
+import type { AdminShadow } from 'api/persistence/models/AdminShadow.js'
 import { GameEngineEvent, GameEngineEventType } from 'core/gameEngine.js'
 import type { MacAddress } from 'core/models/MacAddress.js'
 import type { RobotPosition } from 'core/models/RobotPosition.js'
 
-export const gameEvent2StateUpdate = (
+export const gameEvent2AdminStateUpdate = (
 	event: GameEngineEvent,
 ):
 	| Partial<{
 			robotTeamAssignment: Static<
-				typeof gameControllerAdminShadow
-			>['state']['reported']['robotTeamAssignment']
+				typeof AdminShadow
+			>['reported']['robotTeamAssignment']
 
 			robotFieldPosition: Record<
 				Static<typeof MacAddress>,
@@ -24,6 +24,10 @@ export const gameEvent2StateUpdate = (
 				robotTeamAssignment: {
 					[event.address]: event.team,
 				},
+			}
+		case GameEngineEventType.robot_positions_set:
+			return {
+				robotFieldPosition: event.positions,
 			}
 		case GameEngineEventType.robot_position_set:
 			return {
