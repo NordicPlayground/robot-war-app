@@ -8,10 +8,10 @@ import {
 
 type Result = {
 	rotationDeg: number
-	driveTimeMs: number
+	distancePx: number
 }
 
-export const RobotActionGesture = createContext<{
+export const DragGesture = createContext<{
 	start: (args: { x: number; y: number }) => void
 	updateMousePosition: (args: { x: number; y: number }) => Result
 	end: () => Result
@@ -19,23 +19,17 @@ export const RobotActionGesture = createContext<{
 	start: () => undefined,
 	updateMousePosition: () => ({
 		rotationDeg: 0,
-		driveTimeMs: 0,
+		distancePx: 0,
 	}),
 	end: () => ({
 		rotationDeg: 0,
-		driveTimeMs: 0,
+		distancePx: 0,
 	}),
 })
 
-export const useRobotActionGesture = () => useContext(RobotActionGesture)
+export const useDragGesture = () => useContext(DragGesture)
 
 type Position = [number, number]
-
-const getDriveTime = (x: number, y: number) => {
-	const xs = x * x
-	const ys = y * y
-	return Math.round(Math.min(1000, Math.sqrt(xs + ys) * 5)) // FIXME: convert to percentage
-}
 
 const getRotation = (x: number, y: number) => {
 	const rad = Math.atan2(y, x) // In radians
@@ -51,16 +45,16 @@ const getRotation = (x: number, y: number) => {
 const result = (start: [number, number], current: [number, number]) => {
 	const deltaX = start[0] - current[0]
 	const deltaY = start[1] - current[1]
-	const driveTime = getDriveTime(deltaX, deltaY)
 	const rotation = getRotation(deltaX, deltaY)
+	const distance = Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2))
 
 	return {
 		rotationDeg: rotation,
-		driveTimeMs: driveTime,
+		distancePx: distance,
 	}
 }
 
-export const RobotActionProvider: FunctionComponent<{
+export const DragGestureProvider: FunctionComponent<{
 	children: ReactNode
 }> = ({ children }) => {
 	const [active, setIsActive] = useState<boolean>(false)
@@ -68,7 +62,7 @@ export const RobotActionProvider: FunctionComponent<{
 	const [current, setCurrentPosition] = useState<Position>([0, 0])
 
 	return (
-		<RobotActionGesture.Provider
+		<DragGesture.Provider
 			value={{
 				start: ({ x: xPosition, y: yPosition }) => {
 					setStartPosition([xPosition, yPosition])
@@ -87,6 +81,6 @@ export const RobotActionProvider: FunctionComponent<{
 			}}
 		>
 			{children}
-		</RobotActionGesture.Provider>
+		</DragGesture.Provider>
 	)
 }
