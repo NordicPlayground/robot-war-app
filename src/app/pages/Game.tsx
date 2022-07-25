@@ -5,10 +5,11 @@ import { Robot } from 'components/Game/Robot'
 import { SelectTeam } from 'components/Team/SelectTeam'
 import { useAppConfig } from 'hooks/useAppConfig'
 import { useCore } from 'hooks/useCore'
-import { useRobotActionGesture } from 'hooks/useRobotActionGesture'
+import { useDragGesture } from 'hooks/useDragGesture'
 import { useScrollBlock } from 'hooks/useScrollBlock'
 import { useTeam } from 'hooks/useTeam'
 import { useState } from 'react'
+import { distanceToDriveTime } from 'utils/distanceToDriveTime'
 import { mirrorAngle } from 'utils/mirrorAngle'
 import { shortestRotation } from 'utils/shortestRotation'
 import { defaultColor, teamColor } from 'utils/teamColor'
@@ -25,7 +26,7 @@ export const Game = () => {
 		start: startRobotGesture,
 		end: endRobotGesture,
 		updateMousePosition,
-	} = useRobotActionGesture()
+	} = useDragGesture()
 	const [robotMovements, setRobotMovements] = useState<
 		Record<
 			string,
@@ -64,11 +65,11 @@ export const Game = () => {
 	const handleRobotGestureEnd = () => {
 		if (activeRobot === undefined) return
 		allowScroll()
-		const { rotationDeg, driveTimeMs } = endRobotGesture()
+		const { rotationDeg, distancePx } = endRobotGesture()
 		updateRobotCommandFromGesture({
 			mac: activeRobot,
 			rotationDeg,
-			driveTimeMs,
+			driveTimeMs: distanceToDriveTime(distancePx),
 		})
 		teamSetRobotMovement(activeRobot, {
 			angleDeg: mirrorAngle(
@@ -76,7 +77,7 @@ export const Game = () => {
 					rotationDeg - (robots[activeRobot]?.position?.rotationDeg ?? 0),
 				),
 			),
-			driveTimeMs,
+			driveTimeMs: distanceToDriveTime(distancePx),
 		})
 		setActiveRobot(undefined)
 	}
@@ -89,12 +90,14 @@ export const Game = () => {
 				role={'presentation'}
 				onPointerMove={(e) => {
 					if (activeRobot === undefined) return
+					const update = updateMousePosition({
+						x: e.clientX,
+						y: e.clientY,
+					})
 					updateRobotCommandFromGesture({
 						mac: activeRobot,
-						...updateMousePosition({
-							x: e.clientX,
-							y: e.clientY,
-						}),
+						rotationDeg: update.rotationDeg,
+						driveTimeMs: distanceToDriveTime(update.distancePx),
 					})
 				}}
 				onPointerUp={handleRobotGestureEnd}

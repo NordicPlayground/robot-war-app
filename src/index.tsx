@@ -3,8 +3,8 @@ import { AWSIoTPersistenceProvider } from 'components/Storage/AWSIoTPersistence'
 import { AppConfigProvider } from 'hooks/useAppConfig'
 import { CoreProvider } from 'hooks/useCore'
 import { CredentialsProvider } from 'hooks/useCredentials'
+import { DragGestureProvider } from 'hooks/useDragGesture'
 import { GameControllerThingProvider } from 'hooks/useGameControllerThing'
-import { RobotActionProvider } from 'hooks/useRobotActionGesture'
 import { TeamProvider } from 'hooks/useTeam'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
@@ -19,9 +19,9 @@ root.render(
 					<CoreProvider>
 						<TeamProvider>
 							<AWSIoTPersistenceProvider>
-								<RobotActionProvider>
+								<DragGestureProvider>
 									<App />
-								</RobotActionProvider>
+								</DragGestureProvider>
 							</AWSIoTPersistenceProvider>
 						</TeamProvider>
 					</CoreProvider>
