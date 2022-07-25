@@ -165,9 +165,6 @@ export const Game = () => {
 											})
 										}
 									}}
-									onRotate={() => {
-										console.log('onRotate')
-									}}
 									onPointerUp={() => {
 										handleRobotGestureEnd()
 										setActiveRobot(undefined)
