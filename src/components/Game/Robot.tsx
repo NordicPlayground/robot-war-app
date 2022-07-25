@@ -84,26 +84,24 @@ export const Robot = ({
 				</linearGradient>
 			</defs>
 			{angleDeg !== undefined && (
-				<>
-					<g transform={`rotate(${rotationDeg + angleDeg}, ${xMm}, ${yMm})`}>
-						<path
-							d={`M${xMm} ${yMm} L${xMm} ${
-								yMm - widthMm * 4 * (driveTimeBudgetPercent ?? 1)
-							}`}
-							style={{
-								fill: `none`,
-								stroke: 'green',
-								strokeWidth: 4,
-								strokeLinecap: 'butt',
-								strokeLinejoin: 'miter',
-								strokeOpacity: 1,
-								strokeMiterlimit: 4,
-								strokeDasharray: '4,4',
-								strokeDashoffset: 0,
-							}}
-						/>
-					</g>
-				</>
+				<g transform={`rotate(${rotationDeg + angleDeg}, ${xMm}, ${yMm})`}>
+					<path
+						d={`M${xMm} ${yMm} L${xMm} ${
+							yMm - widthMm * 4 * (driveTimeBudgetPercent ?? 1)
+						}`}
+						style={{
+							fill: `none`,
+							stroke: 'green',
+							strokeWidth: 4,
+							strokeLinecap: 'butt',
+							strokeLinejoin: 'miter',
+							strokeOpacity: 1,
+							strokeMiterlimit: 4,
+							strokeDasharray: '4,4',
+							strokeDashoffset: 0,
+						}}
+					/>
+				</g>
 			)}
 			<g transform={`rotate(${rotationDeg}, ${xMm}, ${yMm})`}>
 				<polygon
