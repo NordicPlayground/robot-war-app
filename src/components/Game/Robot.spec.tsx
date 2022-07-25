@@ -167,8 +167,11 @@ T = tip
 
 		robot.findOne('[data-test-id=robot]').props.onPointerDown({
 			stopPropagation: jest.fn(),
+			clientX: 10,
+			clientY: 10,
 		})
 		expect(onPointerDown).toHaveBeenCalledTimes(1)
+		expect(onPointerDown).toHaveBeenCalledWith({ x: 10, y: 10 })
 	})
 
 	it('Should trigger onPointerUp after onPointerDown is triggered', () => {
@@ -199,8 +202,11 @@ T = tip
 
 		robot.findOne('[data-test-id=robot]').props.onPointerDown({
 			stopPropagation: jest.fn(),
+			clientX: 10,
+			clientY: 10,
 		})
 		expect(onPointerDown).toHaveBeenCalledTimes(1)
+		expect(onPointerDown).toHaveBeenCalledWith({ x: 10, y: 10 })
 
 		robot.findOne('[data-test-id=robot]').props.onPointerUp({
 			stopPropagation: jest.fn(),
