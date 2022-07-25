@@ -37,7 +37,7 @@ export const Robot = ({
 	angleDeg?: number
 	driveTimeBudgetPercent?: number
 	colorHex: string
-	onRotate: (rotateDeg: number) => void
+	onRotate?: (rotateDeg: number) => void
 	onClick?: () => void
 	onPointerDown?: (args: { x: number; y: number }) => void
 	onPointerUp?: () => void
@@ -107,7 +107,7 @@ export const Robot = ({
 			)}
 			<g transform={`rotate(${rotationDeg}, ${xMm}, ${yMm})`}>
 				<polygon
-					data-test="rotation-handle"
+					data-test-id="rotation-handle"
 					style={{
 						fill: '#FF0000',
 						stroke: colorHex,
@@ -117,7 +117,7 @@ export const Robot = ({
 					points={points.map((pointDef) => pointDef.join(',')).join(' ')}
 					onWheel={(e) => {
 						e.stopPropagation()
-						onRotate(e.deltaY > 0 ? 5 : -5)
+						onRotate?.(e.deltaY > 0 ? 5 : -5)
 					}}
 					onClick={(e) => {
 						e.stopPropagation()
@@ -140,13 +140,14 @@ export const Robot = ({
 					}
 					onWheel={(e) => {
 						e.stopPropagation()
-						onRotate(e.deltaY > 0 ? 5 : -5)
+						onRotate?.(e.deltaY > 0 ? 5 : -5)
 					}}
 					onClick={(e) => {
 						e.stopPropagation()
 						onClick?.()
 					}}
 					points={points.map((pointDef) => pointDef.join(',')).join(' ')}
+					data-test-id="triangle"
 				/>
 			</g>
 			<text
@@ -155,6 +156,7 @@ export const Robot = ({
 				className={styles.label}
 				dominantBaseline="middle"
 				textAnchor="middle"
+				data-test-id="label"
 			>
 				{id}
 			</text>
