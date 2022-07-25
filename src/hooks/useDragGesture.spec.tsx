@@ -39,7 +39,8 @@ describe('UseRobotActionGesture', () => {
 				[-65, -12],
 			],
 		])(
-			'First coordinate: , Second coordinate: ',
+			// #FIXME: set correct test description
+			'First coordinate: %d , Second coordinate: %d',
 			(firstCoordinate, secondCoordinate) => {
 				const { distancePx } = result(
 					firstCoordinate as [number, number],
