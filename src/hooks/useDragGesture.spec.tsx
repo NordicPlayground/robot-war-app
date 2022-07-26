@@ -3,6 +3,7 @@ import { result, subtractCoordinates } from 'hooks/useDragGesture.js'
 describe('UseRobotActionGesture', () => {
 	describe('given 2 coordinates should return the rotation degree and distance in pixeles between them', () => {
 		it.each([
+			// FIXME: update drag
 			/*                  0
 			 **	  			    |
 			 **	  	  B		    |
