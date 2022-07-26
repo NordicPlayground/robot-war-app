@@ -18,35 +18,22 @@ describe('UseRobotActionGesture', () => {
 		expect(rotationDeg).not.toBeNaN()
 		expect(distancePx).toBeDefined()
 		expect(distancePx).not.toBeNaN()
+		// expect(angle(...)).toEqual(42)
 	})
 
-	describe('Distance between coordinates should not be negative', () => {
+	describe('result should calculate the distance between to coordinats', () => {
 		it.each([
-			[
-				[10, 10],
-				[-10, -10],
-			],
-			[
-				[-89, 154],
-				[-87, 45],
-			],
-			[
-				[10, 14780],
-				[-8, 40],
-			],
-			[
-				[12, -54],
-				[-65, -12],
-			],
+			[[0, 0], [0, 0], 0],
+			[[1, 0], [0, 0], 1],
+			[[-3, 0], [0, 0], 3],
+			[[0, -5], [0, 0], 5],
+			[[1, 1], [0, 0], Math.sqrt(2)],
+			[[-1, -1], [0, 0], Math.sqrt(2)],
 		])(
-			// #FIXME: set correct test description
-			'First coordinate: %d , Second coordinate: %d',
-			(firstCoordinate, secondCoordinate) => {
-				const { distancePx } = result(
-					firstCoordinate as [number, number],
-					secondCoordinate as [number, number],
-				)
-				expect(distancePx).toBeGreaterThanOrEqual(0)
+			'Distance between %s and %s should be %d',
+			([x1, y1], [x2, y2], expectedDistance) => {
+				const { distancePx } = result([x1, y1], [x2, y2])
+				expect(distancePx).toEqual(expectedDistance)
 			},
 		)
 	})
