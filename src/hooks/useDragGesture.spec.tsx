@@ -96,19 +96,40 @@ describe('UseRobotActionGesture', () => {
 	})
 
 	describe('subtractCoordinates', () => {
-		test('Given 2 coordinates should return the subtract of both, creating a new coordinate', () => {
-			const referencePoint: [number, number] = [10, 10]
-			const desiredPoint: [number, number] = [50, 50]
-			const [x, y] = subtractCoordinates(referencePoint, desiredPoint)
-			expect(x).not.toBeNaN()
-			expect(y).not.toBeNaN()
-		})
-		test('Given 2 coordinates should subtract the second coordinate over the first coordinate passed by params', () => {
-			const referencePoint: [number, number] = [10, 10]
-			const desiredPoint: [number, number] = [50, 50]
-			const [x, y] = subtractCoordinates(referencePoint, desiredPoint)
-			expect(x).toEqual(-40)
-			expect(y).toEqual(-40)
+		describe('Given 2 coordinates should subtract the second coordinate over the first coordinate passed by params, creating a new coordinate as result', () => {
+			it.each([
+				[
+					[0, 0],
+					[0, 0],
+					[0, 0],
+				],
+				[
+					[10, 10],
+					[100, 100],
+					[-90, -90],
+				],
+				[
+					[100, 100],
+					[10, 10],
+					[90, 90],
+				],
+				[
+					[10, 10],
+					[-100, -100],
+					[110, 110],
+				],
+				[
+					[-100, -100],
+					[10, 10],
+					[-110, -110],
+				],
+			])(
+				'The substraction of %s and %s should generate the following coordinate: %s',
+				([x1, y1], [x2, y2], expectedCoordinate) =>
+					expect(subtractCoordinates([x1, y1], [x2, y2])).toEqual(
+						expectedCoordinate,
+					),
+			)
 		})
 	})
 })
