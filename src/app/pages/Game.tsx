@@ -19,9 +19,10 @@ export const Game = () => {
 	const {
 		robots,
 		game: { field, teamFight, teamSetRobotMovement },
+		teams,
 	} = useCore()
 	const { helperLinesNumber } = useAppConfig()
-	const { selectedTeam } = useTeam()
+	const { selectedTeam, setSelectedTeam } = useTeam()
 	const {
 		start: startRobotGesture,
 		end: endRobotGesture,
@@ -91,7 +92,8 @@ export const Game = () => {
 		})
 	}, [robots])
 
-	if (selectedTeam === undefined) return <SelectTeam />
+	if (selectedTeam === undefined)
+		return <SelectTeam teams={teams} onSelect={setSelectedTeam} />
 
 	return (
 		<>
