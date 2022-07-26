@@ -3,8 +3,8 @@ import {
 	UpdateThingShadowCommand,
 } from '@aws-sdk/client-iot-data-plane'
 import type { TObject } from '@sinclair/typebox'
+import type { ErrorInfo } from 'api/persistence/errors/ErrorInfo.js'
 import { validateWithJSONSchema } from 'api/persistence/validateWithJSONSchema.js'
-import type { ErrorInfo } from 'utils/errors/ErrorInfo.js'
 
 export const updateShadow =
 	<Schema extends TObject>({

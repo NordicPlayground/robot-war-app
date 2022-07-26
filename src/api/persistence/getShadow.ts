@@ -4,9 +4,9 @@ import {
 } from '@aws-sdk/client-iot-data-plane'
 import { toUtf8 } from '@aws-sdk/util-utf8-browser'
 import { Static, TObject, Type } from '@sinclair/typebox'
+import type { ErrorInfo } from 'api/persistence/errors/ErrorInfo.js'
+import { NotFoundError } from 'api/persistence/errors/NotFoundError.js'
 import { validateWithJSONSchema } from 'api/persistence/validateWithJSONSchema.js'
-import type { ErrorInfo } from 'utils/errors/ErrorInfo.js'
-import { NotFoundError } from 'utils/errors/NotFoundError.js'
 
 export const getShadow =
 	<Schema extends TObject>({
