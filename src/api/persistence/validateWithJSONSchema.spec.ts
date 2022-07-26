@@ -1,5 +1,5 @@
 import { Static, Type } from '@sinclair/typebox'
-import { validateWithJSONSchema } from 'utils/validateWithJSONSchema.js'
+import { validateWithJSONSchema } from 'api/persistence/validateWithJSONSchema.js'
 
 const typedInputSchema = Type.Object(
 	{

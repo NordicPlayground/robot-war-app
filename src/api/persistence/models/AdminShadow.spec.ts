@@ -1,7 +1,7 @@
 import type { Static } from '@sinclair/typebox'
 import { AdminShadow } from 'api/persistence/models/AdminShadow.js'
+import { validateWithJSONSchema } from 'api/persistence/validateWithJSONSchema.js'
 import { randomMac } from 'core/test/randomMac.js'
-import { validateWithJSONSchema } from 'utils/validateWithJSONSchema.js'
 
 describe('validateAdminShadow()', () => {
 	const robot1 = randomMac()

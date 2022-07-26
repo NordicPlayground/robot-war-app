@@ -1,6 +1,6 @@
 import type { Static } from '@sinclair/typebox'
 import { GameControllerShadow } from 'api/persistence/models/GameControllerShadow.js'
-import { validateWithJSONSchema } from 'utils/validateWithJSONSchema.js'
+import { validateWithJSONSchema } from 'api/persistence/validateWithJSONSchema.js'
 
 const goodShadow: Static<typeof GameControllerShadow> = {
 	reported: {
