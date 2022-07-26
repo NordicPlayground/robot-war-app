@@ -124,6 +124,7 @@ export const Field = ({
 			/>
 			{/* Click target */}
 			<rect
+				data-test-id="field"
 				ref={rectRef}
 				style={{
 					fill: '#ffffff',

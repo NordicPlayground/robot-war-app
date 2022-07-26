@@ -56,6 +56,7 @@ export const Robot = ({
 
 	return (
 		<g
+			data-test-id="robot"
 			onPointerDown={(e) => {
 				e.stopPropagation()
 				onPointerDown?.(getMouseCoordinates(e))

@@ -117,4 +117,100 @@ T = tip
 		})
 		expect(onRotate).toHaveBeenLastCalledWith(-5)
 	})
+
+	it('should call onClick method when robot is clicked', () => {
+		const onClick = jest.fn()
+
+		const robot = isolateComponent(
+			<Robot
+				colorHex={randomColor()}
+				heightMm={100}
+				widthMm={100}
+				id={randomMac()}
+				xMm={0}
+				yMm={0}
+				rotationDeg={0}
+				onClick={onClick}
+			/>,
+		)
+
+		// Click on robot
+		robot.findOne('[data-test-id=rotation-handle]').props.onClick({
+			stopPropagation: jest.fn(),
+		})
+		expect(onClick).toHaveBeenCalledTimes(1)
+	})
+
+	it('Should trigger onPointerDown after robot is clicked', () => {
+		const onClick = jest.fn()
+		const onPointerDown = jest.fn()
+
+		const robot = isolateComponent(
+			<Robot
+				colorHex={randomColor()}
+				heightMm={100}
+				widthMm={100}
+				id={randomMac()}
+				xMm={0}
+				yMm={0}
+				rotationDeg={0}
+				onClick={onClick}
+				onPointerDown={onPointerDown}
+			/>,
+		)
+
+		// Click on robot
+		robot.findOne('[data-test-id=rotation-handle]').props.onClick({
+			stopPropagation: jest.fn(),
+		})
+		expect(onClick).toHaveBeenCalledTimes(1)
+
+		robot.findOne('[data-test-id=robot]').props.onPointerDown({
+			stopPropagation: jest.fn(),
+			clientX: 10,
+			clientY: 10,
+		})
+		expect(onPointerDown).toHaveBeenCalledTimes(1)
+		expect(onPointerDown).toHaveBeenCalledWith({ x: 10, y: 10 })
+	})
+
+	it('Should trigger onPointerUp after onPointerDown is triggered', () => {
+		const onClick = jest.fn()
+		const onPointerDown = jest.fn()
+		const onPointerUp = jest.fn()
+
+		const robot = isolateComponent(
+			<Robot
+				colorHex={randomColor()}
+				heightMm={100}
+				widthMm={100}
+				id={randomMac()}
+				xMm={0}
+				yMm={0}
+				rotationDeg={0}
+				onClick={onClick}
+				onPointerDown={onPointerDown}
+				onPointerUp={onPointerUp}
+			/>,
+		)
+
+		// Click on robot
+		robot.findOne('[data-test-id=rotation-handle]').props.onClick({
+			stopPropagation: jest.fn(),
+		})
+		expect(onClick).toHaveBeenCalledTimes(1)
+
+		robot.findOne('[data-test-id=robot]').props.onPointerDown({
+			stopPropagation: jest.fn(),
+			clientX: 10,
+			clientY: 10,
+		})
+		expect(onPointerDown).toHaveBeenCalledTimes(1)
+		expect(onPointerDown).toHaveBeenCalledWith({ x: 10, y: 10 })
+
+		robot.findOne('[data-test-id=robot]').props.onPointerUp({
+			stopPropagation: jest.fn(),
+		})
+		expect(onPointerUp).toHaveBeenCalledTimes(1)
+	})
 })
