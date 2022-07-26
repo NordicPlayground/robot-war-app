@@ -8,6 +8,18 @@ import type { ErrorInfo } from 'api/persistence/errors/ErrorInfo.js'
 import { NotFoundError } from 'api/persistence/errors/NotFoundError.js'
 import { validateWithJSONSchema } from 'api/persistence/validateWithJSONSchema.js'
 
+export type AWSIoTShadow<Schema extends TObject> = {
+	state: Static<Schema> & {
+		delta?: Partial<Schema>
+	}
+	metadata: {
+		desired?: Record<string, any>
+		reported?: Record<string, any>
+	}
+	version: number
+	timestamp: number
+}
+
 export const getShadow =
 	<Schema extends TObject>({
 		iotDataPlaneClient,
@@ -20,7 +32,7 @@ export const getShadow =
 		shadowName?: undefined | 'admin'
 		schema: Schema
 	}) =>
-	async (): Promise<ErrorInfo | Static<typeof schema>> => {
+	async (): Promise<ErrorInfo | AWSIoTShadow<typeof schema>> => {
 		const { payload } = await iotDataPlaneClient.send(
 			new GetThingShadowCommand({
 				thingName: thingName,
@@ -36,7 +48,7 @@ export const getShadow =
 			}
 		}
 
-		const shadow = JSON.parse(toUtf8(payload))
+		const shadow = JSON.parse(toUtf8(payload)) as AWSIoTShadow<Schema>
 
 		const maybeValidShadow = validateWithJSONSchema(
 			Type.Object({
@@ -48,5 +60,5 @@ export const getShadow =
 			return maybeValidShadow
 		}
 
-		return (maybeValidShadow as Record<string, any>).state
+		return shadow
 	}

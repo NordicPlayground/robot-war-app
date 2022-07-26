@@ -1,3 +1,4 @@
+import { InvisibleIcon, VisibleIcon } from 'components/FeatherIcon'
 import { Main } from 'components/Main'
 import { useAppConfig } from 'hooks/useAppConfig'
 import { useCredentials } from 'hooks/useCredentials'
@@ -21,6 +22,7 @@ export const Settings = () => {
 	const [secretAccessKey, setSecretAccessKey] = useState<string>(
 		storedSecretAccessKey ?? '',
 	)
+	const [showPassword, setShowPassword] = useState<boolean>(false)
 
 	const save = () => {
 		updateCredentials({
@@ -44,10 +46,13 @@ export const Settings = () => {
 				<div className="card-body">
 					<fieldset>
 						<legend>AWS access key</legend>
-						<p>
-							Please enter your AWS access key ID:<br></br>
+						<div>
+							<label htmlFor="awsAccessKeyId">
+								Please enter your AWS access key ID:
+							</label>
 							<input
 								type="text"
+								id="awsAccessKeyId"
 								name="awsAccessKeyId"
 								onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
 									setAccessKeyId(e.target.value)
@@ -56,22 +61,46 @@ export const Settings = () => {
 								autoComplete={'off'}
 								className={'form-control'}
 							/>
-						</p>
-						<p>
-							Please enter your AWS secret access key:<br></br>
-							<input
-								type="password"
-								name="awsPrivateAccessKey"
-								onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-									setSecretAccessKey(e.target.value)
-								}
-								value={secretAccessKey}
-								autoComplete={'off'}
-								className={'form-control'}
-							/>
-						</p>
+						</div>
+						<div className="mt-2">
+							<label htmlFor="awsPrivateAccessKey">
+								Please enter your AWS secret access key:
+							</label>
+							<div className="input-group">
+								<input
+									type={showPassword ? 'text' : 'password'}
+									name="awsPrivateAccessKey"
+									id="awsPrivateAccessKey"
+									onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+										setSecretAccessKey(e.target.value)
+									}
+									value={secretAccessKey}
+									autoComplete={'off'}
+									className={'form-control'}
+								/>
+								{showPassword ? (
+									<button
+										className="btn btn-outline-secondary"
+										type="button"
+										title="hide password"
+										onClick={() => setShowPassword((show) => !show)}
+									>
+										<InvisibleIcon />
+									</button>
+								) : (
+									<button
+										className="btn btn-outline-secondary"
+										type="button"
+										title="show password"
+										onClick={() => setShowPassword((show) => !show)}
+									>
+										<VisibleIcon />
+									</button>
+								)}
+							</div>
+						</div>
 					</fieldset>
-					<fieldset>
+					<fieldset className="mt-4">
 						<legend>Auto-updated</legend>
 						<div className="form-check">
 							<input
@@ -88,7 +117,7 @@ export const Settings = () => {
 								Enable auto-updated?
 							</label>
 						</div>
-						<div className="mt-3">
+						<div className="mt-2">
 							<label htmlFor="autoUpdateInterval" className="form-label">
 								Auto-update interval
 							</label>

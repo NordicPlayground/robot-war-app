@@ -354,6 +354,14 @@ export const CoreIcon = (options?: TypedIconOptions) => (
 	<FeatherIcon {...options} title="Core" type="hexagon" />
 )
 
+export const VisibleIcon = (options?: TypedIconOptions) => (
+	<FeatherIcon {...options} title="Visible" type="eye" />
+)
+
+export const InvisibleIcon = (options?: TypedIconOptions) => (
+	<FeatherIcon {...options} title="Invisible" type="eye-off" />
+)
+
 export const IconWithText: FunctionComponent<PropsWithChildren<any>> = ({
 	children,
 	...rest

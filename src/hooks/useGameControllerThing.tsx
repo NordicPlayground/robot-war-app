@@ -1,11 +1,15 @@
 import { ListThingsInThingGroupCommand } from '@aws-sdk/client-iot'
+import type { IoTDataPlaneClient } from '@aws-sdk/client-iot-data-plane'
 import type { Static } from '@sinclair/typebox'
 import { useIoTClient } from 'api/hooks/useIoTClient'
 import { useIoTDataPlaneClient } from 'api/hooks/useIoTDataPlaneClient'
 import { clearShadow } from 'api/persistence/clearShadow'
-import { getShadow } from 'api/persistence/getShadow'
+import type { ErrorInfo } from 'api/persistence/errors/ErrorInfo'
+import { AWSIoTShadow, getShadow } from 'api/persistence/getShadow'
+import { AdminShadow } from 'api/persistence/models/AdminShadow'
 import { GameControllerShadow } from 'api/persistence/models/GameControllerShadow'
 import { updateShadow } from 'api/persistence/updateShadow'
+import type { GameEngine } from 'core/gameEngine'
 import { useCore } from 'hooks/useCore'
 import {
 	createContext,
@@ -16,8 +20,42 @@ import {
 	useState,
 } from 'react'
 
-export const GameControllerThingContext = createContext<{
-	thingName?: string
+const notReady = () => {
+	console.error('[useGameControllerThing]', 'Not ready!')
+}
+const notReadyPromise = async () =>
+	Promise.reject(new Error(`[useGameControllerThing] Not ready!`))
+const dummyStateFns: ReturnType<typeof stateFunctions> = {
+	reset: notReady,
+	resetAdmin: notReady,
+	report: notReady,
+	reportDesired: notReady,
+	getState: notReadyPromise,
+	getAdminState: notReadyPromise,
+}
+
+export const GameControllerThingContext = createContext<
+	{
+		thingName?: string
+	} & ReturnType<typeof stateFunctions>
+>(dummyStateFns)
+
+export const useGameControllerThing = () =>
+	useContext(GameControllerThingContext)
+
+const stateFunctions = ({
+	thingName,
+	iotDataPlaneClient,
+	game,
+}: {
+	thingName: string
+	iotDataPlaneClient: IoTDataPlaneClient
+	game: GameEngine
+}): {
+	/**
+	 * Returns the current shadow of the GameController
+	 */
+	getState: () => Promise<ErrorInfo | AWSIoTShadow<typeof GameControllerShadow>>
 	/**
 	 * Write the given robots to the GameController default shadow
 	 */
@@ -36,22 +74,74 @@ export const GameControllerThingContext = createContext<{
 	 * Reset the GameController admin shadow
 	 */
 	resetAdmin: () => void
-}>({
-	report: () => undefined,
-	reportDesired: () => undefined,
-	reset: () => undefined,
-	resetAdmin: () => undefined,
-})
+	/**
+	 * Returns the current admin shadow of the GameController
+	 */
+	getAdminState: () => Promise<ErrorInfo | AWSIoTShadow<typeof AdminShadow>>
+} => {
+	const updateGatewayShadow = updateShadow({
+		iotDataPlaneClient,
+		thingName,
+		schema: GameControllerShadow,
+	})
+	const getGatewayShadow = getShadow({
+		iotDataPlaneClient,
+		thingName,
+		schema: GameControllerShadow,
+	})
+	const clearGatewayShadow = clearShadow({
+		iotDataPlaneClient,
+		thingName,
+	})
+	const clearAdminShadow = clearShadow({
+		iotDataPlaneClient,
+		thingName,
+		shadowName: 'admin',
+	})
+	const getAdminShadow = getShadow({
+		iotDataPlaneClient,
+		thingName,
+		schema: AdminShadow,
+		shadowName: 'admin',
+	})
+	return {
+		reset: () => {
+			clearGatewayShadow().catch(console.error)
+		},
+		resetAdmin: () => {
+			clearAdminShadow().catch(console.error)
+		},
+		report: (robots) => {
+			updateGatewayShadow({ reported: { robots } }).catch(console.error)
+			game.gatewayReportDiscoveredRobots(robots)
+		},
+		reportDesired: () => {
+			getGatewayShadow()
+				.then((maybeShadow) => {
+					if ('error' in maybeShadow) {
+						console.error(maybeShadow)
+						return
+					}
+					updateGatewayShadow({
+						reported: maybeShadow.state.desired,
+					}).catch(console.error)
+				})
+				.catch(console.error)
+		},
+		getState: async () => getGatewayShadow(),
+		getAdminState: async () => getAdminShadow(),
+	}
+}
 
-export const useGameControllerThing = () =>
-	useContext(GameControllerThingContext)
+const boundStateFunctions: Record<
+	string,
+	ReturnType<typeof stateFunctions>
+> = {}
 
 export const GameControllerThingProvider: FunctionComponent<{
 	children: ReactNode
 }> = ({ children }) => {
-	const {
-		game: { gatewayReportDiscoveredRobots },
-	} = useCore()
+	const { game } = useCore()
 	const [thingName, setThingName] = useState<string>()
 
 	const iotClient = useIoTClient()
@@ -83,65 +173,26 @@ export const GameControllerThingProvider: FunctionComponent<{
 			})
 	}, [iotClient])
 
-	const updateGatewayShadow =
-		iotDataPlaneClient === undefined || thingName === undefined
-			? undefined
-			: updateShadow({
-					iotDataPlaneClient,
-					thingName,
-					schema: GameControllerShadow,
-			  })
-	const getGatewayShadow =
-		iotDataPlaneClient === undefined || thingName === undefined
-			? undefined
-			: getShadow({
-					iotDataPlaneClient,
-					thingName,
-					schema: GameControllerShadow,
-			  })
-	const clearGatewayShadow =
-		iotDataPlaneClient === undefined || thingName === undefined
-			? undefined
-			: clearShadow({
-					iotDataPlaneClient,
-					thingName,
-			  })
-	const clearAdminShadow =
-		iotDataPlaneClient === undefined || thingName === undefined
-			? undefined
-			: clearShadow({
-					iotDataPlaneClient,
-					thingName,
-					shadowName: 'admin',
-			  })
+	if (
+		thingName !== undefined &&
+		iotDataPlaneClient !== undefined &&
+		boundStateFunctions[thingName] === undefined
+	) {
+		boundStateFunctions[thingName] = stateFunctions({
+			thingName,
+			iotDataPlaneClient,
+			game,
+		})
+	}
+
+	const stateFns: ReturnType<typeof stateFunctions> =
+		boundStateFunctions[thingName ?? ''] ?? dummyStateFns
 
 	return (
 		<GameControllerThingContext.Provider
 			value={{
 				thingName,
-				reset: () => {
-					clearGatewayShadow?.().catch(console.error)
-				},
-				resetAdmin: () => {
-					clearAdminShadow?.().catch(console.error)
-				},
-				report: (robots) => {
-					updateGatewayShadow?.({ reported: { robots } }).catch(console.error)
-					gatewayReportDiscoveredRobots(robots)
-				},
-				reportDesired: () => {
-					getGatewayShadow?.()
-						.then((maybeShadow) => {
-							if ('error' in maybeShadow) {
-								console.error(maybeShadow)
-								return
-							}
-							updateGatewayShadow?.({ reported: maybeShadow.desired }).catch(
-								console.error,
-							)
-						})
-						.catch(console.error)
-				},
+				...stateFns,
 			}}
 		>
 			{children}

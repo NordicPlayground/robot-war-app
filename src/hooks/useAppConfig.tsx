@@ -55,7 +55,7 @@ const defaultConfig: AppConfig = {
 	helperLinesNumber: 3,
 	autoUpdateEnabled: true,
 	enableAutoUpdate: () => undefined,
-	autoUpdateIntervalSeconds: 2,
+	autoUpdateIntervalSeconds: 10,
 	setAutoUpdateIntervalSeconds: () => undefined,
 }
 

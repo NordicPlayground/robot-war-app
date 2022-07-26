@@ -1,17 +1,45 @@
-import type { IoTDataPlaneClient } from '@aws-sdk/client-iot-data-plane'
+import type { AWSIoTShadow } from 'api/persistence/getShadow.js'
 import { AdminShadow } from 'api/persistence/models/AdminShadow.js'
 import { updateShadow } from 'api/persistence/updateShadow.js'
 import { randomMac } from 'core/test/randomMac.js'
 
 describe('updateShadow()', () => {
 	it('should persist changes to an AWS IoT thing shadow', async () => {
-		const mockIoTDataPlaneClient: IoTDataPlaneClient = {
-			send: jest.fn(async () => Promise.resolve()),
+		const address = randomMac()
+		const expectedState: AWSIoTShadow<typeof AdminShadow> = {
+			state: {
+				reported: {
+					robotTeamAssignment: {
+						[address]: 'Team A',
+					},
+					robotFieldPosition: {
+						[address]: {
+							rotationDeg: 90,
+							xMm: 42,
+							yMm: 17,
+						},
+					},
+				},
+			},
+			metadata: {
+				desired: {},
+				reported: {},
+			},
+			version: 42,
+			timestamp: Date.now(),
+		}
+
+		const mockIoTDataPlaneClient = {
+			send: jest.fn(async () =>
+				Promise.resolve({
+					payload: new TextEncoder().encode(JSON.stringify(expectedState)),
+				}),
+			),
 		} as any
 
 		const randomThingName = `thing${randomMac().replace(/:/g, '')}`
-		const address = randomMac()
-		await updateShadow({
+
+		const res = await updateShadow({
 			iotDataPlaneClient: mockIoTDataPlaneClient,
 			thingName: randomThingName,
 			schema: AdminShadow,
@@ -38,20 +66,8 @@ describe('updateShadow()', () => {
 		expect(thingName).toEqual(randomThingName)
 		expect(shadowName).toEqual('admin')
 		expect(JSON.parse(new TextDecoder().decode(payload))).toEqual({
-			state: {
-				reported: {
-					robotTeamAssignment: {
-						[address]: 'Team A',
-					},
-					robotFieldPosition: {
-						[address]: {
-							rotationDeg: 90,
-							xMm: 42,
-							yMm: 17,
-						},
-					},
-				},
-			},
+			state: expectedState.state,
 		})
+		expect(res).toEqual(expectedState)
 	})
 })

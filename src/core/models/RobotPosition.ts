@@ -1,6 +1,6 @@
 import { Type } from '@sinclair/typebox'
 
-export const RobotPosition = Type.Object(
+export const Coordinates = Type.Object(
 	{
 		xMm: Type.Integer({
 			minimum: 0,
@@ -12,6 +12,12 @@ export const RobotPosition = Type.Object(
 			title:
 				'Y-Position (left to right) on the field in mm from the top left corner',
 		}),
+	},
+	{ title: 'Coordinates on the field' },
+)
+
+export const Rotation = Type.Object(
+	{
 		rotationDeg: Type.Number({
 			minimum: 0,
 			maximum: 359,
@@ -19,5 +25,9 @@ export const RobotPosition = Type.Object(
 				'Rotation in degrees, 0 facing North on the field, 90 facing east, 180 facing south, 270 facing west',
 		}),
 	},
-	{ title: 'Position on the field' },
+	{ title: 'Rotation on the field' },
 )
+
+export const RobotPosition = Type.Intersect([Coordinates, Rotation], {
+	title: 'Position on the field',
+})

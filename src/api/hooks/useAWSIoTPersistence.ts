@@ -2,22 +2,45 @@ import { Type } from '@sinclair/typebox'
 import { useIoTDataPlaneClient } from 'api/hooks/useIoTDataPlaneClient.js'
 import { gameEvent2AdminStateUpdate } from 'api/persistence/gameEvent2AdminStateUpdate'
 import { gameEvent2GatewayStateUpdate } from 'api/persistence/gameEvent2GatewayStateUpdate'
-import { getShadow } from 'api/persistence/getShadow'
-import { AdminShadow } from 'api/persistence/models/AdminShadow'
-import { GameControllerShadow } from 'api/persistence/models/GameControllerShadow'
+import { AdminShadowUpdate } from 'api/persistence/models/AdminShadow'
 import { updateShadow } from 'api/persistence/updateShadow'
 import type { GameEngineEvent } from 'core/gameEngine'
 import { MacAddress } from 'core/models/MacAddress.js'
 import { Robot } from 'core/models/Robot.js'
+import { useAppConfig } from 'hooks/useAppConfig'
 import { useCore } from 'hooks/useCore.js'
 import { useGameControllerThing } from 'hooks/useGameControllerThing.js'
 import { debounce, merge } from 'lodash-es'
-import { useEffect } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
+
+const updateVersion =
+	(ref: React.MutableRefObject<number>, label: string) =>
+	(newVersion: number): void => {
+		ref.current = newVersion
+		console.debug(
+			`[useAWSIoTPersistence]`,
+			`${label} shadow version`,
+			ref.current,
+		)
+	}
 
 export const useAWSIoTPersistence = (): void => {
 	const { game } = useCore()
-	const { thingName } = useGameControllerThing()
+	const { thingName, getState, getAdminState } = useGameControllerThing()
 	const iotDataPlaneClient = useIoTDataPlaneClient()
+	const { autoUpdateEnabled, autoUpdateIntervalSeconds } = useAppConfig()
+
+	const gatewayShadowVersion = useRef<number>(-1)
+	const adminShadowVersion = useRef<number>(-1)
+	const updateGatewayVersion = useCallback(
+		(version: number) =>
+			updateVersion(gatewayShadowVersion, 'gateway')(version),
+		[gatewayShadowVersion],
+	)
+	const updateAdminVersion = useCallback(
+		(version: number) => updateVersion(adminShadowVersion, 'admin')(version),
+		[adminShadowVersion],
+	)
 
 	// Set up storing of changes
 	useEffect(() => {
@@ -36,11 +59,13 @@ export const useAWSIoTPersistence = (): void => {
 				iotDataPlaneClient,
 				thingName,
 				shadowName: 'admin',
-				schema: AdminShadow,
+				schema: AdminShadowUpdate,
 			})({ reported: updates })
 			if (res !== undefined && 'error' in res) {
 				console.error(res.error)
 				console.error(res.error.details)
+			} else {
+				updateAdminVersion(res.version)
 			}
 		}, 1000)
 
@@ -62,6 +87,8 @@ export const useAWSIoTPersistence = (): void => {
 			if (res !== undefined && 'error' in res) {
 				console.error(res.error)
 				console.error(res.error.details)
+			} else {
+				updateGatewayVersion(res.version)
 			}
 		}, 1000)
 
@@ -86,61 +113,142 @@ export const useAWSIoTPersistence = (): void => {
 			}
 		}
 
+		const enableListeners = () => {
+			console.debug(`[useAWSIoTPersistence]`, `enabling listeners`)
+			game.onAll(adminEventHandler)
+			game.onAll(teamEventHandler)
+		}
+		const disableListeners = () => {
+			console.debug(`[useAWSIoTPersistence]`, `disabling listeners`)
+			game.offAll(adminEventHandler)
+			game.offAll(teamEventHandler)
+		}
+
 		// Retrieve current cloud state
-		Promise.all([
-			getShadow({
-				iotDataPlaneClient,
-				thingName,
-				schema: GameControllerShadow,
-			})(),
-			getShadow({
-				iotDataPlaneClient,
-				thingName,
-				schema: AdminShadow,
-				shadowName: 'admin',
-			})(),
-		])
+		Promise.all([getState(), getAdminState()])
 			.then(([maybeGameControllerShadow, maybeAdminShadow]) => {
 				// Restore discovered robots
 				if ('error' in maybeGameControllerShadow) {
 					console.error(maybeGameControllerShadow)
 				} else {
+					updateGatewayVersion(maybeGameControllerShadow.version)
 					game.gatewayReportDiscoveredRobots(
-						maybeGameControllerShadow.reported.robots,
+						maybeGameControllerShadow.state.reported.robots,
 					)
 				}
 				// Restore admin positioning
 				if ('error' in maybeAdminShadow) {
 					console.error(maybeAdminShadow)
 				} else {
-					if (maybeAdminShadow.reported.robotFieldPosition !== undefined) {
+					updateAdminVersion(maybeAdminShadow.version)
+					if (
+						maybeAdminShadow.state.reported.robotFieldPosition !== undefined
+					) {
 						game.adminSetAllRobotPositions(
-							maybeAdminShadow.reported.robotFieldPosition,
+							maybeAdminShadow.state.reported.robotFieldPosition,
 						)
 					}
-					if (maybeAdminShadow.reported.robotTeamAssignment !== undefined) {
+					if (
+						maybeAdminShadow.state.reported.robotTeamAssignment !== undefined
+					) {
 						game.adminAssignAllRobotTeams(
-							maybeAdminShadow.reported.robotTeamAssignment,
+							maybeAdminShadow.state.reported.robotTeamAssignment,
 						)
 					}
 				}
 				// Set team's desired movements
 				if (!('error' in maybeGameControllerShadow)) {
 					game.teamSetAllRobotMovements(
-						maybeGameControllerShadow.desired?.robots ?? {},
+						maybeGameControllerShadow.state.desired?.robots ?? {},
 					)
 				}
 			})
 			.finally(() => {
 				// Listen to all changes, after we have loaded the state so we do not trigger the storage
-				game.onAll(adminEventHandler)
-				game.onAll(teamEventHandler)
+				enableListeners()
 			})
+
+		// TODO: Polling makes integrating the updates unneccessary complicated, listen to individual change events via webhooks instead
+		let autoUpdateInterval: NodeJS.Timeout
+		if (autoUpdateEnabled) {
+			const intervalSeconds = Math.max(5, autoUpdateIntervalSeconds)
+			console.debug(
+				`[useAWSIoTPersistence]`,
+				'enabling auto-update every',
+				intervalSeconds,
+				'seconds',
+			)
+			autoUpdateInterval = setInterval(() => {
+				Promise.all([getState(), getAdminState()])
+					.then(([maybeGatewayState, maybeAdminState]) => {
+						if ('error' in maybeGatewayState) {
+							console.error(maybeGatewayState.error)
+						} else if (
+							maybeGatewayState.version > gatewayShadowVersion.current
+						) {
+							console.debug(
+								`[useAWSIoTPersistence]`,
+								`gateway shadow was changed`,
+								`current version`,
+								gatewayShadowVersion.current,
+								`next version`,
+								maybeGatewayState.version,
+							)
+							updateGatewayVersion(maybeGatewayState.version)
+						}
+						if ('error' in maybeAdminState) {
+							console.error(maybeAdminState.error)
+						} else if (maybeAdminState.version > adminShadowVersion.current) {
+							console.debug(
+								`[useAWSIoTPersistence]`,
+								`admin shadow was changed`,
+								`current version`,
+								adminShadowVersion.current,
+								`next version`,
+								maybeAdminState.version,
+							)
+							if (
+								maybeAdminState.state.reported.robotFieldPosition !== undefined
+							) {
+								disableListeners()
+								game.adminSetAllRobotPositions(
+									maybeAdminState.state.reported.robotFieldPosition,
+								)
+								enableListeners()
+							}
+							if (
+								maybeAdminState.state.reported.robotTeamAssignment !== undefined
+							) {
+								disableListeners()
+								game.adminAssignAllRobotTeams(
+									maybeAdminState.state.reported.robotTeamAssignment,
+								)
+								enableListeners()
+							}
+							updateAdminVersion(maybeAdminState.version)
+						}
+					})
+					.catch((err) => console.error(`[useAWSIoTPersistence]`, err))
+			}, intervalSeconds * 1000)
+		}
 
 		return () => {
 			console.log(`[useAWSIoTPersistence]`, 'closing connection')
-			game.offAll(adminEventHandler)
-			game.offAll(teamEventHandler)
+			disableListeners()
+			if (autoUpdateInterval !== undefined) {
+				clearInterval(autoUpdateInterval)
+				console.debug(`[useAWSIoTPersistence]`, 'disabling auto-update')
+			}
 		}
-	}, [game, thingName, iotDataPlaneClient])
+	}, [
+		game,
+		thingName,
+		iotDataPlaneClient,
+		autoUpdateEnabled,
+		autoUpdateIntervalSeconds,
+		getAdminState,
+		getState,
+		updateAdminVersion,
+		updateGatewayVersion,
+	])
 }

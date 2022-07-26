@@ -28,11 +28,13 @@ export const SelectTeam: FunctionComponent<{
 				}}
 			>
 				<option value="0">Select team</option>
-				{teams.map((team) => (
-					<option key={team} value={team}>
-						{team}
-					</option>
-				))}
+				{teams
+					.sort((a, b) => a.localeCompare(b))
+					.map((team) => (
+						<option key={team} value={team}>
+							{team}
+						</option>
+					))}
 			</select>
 		</Popup>
 	)

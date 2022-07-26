@@ -2,8 +2,10 @@ import {
 	IoTDataPlaneClient,
 	UpdateThingShadowCommand,
 } from '@aws-sdk/client-iot-data-plane'
+import { toUtf8 } from '@aws-sdk/util-utf8-browser'
 import type { TObject } from '@sinclair/typebox'
 import type { ErrorInfo } from 'api/persistence/errors/ErrorInfo.js'
+import type { AWSIoTShadow } from 'api/persistence/getShadow.js'
 import { validateWithJSONSchema } from 'api/persistence/validateWithJSONSchema.js'
 
 export const updateShadow =
@@ -21,12 +23,12 @@ export const updateShadow =
 	async (stateUpdate: {
 		reported?: Record<string, any> | null
 		desired?: Record<string, any> | null
-	}): Promise<ErrorInfo | undefined> => {
+	}): Promise<ErrorInfo | AWSIoTShadow<Schema>> => {
 		const maybeValidShadow = validateWithJSONSchema(schema)(stateUpdate)
 		if ('error' in maybeValidShadow) {
 			return maybeValidShadow as ErrorInfo
 		}
-		await iotDataPlaneClient.send(
+		const { payload } = await iotDataPlaneClient.send(
 			new UpdateThingShadowCommand({
 				thingName: thingName,
 				shadowName,
@@ -35,4 +37,12 @@ export const updateShadow =
 				),
 			}),
 		)
+		if (payload === undefined) {
+			throw new Error(
+				`Failed to update ${thingName}'s ${
+					shadowName ?? 'default'
+				} shadow: response payload is empty.`,
+			)
+		}
+		return JSON.parse(toUtf8(payload)) as AWSIoTShadow<Schema>
 	}

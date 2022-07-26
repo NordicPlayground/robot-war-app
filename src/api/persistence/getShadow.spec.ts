@@ -1,30 +1,33 @@
-import type { Static } from '@sinclair/typebox'
-import { getShadow } from 'api/persistence/getShadow.js'
+import { AWSIoTShadow, getShadow } from 'api/persistence/getShadow.js'
 import { GameControllerShadow } from 'api/persistence/models/GameControllerShadow.js'
 import { randomMac } from 'core/test/randomMac.js'
 import { randomRobot } from 'core/test/randomRobot.js'
 
 describe('getShadow()', () => {
 	it('should return the reported Gateway state', async () => {
-		const expectedState: Static<typeof GameControllerShadow> = {
-			reported: {
-				robots: {
-					[randomMac()]: randomRobot(),
-					[randomMac()]: randomRobot(),
-					[randomMac()]: randomRobot(),
-					[randomMac()]: randomRobot(),
+		const expectedState: AWSIoTShadow<typeof GameControllerShadow> = {
+			state: {
+				reported: {
+					robots: {
+						[randomMac()]: randomRobot(),
+						[randomMac()]: randomRobot(),
+						[randomMac()]: randomRobot(),
+						[randomMac()]: randomRobot(),
+					},
 				},
 			},
+			metadata: {
+				desired: {},
+				reported: {},
+			},
+			version: 42,
+			timestamp: Date.now(),
 		}
 
 		const mockIoTDataPlaneClient = {
 			send: jest.fn(async () =>
 				Promise.resolve({
-					payload: new TextEncoder().encode(
-						JSON.stringify({
-							state: expectedState,
-						}),
-					),
+					payload: new TextEncoder().encode(JSON.stringify(expectedState)),
 				}),
 			),
 		} as any
