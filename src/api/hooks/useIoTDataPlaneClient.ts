@@ -1,8 +1,5 @@
 import { IoTDataPlaneClient } from '@aws-sdk/client-iot-data-plane'
 import { useCredentials } from 'hooks/useCredentials.js'
-import { createContext } from 'react'
-
-export const AWSIoTPersistenceContext = createContext(undefined)
 
 // Ensure clients do not change on every rerender
 const configuredClients: Record<string, IoTDataPlaneClient> = {}

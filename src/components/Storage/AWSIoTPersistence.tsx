@@ -1,16 +1,10 @@
 import { useAWSIoTPersistence } from 'api/hooks/useAWSIoTPersistence.js'
-import { createContext, FunctionComponent, ReactNode } from 'react'
+import { useAWSIoTPollingUpdates } from 'api/hooks/useAWSIoTPollingUpdates.js'
+import type { FunctionComponent } from 'react'
 
-export const AWSIoTPersistenceContext = createContext(undefined)
-
-export const AWSIoTPersistenceProvider: FunctionComponent<{
-	children: ReactNode
-}> = ({ children }) => {
+export const AWSIoTPersistence: FunctionComponent = () => {
 	useAWSIoTPersistence()
+	useAWSIoTPollingUpdates()
 
-	return (
-		<AWSIoTPersistenceContext.Provider value={undefined}>
-			{children}
-		</AWSIoTPersistenceContext.Provider>
-	)
+	return null
 }

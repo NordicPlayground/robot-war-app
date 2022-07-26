@@ -1,5 +1,5 @@
 import { App } from 'app/App'
-import { AWSIoTPersistenceProvider } from 'components/Storage/AWSIoTPersistence'
+import { AWSIoTPersistence } from 'components/Storage/AWSIoTPersistence'
 import { AppConfigProvider } from 'hooks/useAppConfig'
 import { CoreProvider } from 'hooks/useCore'
 import { CredentialsProvider } from 'hooks/useCredentials'
@@ -18,11 +18,10 @@ root.render(
 				<CredentialsProvider>
 					<GameControllerThingProvider>
 						<TeamProvider>
-							<AWSIoTPersistenceProvider>
-								<DragGestureProvider>
-									<App />
-								</DragGestureProvider>
-							</AWSIoTPersistenceProvider>
+							<AWSIoTPersistence />
+							<DragGestureProvider>
+								<App />
+							</DragGestureProvider>
 						</TeamProvider>
 					</GameControllerThingProvider>
 				</CredentialsProvider>
