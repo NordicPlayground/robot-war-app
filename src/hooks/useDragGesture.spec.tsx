@@ -1,24 +1,80 @@
 import { result, subtractCoordinates } from 'hooks/useDragGesture.js'
 
 describe('UseRobotActionGesture', () => {
-	it('given 2 coordinates should return the rotation degree and distance in pixeles between them', () => {
-		const firstCoordinate: [number, number] = [
-			Math.floor(Math.random()),
-			Math.floor(Math.random()),
-		]
-		const secondCoordinate: [number, number] = [
-			Math.floor(Math.random()),
-			Math.floor(Math.random()),
-		]
-		const { rotationDeg, distancePx } = result(
-			firstCoordinate,
-			secondCoordinate,
+	describe('given 2 coordinates should return the rotation degree and distance in pixeles between them', () => {
+		it.each([
+			/*                  0
+			 **	  			    |
+			 **	  	  B		    |
+			 **	  	     A      |
+			 **	  			    |
+			 **  90  ------------------------- 270
+			 **				    |
+			 **				    |
+			 **			        |
+			 **			        |
+			 **                 180
+			 */
+			// [ B ]     [ A ]
+			[[-10, 10], [-5, 5], 45, 7],
+			[[-100, 100], [-50, 50], 45, 71],
+
+			/*                  0
+			 **	  			    |
+			 **	  	   		    |
+			 **	  	            |
+			 **	  			    |
+			 **  90  ------------------------- 270
+			 **				    |
+			 **				A   |
+			 **			  B     |
+			 **			        |
+			 **                 180
+			 */
+			// [ B ]     [ A ]
+			[[-10, -10], [-5, -5], 135, 7],
+			[[-100, -100], [-50, -50], 135, 71],
+
+			/*                  0
+			 **	  			    |
+			 **	  	   		    |
+			 **	  	            |
+			 **	  			    |
+			 **  90  ------------------------- 270
+			 **				    |
+			 **				    |    A
+			 **			        |       B
+			 **			        |
+			 **                 180
+			 */
+			// [ B ]     [ A ]
+			[[10, -10], [5, -5], 225, 7],
+			[[100, -100], [50, -50], 225, 71],
+
+			/*                  0
+			 **	  			    |
+			 **	  	   		    |      B
+			 **	  	            |    A
+			 **	  			    |
+			 **  90  ------------------------- 270
+			 **				    |
+			 **				    |
+			 **			        |
+			 **			        |
+			 **                 180
+			 */
+			// [ B ]     [ A ]
+			[[10, 10], [5, 5], 315, 7],
+			[[100, 100], [50, 50], 315, 71],
+		])(
+			'first coordinate: %s, second coordinate: %s. Rotation degree: %d, distance: %d',
+			([x1, y1], [x2, y2], expectedRotation, expectedDistance) => {
+				const { rotationDeg, distancePx } = result([x1, y1], [x2, y2])
+
+				expect(rotationDeg).toEqual(expectedRotation)
+				expect(Math.round(distancePx)).toEqual(expectedDistance)
+			},
 		)
-		expect(rotationDeg).toBeDefined()
-		expect(rotationDeg).not.toBeNaN()
-		expect(distancePx).toBeDefined()
-		expect(distancePx).not.toBeNaN()
-		// expect(angle(...)).toEqual(42)
 	})
 
 	describe('result should calculate the distance between to coordinats', () => {
