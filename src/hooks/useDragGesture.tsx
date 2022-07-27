@@ -6,6 +6,8 @@ import {
 	useState,
 } from 'react'
 
+import { getRotation } from 'utils/getRotation.js'
+
 type Result = {
 	rotationDeg: number
 	distancePx: number
@@ -31,20 +33,20 @@ export const useDragGesture = () => useContext(DragGesture)
 
 type Position = [number, number]
 
-const getRotation = (x: number, y: number) => {
-	const rad = Math.atan2(y, x) // In radians
-	const deg = rad * (180 / Math.PI) // In degrees
-	return (
-		(deg +
-			180 + // Normalize to 360 degrees
-			90) % // North is up
-		360
-	)
+/**
+ * Subtract the x-coordinates and y-coordinates of one point from the other
+ */
+export const subtractCoordinates = (
+	firstCoordinate: [number, number],
+	secondCoordinate: [number, number],
+): [number, number] => {
+	const [x1, y1] = firstCoordinate
+	const [x2, y2] = secondCoordinate
+	return [x1 - x2, y1 - y2]
 }
 
-const result = (start: [number, number], current: [number, number]) => {
-	const deltaX = start[0] - current[0]
-	const deltaY = start[1] - current[1]
+export const result = (start: [number, number], current: [number, number]) => {
+	const [deltaX, deltaY] = subtractCoordinates(start, current)
 	const rotation = getRotation(deltaX, deltaY)
 	const distance = Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2))
 

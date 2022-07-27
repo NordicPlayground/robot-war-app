@@ -23,7 +23,6 @@ export const Robot = ({
 	driveTimeBudgetPercent,
 	colorHex,
 	onRotate,
-	onClick,
 	outline,
 	onPointerDown,
 	onPointerUp,
@@ -38,7 +37,6 @@ export const Robot = ({
 	driveTimeBudgetPercent?: number
 	colorHex: string
 	onRotate?: (rotateDeg: number) => void
-	onClick?: () => void
 	onPointerDown?: (args: { x: number; y: number }) => void
 	onPointerUp?: () => void
 	outline?: boolean
@@ -56,6 +54,7 @@ export const Robot = ({
 
 	return (
 		<g
+			data-test-id="robot"
 			onPointerDown={(e) => {
 				e.stopPropagation()
 				onPointerDown?.(getMouseCoordinates(e))
@@ -117,10 +116,6 @@ export const Robot = ({
 						e.stopPropagation()
 						onRotate?.(e.deltaY > 0 ? 5 : -5)
 					}}
-					onClick={(e) => {
-						e.stopPropagation()
-						onClick?.()
-					}}
 				/>
 				<polygon
 					style={
@@ -139,10 +134,6 @@ export const Robot = ({
 					onWheel={(e) => {
 						e.stopPropagation()
 						onRotate?.(e.deltaY > 0 ? 5 : -5)
-					}}
-					onClick={(e) => {
-						e.stopPropagation()
-						onClick?.()
 					}}
 					points={points.map((pointDef) => pointDef.join(',')).join(' ')}
 					data-test-id="triangle"
