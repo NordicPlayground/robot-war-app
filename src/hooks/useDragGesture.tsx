@@ -59,7 +59,6 @@ export const result = (start: [number, number], current: [number, number]) => {
 export const DragGestureProvider: FunctionComponent<{
 	children: ReactNode
 }> = ({ children }) => {
-	const [active, setIsActive] = useState<boolean>(false)
 	const [start, setStartPosition] = useState<Position>([0, 0])
 	const [current, setCurrentPosition] = useState<Position>([0, 0])
 
@@ -69,17 +68,12 @@ export const DragGestureProvider: FunctionComponent<{
 				start: ({ x: xPosition, y: yPosition }) => {
 					setStartPosition([xPosition, yPosition])
 					setCurrentPosition([xPosition, yPosition])
-					setIsActive(true)
 				},
 				updateMousePosition: ({ x: xPosition, y: yPosition }) => {
-					if (!active) return result(start, [xPosition, yPosition])
 					setCurrentPosition([xPosition, yPosition])
 					return result(start, [xPosition, yPosition])
 				},
-				end: () => {
-					setIsActive(false)
-					return result(start, current)
-				},
+				end: () => result(start, current),
 			}}
 		>
 			{children}
