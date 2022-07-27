@@ -4,6 +4,7 @@ import {
 	FunctionComponent,
 	ReactNode,
 	useContext,
+	useEffect,
 	useState,
 } from 'react'
 
@@ -18,18 +19,23 @@ export const TeamContext = createContext<Team>({
 
 export const useTeam = () => useContext(TeamContext)
 
-const SELECTED_TEAM = 'Team:auto-update-interval'
+const SELECTED_TEAM = 'useTeam:selected-team'
+
+const storedTeam = localStorage.getItem(SELECTED_TEAM) ?? undefined
 
 export const TeamProvider: FunctionComponent<{
 	children: ReactNode
 }> = ({ children }) => {
-	let storedTeam = localStorage.getItem(SELECTED_TEAM) ?? undefined
 	const { teams } = useCore()
-	if (storedTeam !== undefined && !teams.includes(storedTeam))
-		storedTeam = undefined
 	const [selectedTeam, setSelectedTeam] = useState<string | undefined>(
-		storedTeam,
+		teams.find((name) => name === storedTeam),
 	)
+
+	useEffect(() => {
+		if (teams.find((name) => name === storedTeam) !== undefined)
+			setSelectedTeam(storedTeam)
+	}, [teams])
+
 	return (
 		<TeamContext.Provider
 			value={{
