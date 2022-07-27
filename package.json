@@ -115,11 +115,6 @@
       ".tsx",
       ".css"
     ],
-    "globals": {
-      "ts-jest": {
-        "useESM": true
-      }
-    },
     "setupFilesAfterEnv": [
       "<rootDir>/setup-jest.js"
     ]
