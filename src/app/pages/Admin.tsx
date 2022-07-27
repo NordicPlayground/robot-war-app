@@ -75,7 +75,7 @@ export const Admin = () => {
 					widthMm={field.widthMm}
 					numberOfHelperLines={helperLinesNumber}
 					startZoneSizeMm={startZoneSizeMm}
-					onClick={({ xMm, yMm }) => {
+					onPointerUp={({ xMm, yMm }) => {
 						if (selectedRobot !== undefined) {
 							setSelectedRobot(undefined)
 							adminSetRobotPosition(selectedRobot, {
@@ -105,7 +105,7 @@ export const Admin = () => {
 									rotationDeg: shortestRotation360(rotationDeg + rotation),
 								})
 							}}
-							onClick={() => {
+							onPointerDown={() => {
 								setSelectedRobot(mac)
 							}}
 						/>

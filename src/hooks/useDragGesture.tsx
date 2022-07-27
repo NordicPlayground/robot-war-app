@@ -33,8 +33,8 @@ export const useDragGesture = () => useContext(DragGesture)
 
 type Position = [number, number]
 
-/*
- ** Subtract the x-coordinates and y-coordinates of one point from the other
+/**
+ * Subtract the x-coordinates and y-coordinates of one point from the other
  */
 export const subtractCoordinates = (
 	firstCoordinate: [number, number],

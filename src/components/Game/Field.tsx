@@ -5,7 +5,6 @@ export const Field = ({
 	startZoneSizeMm,
 	heightMm,
 	widthMm,
-	onClick,
 	children,
 	onPointerMove,
 	onPointerUp,
@@ -14,7 +13,6 @@ export const Field = ({
 	startZoneSizeMm: number
 	heightMm: number
 	widthMm: number
-	onClick?: (args: { xMm: number; yMm: number }) => void
 	onPointerMove?: (args: { xMm: number; yMm: number }) => void
 	onPointerUp?: (args: { xMm: number; yMm: number }) => void
 }>) => {
@@ -135,10 +133,6 @@ export const Field = ({
 				x="0"
 				height={heightMm}
 				width={widthMm}
-				onClick={(e) => {
-					if (rectRef.current === null) return
-					onClick?.(getMouseCoordinates(rectRef.current, e))
-				}}
 				onPointerMove={(e) => {
 					if (rectRef.current === null) return
 					onPointerMove?.(getMouseCoordinates(rectRef.current, e))

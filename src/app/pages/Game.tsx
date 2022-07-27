@@ -130,7 +130,7 @@ export const Game = () => {
 						widthMm={field.widthMm}
 						numberOfHelperLines={helperLinesNumber}
 						startZoneSizeMm={startZoneSizeMm}
-						onClick={(position) => {
+						onPointerUp={(position) => {
 							console.debug(`User clicked on field at`, position)
 						}}
 					>
