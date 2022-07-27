@@ -3,17 +3,16 @@ import { result, subtractCoordinates } from 'hooks/useDragGesture.js'
 describe('UseRobotActionGesture', () => {
 	describe('given 2 coordinates should return the rotation degree and distance in pixeles between them', () => {
 		it.each([
-			// FIXME: update drag
 			/*                  0
-			 **	  			    |
-			 **	  	  B		    |
-			 **	  	     A      |
-			 **	  			    |
+			 **                 |
+			 **       B         |
+			 **          A      |
+			 **                 |
 			 **  90  ------------------------- 270
-			 **				    |
-			 **				    |
-			 **			        |
-			 **			        |
+			 **                 |
+			 **                 |
+			 **                 |
+			 **                 |
 			 **                 180
 			 */
 			// [ B ]     [ A ]
@@ -21,15 +20,15 @@ describe('UseRobotActionGesture', () => {
 			[[-100, 100], [-50, 50], 45, 71],
 
 			/*                  0
-			 **	  			    |
-			 **	  	   		    |
-			 **	  	            |
-			 **	  			    |
+			 **                 |
+			 **                 |
+			 **                 |
+			 **                 |
 			 **  90  ------------------------- 270
-			 **				    |
-			 **				A   |
-			 **			  B     |
-			 **			        |
+			 **                 |
+			 **	            A   |
+			 **	          B     |
+			 **                 |
 			 **                 180
 			 */
 			// [ B ]     [ A ]
@@ -37,15 +36,15 @@ describe('UseRobotActionGesture', () => {
 			[[-100, -100], [-50, -50], 135, 71],
 
 			/*                  0
-			 **	  			    |
-			 **	  	   		    |
-			 **	  	            |
-			 **	  			    |
+			 **                 |
+			 **                 |
+			 **                 |
+			 **                 |
 			 **  90  ------------------------- 270
-			 **				    |
-			 **				    |    A
-			 **			        |       B
-			 **			        |
+			 **                 |
+			 **                 |    A
+			 **                 |       B
+			 **                 |
 			 **                 180
 			 */
 			// [ B ]     [ A ]
@@ -53,15 +52,15 @@ describe('UseRobotActionGesture', () => {
 			[[100, -100], [50, -50], 225, 71],
 
 			/*                  0
-			 **	  			    |
-			 **	  	   		    |      B
-			 **	  	            |    A
-			 **	  			    |
+			 **                 |
+			 **                 |      B
+			 **                 |    A
+			 **                 |
 			 **  90  ------------------------- 270
-			 **				    |
-			 **				    |
-			 **			        |
-			 **			        |
+			 **                 |
+			 **                 |
+			 **                 |
+			 **                 |
 			 **                 180
 			 */
 			// [ B ]     [ A ]
