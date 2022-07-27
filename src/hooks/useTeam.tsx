@@ -21,20 +21,25 @@ export const useTeam = () => useContext(TeamContext)
 
 const SELECTED_TEAM = 'useTeam:selected-team'
 
-const storedTeam = localStorage.getItem(SELECTED_TEAM) ?? undefined
-
 export const TeamProvider: FunctionComponent<{
 	children: ReactNode
-}> = ({ children }) => {
-	const { teams } = useCore()
+	useCore?: typeof useCore
+}> = ({ children, useCore: useCoreInjected }) => {
+	const { teams } = (useCoreInjected ?? useCore)()
+	const storedTeam = localStorage.getItem(SELECTED_TEAM) ?? undefined
+
 	const [selectedTeam, setSelectedTeam] = useState<string | undefined>(
 		teams.find((name) => name === storedTeam),
 	)
 
 	useEffect(() => {
-		if (teams.find((name) => name === storedTeam) !== undefined)
+		if (
+			teams.find((name) => name === storedTeam) !== undefined &&
+			selectedTeam === undefined
+		) {
 			setSelectedTeam(storedTeam)
-	}, [teams])
+		}
+	}, [teams, selectedTeam, storedTeam])
 
 	return (
 		<TeamContext.Provider
