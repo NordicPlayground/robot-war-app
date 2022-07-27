@@ -29,8 +29,8 @@
   "author": "Nordic Semiconductor ASA | nordicsemi.no",
   "license": "BSD-3-Clause",
   "dependencies": {
-    "@aws-sdk/client-iot": "3.134.0",
-    "@aws-sdk/client-iot-data-plane": "3.131.0",
+    "@aws-sdk/client-iot": "3.137.0",
+    "@aws-sdk/client-iot-data-plane": "3.137.0",
     "@nordicsemiconductor/from-env": "1.0.1",
     "@sinclair/typebox": "0.24.20",
     "ajv": "8.11.0",
