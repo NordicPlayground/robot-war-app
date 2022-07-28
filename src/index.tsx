@@ -10,15 +10,37 @@ import { TeamProvider } from 'hooks/useTeam'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 
-const { region } = fromEnv({
+const {
+	region,
+	version,
+	homepage,
+	shortName,
+	name,
+	themeColor,
+	backgroundColor,
+} = fromEnv({
 	region: 'PUBLIC_AWS_REGION',
+	version: 'PUBLIC_VERSION',
+	homepage: 'PUBLIC_HOMEPAGE',
+	shortName: 'PUBLIC_MANIFEST_SHORT_NAME',
+	name: 'PUBLIC_MANIFEST_NAME',
+	themeColor: 'PUBLIC_MANIFEST_THEME_COLOR',
+	backgroundColor: 'PUBLIC_MANIFEST_BACKGROUND_COLOR',
 })(import.meta.env)
 
 const container = document.getElementById('root') as HTMLElement
 const root = createRoot(container)
 root.render(
 	<StrictMode>
-		<AppConfigProvider>
+		<AppConfigProvider
+			version={version}
+			homepage={homepage}
+			shortName={shortName}
+			name={name}
+			themeColor={themeColor}
+			backgroundColor={backgroundColor}
+			baseName={import.meta.env.BASE_URL ?? '/'}
+		>
 			<CoreProvider>
 				<CredentialsProvider region={region}>
 					<GameControllerThingProvider>

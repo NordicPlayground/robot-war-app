@@ -1,4 +1,3 @@
-import { fromEnv } from '@nordicsemiconductor/from-env'
 import {
 	createContext,
 	FunctionComponent,
@@ -7,28 +6,6 @@ import {
 	useState,
 } from 'react'
 
-const isTest = process.env.NODE_ENV === 'test'
-
-const { version, homepage, shortName, name, themeColor, backgroundColor } =
-	fromEnv({
-		version: 'PUBLIC_VERSION',
-		homepage: 'PUBLIC_HOMEPAGE',
-		shortName: 'PUBLIC_MANIFEST_SHORT_NAME',
-		name: 'PUBLIC_MANIFEST_NAME',
-		themeColor: 'PUBLIC_MANIFEST_THEME_COLOR',
-		backgroundColor: 'PUBLIC_MANIFEST_BACKGROUND_COLOR',
-	})(
-		isTest
-			? {
-					PUBLIC_VERSION: '0.0.0-development',
-					PUBLIC_HOMEPAGE: 'https://robotwar.cloud',
-					PUBLIC_MANIFEST_SHORT_NAME: 'Robot War App',
-					PUBLIC_MANIFEST_NAME: 'nRF Robot War Web Application',
-					PUBLIC_MANIFEST_THEME_COLOR: '#232f3e',
-					PUBLIC_MANIFEST_BACKGROUND_COLOR: '#232f3e',
-			  }
-			: import.meta.env,
-	)
 type AppConfig = {
 	basename: string
 	version: string
@@ -52,14 +29,14 @@ type AppConfig = {
 }
 
 const defaultConfig: AppConfig = {
-	basename: isTest ? '/' : import.meta.env.BASE_URL ?? '/',
-	version,
-	homepage,
+	basename: '/',
+	version: '0.0.0-development',
+	homepage: 'https://robotwar.cloud',
 	manifest: {
-		shortName,
-		name,
-		themeColor,
-		backgroundColor,
+		shortName: 'Robot War App',
+		name: 'nRF Robot War Web Application',
+		themeColor: '#232f3e',
+		backgroundColor: '#232f3e',
 	},
 	robotWidthMm: 100,
 	robotLengthMm: 120,
@@ -82,7 +59,14 @@ const AUTO_UPDATE_INTERVAL = 'appConfig:auto-update-interval'
 
 export const AppConfigProvider: FunctionComponent<{
 	children: ReactNode
-}> = ({ children }) => {
+	baseName: string
+	version: string
+	homepage: string
+	shortName: string
+	name: string
+	themeColor: string
+	backgroundColor: string
+}> = ({ children, ...config }) => {
 	const [autoUpdateEnabled, enableAutoUpdate] = useState<boolean>(
 		localStorage.getItem(AUTO_UPDATE_DISABLED) === '1'
 			? false
@@ -99,6 +83,7 @@ export const AppConfigProvider: FunctionComponent<{
 		<AppConfigContext.Provider
 			value={{
 				...defaultConfig,
+				...config,
 				autoUpdateEnabled,
 				enableAutoUpdate: (enabled) => {
 					console.debug(

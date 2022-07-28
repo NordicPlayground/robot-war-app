@@ -8,7 +8,7 @@
     "build": "vite build --emptyOutDir",
     "preview": "vite preview",
     "prepare": "husky install",
-    "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --passWithNoTests"
+    "test": "jest --passWithNoTests"
   },
   "repository": {
     "type": "git",
