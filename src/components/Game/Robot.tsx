@@ -28,6 +28,7 @@ export const Robot = ({
 	onPointerUp,
 	onPointerEnter,
 	onPointerLeave,
+	onDoubleClick,
 }: {
 	id: string
 	xMm: number
@@ -40,6 +41,7 @@ export const Robot = ({
 	colorHex: string
 	onRotate?: (rotateDeg: number) => void
 	onPointerDown?: (args: { x: number; y: number }) => void
+	onDoubleClick?: (args: { x: number; y: number }) => void
 	onPointerUp?: () => void
 	outline?: boolean
 	onPointerEnter?: () => void
@@ -74,6 +76,10 @@ export const Robot = ({
 			onPointerLeave={(e) => {
 				e.stopPropagation()
 				onPointerLeave?.()
+			}}
+			onDoubleClick={(e) => {
+				e.stopPropagation()
+				onDoubleClick?.(getMouseCoordinates(e))
 			}}
 		>
 			<defs>
