@@ -3,12 +3,12 @@ import { useRef } from 'react'
 const safeDocument: Document = document
 
 export const useScrollBlock = (): [() => void, () => void] => {
-	const scrollBlocked = useRef(false)
+	const isScrollBlocked = useRef(false)
 	const html = safeDocument.documentElement
 	const { body } = safeDocument
 
 	const blockScroll = (): void => {
-		if (body == null || body.style == null || scrollBlocked.current) return
+		if (body == null || body.style == null || isScrollBlocked.current) return
 		if (document === undefined) return
 
 		const scrollBarWidth = window.innerWidth - html.clientWidth
@@ -23,11 +23,11 @@ export const useScrollBlock = (): [() => void, () => void] => {
 		body.style.overflow = 'hidden' /* [2] */
 		body.style.paddingRight = `${bodyPaddingRight + scrollBarWidth}px`
 
-		scrollBlocked.current = true
+		isScrollBlocked.current = true
 	}
 
 	const allowScroll = (): void => {
-		if (body == null || body.style == null || !scrollBlocked.current) return
+		if (body == null || body.style == null || !isScrollBlocked.current) return
 
 		html.style.position = ''
 		html.style.overflow = ''
@@ -35,7 +35,7 @@ export const useScrollBlock = (): [() => void, () => void] => {
 		body.style.overflow = ''
 		body.style.paddingRight = ''
 
-		scrollBlocked.current = false
+		isScrollBlocked.current = false
 	}
 
 	return [blockScroll, allowScroll]
