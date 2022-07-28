@@ -58,9 +58,16 @@ describe('useTeam()', () => {
 					})}
 				>
 					<TeamContext.Consumer>
-						{({ setSelectedTeam }) => {
-							setSelectedTeam('Brutal Bearings')
-							return null
+						{({ selectedTeam, setSelectedTeam }) => {
+							return (
+								<button
+									onClick={() => {
+										setSelectedTeam('Brutal Bearings')
+									}}
+								>
+									{selectedTeam}
+								</button>
+							)
 						}}
 					</TeamContext.Consumer>
 				</TeamProvider>,
@@ -68,10 +75,14 @@ describe('useTeam()', () => {
 
 			isolated.inline('*')
 
+			isolated.findOne('button').props.onClick()
+
 			expect(setItem).toHaveBeenCalledWith(
 				'useTeam:selected-team',
 				'Brutal Bearings',
 			)
+
+			expect(isolated.findOne('button').content()).toEqual('Brutal Bearings')
 		})
 
 		it('should auto-select a previously selected team', () => {
