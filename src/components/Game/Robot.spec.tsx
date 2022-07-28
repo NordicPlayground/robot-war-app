@@ -166,4 +166,50 @@ T = tip
 		})
 		expect(onPointerUp).toHaveBeenCalledTimes(1)
 	})
+
+	it('Should trigger onPointerEnter', () => {
+		const onPointerEnter = jest.fn()
+
+		const robot = isolateComponent(
+			<Robot
+				colorHex={randomColor()}
+				heightMm={100}
+				widthMm={100}
+				id={randomMac()}
+				xMm={0}
+				yMm={0}
+				rotationDeg={0}
+				onPointerEnter={onPointerEnter}
+			/>,
+		)
+
+		// Simulating a mouse entering the robot
+		robot.findOne('[data-test-id=robot]').props.onPointerEnter({
+			stopPropagation: jest.fn(),
+		})
+		expect(onPointerEnter).toHaveBeenCalledTimes(1)
+	})
+
+	it('Should trigger onPointerLeave', () => {
+		const onPointerLeave = jest.fn()
+
+		const robot = isolateComponent(
+			<Robot
+				colorHex={randomColor()}
+				heightMm={100}
+				widthMm={100}
+				id={randomMac()}
+				xMm={0}
+				yMm={0}
+				rotationDeg={0}
+				onPointerLeave={onPointerLeave}
+			/>,
+		)
+
+		// Simulating a mouse leaving the robot
+		robot.findOne('[data-test-id=robot]').props.onPointerLeave({
+			stopPropagation: jest.fn(),
+		})
+		expect(onPointerLeave).toHaveBeenCalledTimes(1)
+	})
 })

@@ -26,6 +26,8 @@ export const Robot = ({
 	outline,
 	onPointerDown,
 	onPointerUp,
+	onPointerEnter,
+	onPointerLeave,
 }: {
 	id: string
 	xMm: number
@@ -40,6 +42,8 @@ export const Robot = ({
 	onPointerDown?: (args: { x: number; y: number }) => void
 	onPointerUp?: () => void
 	outline?: boolean
+	onPointerEnter?: () => void
+	onPointerLeave?: () => void
 }) => {
 	// Construct points for a triangle.
 	const points: [number, number][] = []
@@ -62,6 +66,14 @@ export const Robot = ({
 			onPointerUp={(e) => {
 				e.stopPropagation()
 				onPointerUp?.()
+			}}
+			onPointerEnter={(e) => {
+				e.stopPropagation()
+				onPointerEnter?.()
+			}}
+			onPointerLeave={(e) => {
+				e.stopPropagation()
+				onPointerLeave?.()
 			}}
 		>
 			<defs>
