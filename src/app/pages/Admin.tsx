@@ -107,7 +107,7 @@ export const Admin = () => {
 									rotationDeg: shortestRotation360(rotationDeg + rotation),
 								})
 							}}
-							onPointerDown={() => {
+							onDoubleClick={() => {
 								setSelectedRobot(mac)
 							}}
 							onPointerEnter={() => {
