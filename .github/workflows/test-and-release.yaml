@@ -30,7 +30,7 @@ jobs:
         run: npx tsc
 
       - name: Run unit tests with coverage
-        run: npx jest --coverage
+        run: NODE_OPTIONS=--experimental-vm-modules npx jest --coverage
 
       - uses: actions/upload-artifact@v3
         if: always()

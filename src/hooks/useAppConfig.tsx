@@ -7,6 +7,8 @@ import {
 	useState,
 } from 'react'
 
+const isTest = process.env.NODE_ENV === 'test'
+
 const { version, homepage, shortName, name, themeColor, backgroundColor } =
 	fromEnv({
 		version: 'PUBLIC_VERSION',
@@ -15,7 +17,18 @@ const { version, homepage, shortName, name, themeColor, backgroundColor } =
 		name: 'PUBLIC_MANIFEST_NAME',
 		themeColor: 'PUBLIC_MANIFEST_THEME_COLOR',
 		backgroundColor: 'PUBLIC_MANIFEST_BACKGROUND_COLOR',
-	})(import.meta.env)
+	})(
+		isTest
+			? {
+					PUBLIC_VERSION: '0.0.0-development',
+					PUBLIC_HOMEPAGE: 'https://robotwar.cloud',
+					PUBLIC_MANIFEST_SHORT_NAME: 'Robot War App',
+					PUBLIC_MANIFEST_NAME: 'nRF Robot War Web Application',
+					PUBLIC_MANIFEST_THEME_COLOR: '#232f3e',
+					PUBLIC_MANIFEST_BACKGROUND_COLOR: '#232f3e',
+			  }
+			: import.meta.env,
+	)
 type AppConfig = {
 	basename: string
 	version: string
@@ -37,8 +50,9 @@ type AppConfig = {
 	autoUpdateIntervalSeconds: number
 	setAutoUpdateIntervalSeconds: (seconds: number) => void
 }
+
 const defaultConfig: AppConfig = {
-	basename: import.meta.env.BASE_URL ?? '/',
+	basename: isTest ? '/' : import.meta.env.BASE_URL ?? '/',
 	version,
 	homepage,
 	manifest: {
