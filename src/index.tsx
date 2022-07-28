@@ -1,11 +1,12 @@
 import { fromEnv } from '@nordicsemiconductor/from-env'
 import { CredentialsProvider } from 'api/hooks/useCredentials'
+import { GameControllerThingProvider } from 'api/hooks/useGameControllerThing.js'
+import { GameControllerThingsProvider } from 'api/hooks/useGameControllerThings'
 import { App } from 'app/App'
 import { AWSIoTPersistence } from 'components/Storage/AWSIoTPersistence'
 import { AppConfigProvider } from 'hooks/useAppConfig'
 import { CoreProvider } from 'hooks/useCore'
 import { DragGestureProvider } from 'hooks/useDragGesture'
-import { GameControllerThingProvider } from 'hooks/useGameControllerThing'
 import { TeamProvider } from 'hooks/useTeam'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
@@ -43,14 +44,16 @@ root.render(
 		>
 			<CoreProvider>
 				<CredentialsProvider region={region}>
-					<GameControllerThingProvider>
-						<TeamProvider>
-							<AWSIoTPersistence />
-							<DragGestureProvider>
-								<App />
-							</DragGestureProvider>
-						</TeamProvider>
-					</GameControllerThingProvider>
+					<GameControllerThingsProvider>
+						<GameControllerThingProvider>
+							<TeamProvider>
+								<AWSIoTPersistence />
+								<DragGestureProvider>
+									<App />
+								</DragGestureProvider>
+							</TeamProvider>
+						</GameControllerThingProvider>
+					</GameControllerThingsProvider>
 				</CredentialsProvider>
 			</CoreProvider>
 		</AppConfigProvider>

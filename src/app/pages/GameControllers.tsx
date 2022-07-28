@@ -1,7 +1,7 @@
+import { useGameControllerThing } from 'api/hooks/useGameControllerThing.js'
 import { Main } from 'components/Main'
 import { randomMac } from 'core/test/randomMac'
 import { randomRobot } from 'core/test/randomRobot'
-import { useGameControllerThing } from 'hooks/useGameControllerThing'
 
 export const GameControllers = () => {
 	const {

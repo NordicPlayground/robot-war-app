@@ -1,7 +1,6 @@
-import { ListThingsInThingGroupCommand } from '@aws-sdk/client-iot'
 import type { IoTDataPlaneClient } from '@aws-sdk/client-iot-data-plane'
 import type { Static } from '@sinclair/typebox'
-import { useIoTClient } from 'api/hooks/useIoTClient'
+import { useGameControllerThings } from 'api/hooks/useGameControllerThings.js'
 import { useIoTDataPlaneClient } from 'api/hooks/useIoTDataPlaneClient'
 import { clearShadow } from 'api/persistence/clearShadow'
 import type { ErrorInfo } from 'api/persistence/errors/ErrorInfo'
@@ -37,11 +36,17 @@ const dummyStateFns: ReturnType<typeof stateFunctions> = {
 export const GameControllerThingContext = createContext<
 	{
 		thingName?: string
+		setGameController: (thingName: string) => void
 	} & ReturnType<typeof stateFunctions>
->(dummyStateFns)
+>({
+	...dummyStateFns,
+	setGameController: () => undefined,
+})
 
 export const useGameControllerThing = () =>
 	useContext(GameControllerThingContext)
+
+const SELECTED_GAME_CONTROLLER = 'useGameControllerThing:selected-thing'
 
 const stateFunctions = ({
 	thingName,
@@ -142,12 +147,21 @@ export const GameControllerThingProvider: FunctionComponent<{
 	children: ReactNode
 }> = ({ children }) => {
 	const { game } = useCore()
-	const [thingName, setThingName] = useState<string>()
+	const gameControllers = useGameControllerThings()
+	const storedThingName =
+		localStorage.getItem(SELECTED_GAME_CONTROLLER) ?? undefined
+	const [thingName, setThingName] = useState<string | undefined>(
+		gameControllers.find((name) => name === storedThingName),
+	)
 
-	const iotClient = useIoTClient()
-	if (iotClient === undefined) {
-		console.debug('iotClient not available')
-	}
+	useEffect(() => {
+		if (
+			gameControllers.find((name) => name === storedThingName) !== undefined &&
+			thingName === undefined
+		) {
+			setThingName(storedThingName)
+		}
+	}, [gameControllers, thingName, storedThingName])
 
 	const iotDataPlaneClient = useIoTDataPlaneClient()
 	if (iotDataPlaneClient === undefined) {
@@ -155,23 +169,15 @@ export const GameControllerThingProvider: FunctionComponent<{
 	}
 
 	useEffect(() => {
-		if (iotClient === undefined) return
-		iotClient
-			.send(
-				new ListThingsInThingGroupCommand({
-					thingGroupName: 'gameController',
-				}),
+		if (gameControllers.length === 1) {
+			console.debug(
+				`[GameControllerThingProvider]`,
+				'Only one game controller thing exists, using',
+				gameControllers[0],
 			)
-			.then(({ things }) => {
-				setThingName(things?.filter((thing) => thing === 'gameController')[0])
-			})
-			.catch((error) => {
-				console.error(
-					'Failed to list things in group. No thing called gameController.',
-				)
-				console.error(error)
-			})
-	}, [iotClient])
+			setThingName(gameControllers[0])
+		}
+	}, [gameControllers])
 
 	if (
 		thingName !== undefined &&
@@ -193,6 +199,16 @@ export const GameControllerThingProvider: FunctionComponent<{
 			value={{
 				thingName,
 				...stateFns,
+				setGameController: (thingName) => {
+					if (!gameControllers.includes(thingName)) return
+					console.debug(
+						`[GameControllerThingProvider]`,
+						`Using game controller`,
+						thingName,
+					)
+					setThingName(thingName)
+					localStorage.setItem(SELECTED_GAME_CONTROLLER, thingName)
+				},
 			}}
 		>
 			{children}

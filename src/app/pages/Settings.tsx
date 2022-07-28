@@ -1,10 +1,14 @@
 import { useCredentials } from 'api/hooks/useCredentials.js'
+import { useGameControllerThing } from 'api/hooks/useGameControllerThing'
+import { useGameControllerThings } from 'api/hooks/useGameControllerThings'
 import { InvisibleIcon, VisibleIcon } from 'components/FeatherIcon'
 import { Main } from 'components/Main'
 import { useAppConfig } from 'hooks/useAppConfig'
 import React, { useState } from 'react'
 
 export const Settings = () => {
+	const gameControllers = useGameControllerThings()
+	const { setGameController, thingName } = useGameControllerThing()
 	const {
 		updateCredentials,
 		accessKeyId: storedAccessKeyId,
@@ -99,6 +103,20 @@ export const Settings = () => {
 								)}
 							</div>
 						</div>
+					</fieldset>
+					<fieldset className="mt-4">
+						<legend>Game Controller</legend>
+						<select
+							className="form-select form-select-lg"
+							onChange={(e) => {
+								setGameController(e.target.value)
+							}}
+							value={thingName}
+						>
+							{gameControllers.map((name) => (
+								<option key={name}>{name}</option>
+							))}
+						</select>
 					</fieldset>
 					<fieldset className="mt-4">
 						<legend>Auto-updated</legend>

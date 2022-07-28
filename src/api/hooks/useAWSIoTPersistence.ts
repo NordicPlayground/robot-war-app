@@ -1,4 +1,5 @@
 import { Type } from '@sinclair/typebox'
+import { useGameControllerThing } from 'api/hooks/useGameControllerThing.js'
 import { useIoTDataPlaneClient } from 'api/hooks/useIoTDataPlaneClient.js'
 import { gameEvent2AdminStateUpdate } from 'api/persistence/gameEvent2AdminStateUpdate'
 import { gameEvent2GatewayStateUpdate } from 'api/persistence/gameEvent2GatewayStateUpdate'
@@ -9,7 +10,6 @@ import { MacAddress } from 'core/models/MacAddress.js'
 import { Robot } from 'core/models/Robot.js'
 import { useAppConfig } from 'hooks/useAppConfig'
 import { useCore } from 'hooks/useCore.js'
-import { useGameControllerThing } from 'hooks/useGameControllerThing.js'
 import { debounce, merge } from 'lodash-es'
 import { useCallback, useEffect, useRef } from 'react'
 
