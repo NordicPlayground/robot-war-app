@@ -1,5 +1,5 @@
 import { IoTDataPlaneClient } from '@aws-sdk/client-iot-data-plane'
-import { useCredentials } from 'hooks/useCredentials.js'
+import { useCredentials } from 'api/hooks/useCredentials.js'
 
 // Ensure clients do not change on every rerender
 const configuredClients: Record<string, IoTDataPlaneClient> = {}

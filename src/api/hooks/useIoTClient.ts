@@ -1,5 +1,5 @@
 import { IoTClient } from '@aws-sdk/client-iot'
-import { useCredentials } from 'hooks/useCredentials.js'
+import { useCredentials } from 'api/hooks/useCredentials.js'
 
 // Ensure clients do not change on every rerender
 const configuredClients: Record<string, IoTClient> = {}

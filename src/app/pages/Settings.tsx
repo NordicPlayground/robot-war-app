@@ -1,7 +1,7 @@
+import { useCredentials } from 'api/hooks/useCredentials.js'
 import { InvisibleIcon, VisibleIcon } from 'components/FeatherIcon'
 import { Main } from 'components/Main'
 import { useAppConfig } from 'hooks/useAppConfig'
-import { useCredentials } from 'hooks/useCredentials'
 import React, { useState } from 'react'
 
 export const Settings = () => {

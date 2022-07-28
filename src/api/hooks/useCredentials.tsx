@@ -1,4 +1,3 @@
-import { fromEnv } from '@nordicsemiconductor/from-env'
 import {
 	createContext,
 	FunctionComponent,
@@ -7,10 +6,7 @@ import {
 	useState,
 } from 'react'
 
-const { region } = fromEnv({
-	region: 'PUBLIC_AWS_REGION',
-})(import.meta.env)
-
+const defaultRegion = 'us-east-1'
 export const CredentialsContext = createContext<{
 	accessKeyId?: string
 	secretAccessKey?: string
@@ -21,7 +17,7 @@ export const CredentialsContext = createContext<{
 	}) => void
 }>({
 	updateCredentials: () => undefined,
-	region,
+	region: defaultRegion,
 })
 
 export const useCredentials = () => useContext(CredentialsContext)
@@ -31,7 +27,8 @@ const SECRET_ACCESS_KEY_STORAGE_NAME = 'secretAccessKey'
 
 export const CredentialsProvider: FunctionComponent<{
 	children: ReactNode
-}> = ({ children }) => {
+	region?: string
+}> = ({ children, region }) => {
 	const storedAccessKeyId = localStorage.getItem(ACCESS_KEY_ID_STORAGE_NAME)
 	const storedSecretAccessKey = localStorage.getItem(
 		SECRET_ACCESS_KEY_STORAGE_NAME,
@@ -56,7 +53,7 @@ export const CredentialsProvider: FunctionComponent<{
 					setAccessKeyId(accessKeyId)
 					setSecretAccessKey(secretAccessKey)
 				},
-				region,
+				region: region ?? defaultRegion,
 			}}
 		>
 			{children}
