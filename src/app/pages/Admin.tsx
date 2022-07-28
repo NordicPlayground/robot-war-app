@@ -7,6 +7,7 @@ import type { RobotPosition } from 'core/models/RobotPosition'
 import equal from 'fast-deep-equal'
 import { useAppConfig } from 'hooks/useAppConfig'
 import { useCore } from 'hooks/useCore'
+import { useScrollBlock } from 'hooks/useScrollBlock'
 import { useEffect, useState } from 'react'
 import { shortestRotation360 } from 'utils/shortestRotation'
 import { teamColor } from 'utils/teamColor.js'
@@ -20,6 +21,7 @@ export const Admin = () => {
 	} = useCore()
 
 	const [selectedRobot, setSelectedRobot] = useState<string>()
+	const [blockScroll, allowScroll] = useScrollBlock()
 
 	// Create inital positions and rotation on the map
 	// Distribute robots alternating in start zones of teams
@@ -107,6 +109,12 @@ export const Admin = () => {
 							}}
 							onPointerDown={() => {
 								setSelectedRobot(mac)
+							}}
+							onPointerEnter={() => {
+								blockScroll()
+							}}
+							onPointerLeave={() => {
+								allowScroll()
 							}}
 						/>
 					))}
