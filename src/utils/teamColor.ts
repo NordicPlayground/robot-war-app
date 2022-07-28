@@ -1,5 +1,6 @@
 export const defaultColor = '#333333'
 const teamColors: Record<string, string> = {}
+
 const teamColorOption = [
 	'#ffbe0b',
 	'#8338ec',
@@ -10,34 +11,26 @@ const teamColorOption = [
 	'#00bbf9',
 	'#ffe440',
 	'#9b5de5',
-	'#fs15bb5',
+	'#f15bb5',
 ]
 
 /**
- * Provide stable colors for teams
+ * Provide stable colors for teams.
+ *
+ * If there are not enough colors, the last one in the list is used.
  */
-export const teamColor = (team?: string): string => {
+export const teamColor = (
+	team?: string,
+	availableColors = teamColorOption,
+): string => {
 	if (team === undefined) return defaultColor
 	if (teamColors[team] === undefined) {
-		let color = teamColorOption[0]
-		let pickedColor = isColorPicked(color)
-		let count = 0
-		while (pickedColor) {
-			count += 1
-			if (count === teamColorOption.length) {
-				console.debug(
-					'Ohh nooo, team color should be unique and there are more teams than color options available!',
-				)
-				break
-			}
-
-			color = teamColorOption[count]
-			pickedColor = isColorPicked(color)
-		}
-		teamColors[team] = color
+		const pickedColors = Object.values(teamColors)
+		const unpickedColor = availableColors.find(
+			(color) => !pickedColors.includes(color),
+		)
+		teamColors[team] =
+			unpickedColor ?? availableColors[availableColors.length - 1]
 	}
 	return teamColors[team]
 }
-
-const isColorPicked = (color: string) =>
-	Object.values(teamColors).includes(color)
