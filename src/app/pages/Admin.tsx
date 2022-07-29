@@ -21,8 +21,10 @@ export const Admin = () => {
 		game: { field, adminSetRobotPosition, adminSetAllRobotPositions },
 	} = useCore()
 
-	const [selectedRobot, setSelectedRobot] = useState<string>()
-	const [action, setAction] = useState<string>()
+	const [selectedRobot, setSelectedRobot] = useState<{
+		mac: string | undefined
+		action: string | undefined
+	}>()
 	const [blockScroll, allowScroll] = useScrollBlock()
 	const {
 		start: startRobotGesture,
@@ -76,26 +78,16 @@ export const Admin = () => {
 		rotationDeg: robot.position?.rotationDeg ?? 0,
 	}))
 
-	/**
-	 * Define the action the admin is going to execute over expecific robot
-	 */
-	const defineAction = (actionType: string, robotId: string) => {
-		setAction(actionType)
-		setSelectedRobot(robotId)
-	}
-
-	const resetAction = () => {
-		setAction(undefined)
-		setSelectedRobot(undefined)
-	}
-
 	const handleRobotRotationEnd = () => {
-		const { rotationDeg } = endRobotGesture()
-		if (selectedRobot !== undefined && action == 'rotation') {
-			adminSetRobotPosition(selectedRobot, {
+		if (
+			selectedRobot?.mac !== undefined &&
+			selectedRobot?.action == 'rotation'
+		) {
+			const { rotationDeg } = endRobotGesture()
+			adminSetRobotPosition(selectedRobot?.mac, {
 				rotationDeg: shortestRotation360(rotationDeg),
 			})
-			resetAction()
+			setSelectedRobot({ mac: undefined, action: undefined })
 			allowScroll()
 		}
 	}
@@ -105,14 +97,14 @@ export const Admin = () => {
 			<div
 				className={style.field}
 				onPointerMove={(e) => {
-					if (selectedRobot === undefined) return
-					if (action === 'rotation') {
+					if (selectedRobot?.mac === undefined) return
+					if (selectedRobot?.action === 'rotation') {
 						const { rotationDeg } = updateMousePosition({
 							x: e.clientX,
 							y: e.clientY,
 						})
 
-						adminSetRobotPosition(selectedRobot, {
+						adminSetRobotPosition(selectedRobot.mac, {
 							rotationDeg: shortestRotation360(rotationDeg),
 						})
 					}
@@ -125,14 +117,14 @@ export const Admin = () => {
 					numberOfHelperLines={helperLinesNumber}
 					startZoneSizeMm={startZoneSizeMm}
 					onPointerUp={({ xMm, yMm }) => {
-						if (selectedRobot !== undefined) {
-							if (action === 'reposition') {
-								adminSetRobotPosition(selectedRobot, {
+						if (selectedRobot?.mac !== undefined) {
+							if (selectedRobot?.action === 'reposition') {
+								adminSetRobotPosition(selectedRobot?.mac, {
 									xMm,
 									yMm,
 								})
 							}
-							resetAction()
+							setSelectedRobot({ mac: undefined, action: undefined })
 						}
 					}}
 				>
@@ -146,7 +138,7 @@ export const Admin = () => {
 							heightMm={robotLengthMm}
 							colorHex={colorHex}
 							outline={
-								selectedRobot !== undefined && selectedRobot !== mac
+								selectedRobot?.mac !== undefined && selectedRobot.mac !== mac
 									? true
 									: false
 							}
@@ -158,14 +150,14 @@ export const Admin = () => {
 							}}
 							onPointerDown={(args) => {
 								blockScroll()
-								defineAction('rotation', mac)
+								setSelectedRobot({ mac, action: 'rotation' })
 								startRobotGesture({
 									x: args.x,
 									y: args.y,
 								})
 							}}
 							onDoubleClick={() => {
-								defineAction('reposition', mac)
+								setSelectedRobot({ mac, action: 'reposition' })
 							}}
 							onPointerEnter={() => {
 								blockScroll()
