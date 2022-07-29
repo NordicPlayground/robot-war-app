@@ -8,6 +8,7 @@ import equal from 'fast-deep-equal'
 import { useAppConfig } from 'hooks/useAppConfig'
 import { useCore } from 'hooks/useCore'
 import { useDragGesture } from 'hooks/useDragGesture'
+import { usePressTimer } from 'hooks/usePressTimer'
 import { useScrollBlock } from 'hooks/useScrollBlock'
 import { useEffect, useState } from 'react'
 import { shortestRotation360 } from 'utils/shortestRotation'
@@ -31,6 +32,7 @@ export const Admin = () => {
 		end: endRobotGesture,
 		updateMousePosition,
 	} = useDragGesture()
+	const [startTimer, stopTimer, isLongPressRef] = usePressTimer()
 
 	// Create inital positions and rotation on the map
 	// Distribute robots alternating in start zones of teams
@@ -150,12 +152,18 @@ export const Admin = () => {
 								})
 							}}
 							onPointerDown={(args) => {
+								startTimer()
 								blockScroll()
-								setSelectedRobot({ mac, action: 'rotation' })
 								startRobotGesture({
 									x: args.x,
 									y: args.y,
 								})
+							}}
+							onPointerUp={() => {
+								isLongPressRef.current
+									? setSelectedRobot({ mac, action: 'reposition' })
+									: setSelectedRobot({ mac, action: 'rotation' })
+								stopTimer()
 							}}
 							onDoubleClick={() => {
 								setSelectedRobot({ mac, action: 'reposition' })
