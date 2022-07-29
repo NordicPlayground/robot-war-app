@@ -99,6 +99,7 @@ export const Admin = () => {
 				onPointerMove={(e) => {
 					if (selectedRobot?.mac === undefined) return
 					if (selectedRobot?.action === 'rotation') {
+						blockScroll()
 						const { rotationDeg } = updateMousePosition({
 							x: e.clientX,
 							y: e.clientY,
