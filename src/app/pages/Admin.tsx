@@ -7,6 +7,7 @@ import type { RobotPosition } from 'core/models/RobotPosition'
 import equal from 'fast-deep-equal'
 import { useAppConfig } from 'hooks/useAppConfig'
 import { useCore } from 'hooks/useCore'
+import { useDragGesture } from 'hooks/useDragGesture'
 import { useScrollBlock } from 'hooks/useScrollBlock'
 import { useEffect, useState } from 'react'
 import { shortestRotation360 } from 'utils/shortestRotation'
@@ -21,7 +22,13 @@ export const Admin = () => {
 	} = useCore()
 
 	const [selectedRobot, setSelectedRobot] = useState<string>()
+	const [action, setAction] = useState<string>()
 	const [blockScroll, allowScroll] = useScrollBlock()
+	const {
+		start: startRobotGesture,
+		end: endRobotGesture,
+		updateMousePosition,
+	} = useDragGesture()
 
 	// Create inital positions and rotation on the map
 	// Distribute robots alternating in start zones of teams
@@ -69,9 +76,49 @@ export const Admin = () => {
 		rotationDeg: robot.position?.rotationDeg ?? 0,
 	}))
 
+	/**
+	 * Define the action the admin is going to execute over expecific robot
+	 */
+	const defineAction = (actionType: string, robotId: string) => {
+		setAction(actionType)
+		setSelectedRobot(robotId)
+	}
+
+	const resetAction = () => {
+		setAction(undefined)
+		setSelectedRobot(undefined)
+	}
+
+	const handleRobotRotationEnd = () => {
+		const { rotationDeg } = endRobotGesture()
+		if (selectedRobot !== undefined && action == 'rotation') {
+			adminSetRobotPosition(selectedRobot, {
+				rotationDeg: shortestRotation360(rotationDeg),
+			})
+			resetAction()
+			allowScroll()
+		}
+	}
+
 	return (
 		<div>
-			<div className={style.field}>
+			<div
+				className={style.field}
+				onPointerMove={(e) => {
+					if (selectedRobot === undefined) return
+					if (action === 'rotation') {
+						const { rotationDeg } = updateMousePosition({
+							x: e.clientX,
+							y: e.clientY,
+						})
+
+						adminSetRobotPosition(selectedRobot, {
+							rotationDeg: shortestRotation360(rotationDeg),
+						})
+					}
+				}}
+				onPointerUp={handleRobotRotationEnd}
+			>
 				<Field
 					heightMm={field.heightMm}
 					widthMm={field.widthMm}
@@ -79,11 +126,13 @@ export const Admin = () => {
 					startZoneSizeMm={startZoneSizeMm}
 					onPointerUp={({ xMm, yMm }) => {
 						if (selectedRobot !== undefined) {
-							setSelectedRobot(undefined)
-							adminSetRobotPosition(selectedRobot, {
-								xMm,
-								yMm,
-							})
+							if (action === 'reposition') {
+								adminSetRobotPosition(selectedRobot, {
+									xMm,
+									yMm,
+								})
+							}
+							resetAction()
 						}
 					}}
 				>
@@ -107,8 +156,16 @@ export const Admin = () => {
 									rotationDeg: shortestRotation360(rotationDeg + rotation),
 								})
 							}}
+							onPointerDown={(args) => {
+								blockScroll()
+								defineAction('rotation', mac)
+								startRobotGesture({
+									x: args.x,
+									y: args.y,
+								})
+							}}
 							onDoubleClick={() => {
-								setSelectedRobot(mac)
+								defineAction('reposition', mac)
 							}}
 							onPointerEnter={() => {
 								blockScroll()
