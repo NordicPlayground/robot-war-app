@@ -1,6 +1,6 @@
 import { useRef } from 'react'
 
-export const usePressTimer = (): [() => void, () => boolean] => {
+export const usePressDetection = (): [() => void, () => boolean] => {
 	const longPressFlag = 1500 // is considered long press after 1500 milliseconds
 	const timerRef: { current: NodeJS.Timeout | null } = useRef(null)
 	const isLongPressRef = useRef(false)
