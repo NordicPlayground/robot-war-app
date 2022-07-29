@@ -6,9 +6,10 @@ export const Form: FunctionComponent<{
 	onUpdate: (
 		updatedCommands: Record<string, { angleDeg: number; driveTimeMs: number }>,
 	) => void
-}> = ({ movements: commands, onUpdate: onUpdateCommands }) => (
+	teamColor: string
+}> = ({ movements, onUpdate: onUpdateCommands, teamColor }) => (
 	<form>
-		{Object.entries(commands)
+		{Object.entries(movements)
 			.sort(([macA], [macB]) => macA.localeCompare(macB))
 			.map(([robotMac, { angleDeg, driveTimeMs }]) => (
 				<RobotConfig
@@ -18,22 +19,23 @@ export const Form: FunctionComponent<{
 					angleDeg={angleDeg}
 					onUpdateAngleDeg={(angleDeg) =>
 						onUpdateCommands({
-							...commands,
+							...movements,
 							[robotMac]: {
-								...commands[robotMac],
+								...movements[robotMac],
 								angleDeg,
 							},
 						})
 					}
 					onUpdateDriveTimeMs={(driveTimeMs) =>
 						onUpdateCommands({
-							...commands,
+							...movements,
 							[robotMac]: {
-								...commands[robotMac],
+								...movements[robotMac],
 								driveTimeMs,
 							},
 						})
 					}
+					teamColor={teamColor}
 				></RobotConfig>
 			))}
 	</form>

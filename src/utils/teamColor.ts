@@ -1,6 +1,7 @@
 export const defaultColor = '#333333'
 const teamColors: Record<string, string> = {}
 
+// https://coolors.co/ffbe0b-8338ec-fb5607-3a86ff-ff006e-00f5d4-00bbf9-ffe440-9b5de5-f15bb5
 const teamColorOption = [
 	'#ffbe0b',
 	'#8338ec',
