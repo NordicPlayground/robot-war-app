@@ -32,7 +32,7 @@ export const Admin = () => {
 		end: endRobotGesture,
 		updateMousePosition,
 	} = useDragGesture()
-	const [startTimer, stopTimer, isLongPressRef] = usePressTimer()
+	const [startLongPressDetection, endLongPressDetection] = usePressTimer()
 
 	// Create inital positions and rotation on the map
 	// Distribute robots alternating in start zones of teams
@@ -152,7 +152,7 @@ export const Admin = () => {
 								})
 							}}
 							onPointerDown={(args) => {
-								startTimer()
+								startLongPressDetection()
 								blockScroll()
 								startRobotGesture({
 									x: args.x,
@@ -160,10 +160,11 @@ export const Admin = () => {
 								})
 							}}
 							onPointerUp={() => {
-								isLongPressRef.current
+								const isLongPressDetected = endLongPressDetection()
+
+								isLongPressDetected
 									? setSelectedRobot({ mac, action: 'reposition' })
 									: setSelectedRobot({ mac, action: 'rotation' })
-								stopTimer()
 							}}
 							onDoubleClick={() => {
 								setSelectedRobot({ mac, action: 'reposition' })

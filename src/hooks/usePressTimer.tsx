@@ -1,24 +1,23 @@
-import { MutableRefObject, useRef } from 'react'
+import { useRef } from 'react'
 
-export const usePressTimer = (): [
-	() => void,
-	() => void,
-	MutableRefObject<boolean>,
-] => {
+export const usePressTimer = (): [() => void, () => boolean] => {
 	const longPressFlag = 1500 // is considered long press after 1500 milliseconds
 	const timerRef: { current: NodeJS.Timeout | null } = useRef(null)
 	const isLongPressRef = useRef(false)
 
-	const startTimer = (): void => {
+	const startLongPressDetection = (): void => {
 		isLongPressRef.current = false
 		timerRef.current = setTimeout(() => {
 			isLongPressRef.current = true
 		}, longPressFlag)
 	}
 
-	const stopTimer = (): void => {
+	const endLongPressDetection = (): boolean => {
+		const isLongPressDetected = isLongPressRef.current
 		clearTimeout(timerRef.current as NodeJS.Timeout)
+		isLongPressRef.current = false
+		return isLongPressDetected
 	}
 
-	return [startTimer, stopTimer, isLongPressRef]
+	return [startLongPressDetection, endLongPressDetection]
 }
