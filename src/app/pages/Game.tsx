@@ -83,14 +83,17 @@ export const Game = () => {
 		setActiveRobot(undefined)
 	}
 
+	// Set default movements
 	useEffect(() => {
+		if (selectedTeam === undefined) return
 		setRobotMovements((movements) => {
 			Object.entries(robots).forEach(([address, robot]) => {
+				if (robot.team !== selectedTeam) return
 				movements[address] = movements[address] ?? robot
 			})
 			return movements
 		})
-	}, [robots])
+	}, [robots, selectedTeam])
 
 	if (selectedTeam === undefined)
 		return <SelectTeam teams={teams} onSelect={setSelectedTeam} />
@@ -189,6 +192,7 @@ export const Game = () => {
 					movements={robotMovements}
 					onUpdate={setRobotMovements}
 					key={JSON.stringify(robotMovements)}
+					teamColor={teamColor(selectedTeam)}
 				/>
 			</div>
 		</>
