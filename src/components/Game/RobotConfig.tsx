@@ -24,7 +24,7 @@ export const RobotConfig = ({
 	)
 	return (
 		<Main>
-			<form className="card">
+			<div className="card">
 				<div
 					className="card-header"
 					style={{
@@ -121,7 +121,7 @@ export const RobotConfig = ({
 						</div>
 					</fieldset>
 				</div>
-			</form>
+			</div>
 		</Main>
 	)
 }
