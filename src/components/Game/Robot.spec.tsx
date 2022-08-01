@@ -212,4 +212,30 @@ T = tip
 		})
 		expect(onPointerLeave).toHaveBeenCalledTimes(1)
 	})
+
+	it('Should trigger onDoubleClick', () => {
+		const onDoubleClick = jest.fn()
+
+		const robot = isolateComponent(
+			<Robot
+				colorHex={randomColor()}
+				heightMm={100}
+				widthMm={100}
+				id={randomMac()}
+				xMm={0}
+				yMm={0}
+				rotationDeg={0}
+				onDoubleClick={onDoubleClick}
+			/>,
+		)
+
+		// Simulating a double click on robot
+		robot.findOne('[data-test-id=robot]').props.onDoubleClick({
+			stopPropagation: jest.fn(),
+			clientX: 10,
+			clientY: 10,
+		})
+		expect(onDoubleClick).toHaveBeenCalledTimes(1)
+		expect(onDoubleClick).toHaveBeenCalledWith({ x: 10, y: 10 })
+	})
 })
