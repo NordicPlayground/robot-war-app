@@ -66,3 +66,30 @@ work correctly.
    robots, press "SEND REPORTED" on the settings page. This will just update the
    reported state of the robots with the desired robot commands that are set in
    the game page after pressing the "Fight!" button.
+
+# How to play
+
+## Roles
+
+### Admin
+
+The admin has the responsability to assign robots to teams. Also, this role is
+able to set robots positions and rotation.
+
+#### Assign robots to teams
+
+Below the game map, there is a list of the detected robots. To assign a robot to
+the team, write the name of the team into the input field or select it directly
+from the teams options below the input field. After pick the robot team, the
+robot on the game map should turn the same color than the team.
+
+#### Positioning and rotation
+
+On the admin view, the robots can be place and rotate as required, those
+possible changes affect the user view as well. The following table explain how
+to do it.
+
+| ---                  | Mobile                    | Desktop               |
+| -------------------- | ------------------------- | --------------------- |
+| **Set New Position** | Press long time on robot  | Double click on robot |
+| **Set New Rotation** | Press short time on robot | Click on robot        |
