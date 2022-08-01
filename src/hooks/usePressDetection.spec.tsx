@@ -89,6 +89,6 @@ describe('usePressDetection', () => {
 		})
 
 		// End detection after 3 seconds
-		setTimeout(() => expect(end()).toEqual(true), 3000)
+		setTimeout(() => expect(end()).toEqual(true), 510)
 	})
 })

@@ -19,7 +19,7 @@ export const usePressDetection = () => useContext(pressDetection)
 export const PressDetectionProvider: FunctionComponent<{
 	children: ReactNode
 }> = ({ children }) => {
-	const longPressFlag = 1500 // is considered long press after 1500 milliseconds
+	const longPressFlag = 500 // is considered long press after 500 milliseconds
 	const timerRef: { current: NodeJS.Timeout | null } = useRef(null)
 	const isLongPressRef = useRef(false)
 
