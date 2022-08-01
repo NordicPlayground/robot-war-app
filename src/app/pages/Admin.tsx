@@ -32,7 +32,7 @@ export const Admin = () => {
 		end: endRobotGesture,
 		updateMousePosition,
 	} = useDragGesture()
-	const [startLongPressDetection, endLongPressDetection] = usePressDetection()
+	const { startLongPressDetection, endLongPressDetection } = usePressDetection()
 
 	// Create inital positions and rotation on the map
 	// Distribute robots alternating in start zones of teams

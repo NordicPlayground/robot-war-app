@@ -7,6 +7,7 @@ import { AWSIoTPersistence } from 'components/Storage/AWSIoTPersistence'
 import { AppConfigProvider } from 'hooks/useAppConfig'
 import { CoreProvider } from 'hooks/useCore'
 import { DragGestureProvider } from 'hooks/useDragGesture'
+import { PressDetectionProvider } from 'hooks/usePressDetection'
 import { TeamProvider } from 'hooks/useTeam'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
@@ -49,7 +50,9 @@ root.render(
 							<TeamProvider>
 								<AWSIoTPersistence />
 								<DragGestureProvider>
-									<App />
+									<PressDetectionProvider>
+										<App />
+									</PressDetectionProvider>
 								</DragGestureProvider>
 							</TeamProvider>
 						</GameControllerThingProvider>
