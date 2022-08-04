@@ -17,15 +17,18 @@ export const Admin = () => {
 		useAppConfig()
 	const {
 		robots,
-		game: { field, adminSetRobotPosition, adminSetAllRobotPositions },
+		game: {
+			field,
+			adminSetRobotPosition,
+			adminSetAllRobotPositions,
+			adminNextRound,
+		},
 	} = useCore()
 
 	const [selectedRobot, setSelectedRobot] = useState<string>()
 	const [blockScroll, allowScroll] = useScrollBlock()
 	const [moveRobotsUnlocked, setMoveRobotsUnlocked] = useState<boolean>(false)
 
-	// Create inital positions and rotation on the map
-	// Distribute robots alternating in start zones of teams
 	useEffect(() => {
 		const updates: Parameters<typeof adminSetAllRobotPositions>[0] = {}
 		const macs = Object.keys(robots)
@@ -93,7 +96,8 @@ export const Admin = () => {
 					disabled={!moveRobotsUnlocked}
 					onClick={() => {
 						setMoveRobotsUnlocked(false)
-						//Need to add function for confirming that admin has finished moving the robots
+						adminNextRound()
+						// admin next round should clear the teamsReady list
 					}}
 				>
 					Finished Moving Robots

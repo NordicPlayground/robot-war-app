@@ -7,8 +7,7 @@ export const Form: FunctionComponent<{
 		updatedCommands: Record<string, { angleDeg: number; driveTimeMs: number }>,
 	) => void
 	teamColor: string
-	readyToPlay: boolean
-}> = ({ movements, onUpdate: onUpdateCommands, teamColor, readyToPlay }) => (
+}> = ({ movements, onUpdate: onUpdateCommands, teamColor }) => (
 	<form>
 		{Object.entries(movements)
 			.sort(([macA], [macB]) => macA.localeCompare(macB))
@@ -37,7 +36,6 @@ export const Form: FunctionComponent<{
 						})
 					}
 					teamColor={teamColor}
-					readyToPlay
 				></RobotConfig>
 			))}
 	</form>

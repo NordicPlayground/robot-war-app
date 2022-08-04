@@ -18,7 +18,7 @@ export const Game = () => {
 	const { robotWidthMm, robotLengthMm, startZoneSizeMm } = useAppConfig()
 	const {
 		robots,
-		game: { field, teamFight, teamSetRobotMovement },
+		game: { field, teamFight, teamSetRobotMovement, teamsReady },
 		teams,
 	} = useCore()
 	const { helperLinesNumber } = useAppConfig()
@@ -41,9 +41,6 @@ export const Game = () => {
 	const [blockScroll, allowScroll] = useScrollBlock()
 	const [activeRobot, setActiveRobot] = useState<string>()
 	const [fightUnlocked, setFightUnlocked] = useState<boolean>(false)
-
-	// Used to test if I could disable the inputs in robotconfig
-	const [readyToMove, setReadyToMove] = useState<boolean>(true)
 
 	const updateRobotCommandFromGesture = ({
 		mac,
@@ -102,6 +99,8 @@ export const Game = () => {
 	if (selectedTeam === undefined)
 		return <SelectTeam teams={teams} onSelect={setSelectedTeam} />
 
+	const teamIsReadyToPlay = teamsReady().includes(selectedTeam)
+
 	return (
 		<>
 			<div
@@ -126,6 +125,7 @@ export const Game = () => {
 							className="form-check-input"
 							type="checkbox"
 							id="unlockDelete"
+							disabled={teamIsReadyToPlay}
 							checked={fightUnlocked}
 							onChange={({ target: { checked } }) => {
 								setFightUnlocked(checked)
@@ -141,7 +141,6 @@ export const Game = () => {
 						disabled={!fightUnlocked}
 						onClick={() => {
 							teamFight(selectedTeam)
-							setReadyToMove(false)
 							setFightUnlocked(false)
 						}}
 					>
@@ -191,7 +190,7 @@ export const Game = () => {
 									}
 									outline={activeRobot !== undefined && activeRobot !== mac}
 									onPointerDown={(args) => {
-										if (robotBelongsToTeam) {
+										if (robotBelongsToTeam && !teamIsReadyToPlay) {
 											setActiveRobot(mac)
 											blockScroll()
 											startRobotGesture({
@@ -209,13 +208,14 @@ export const Game = () => {
 						})}
 					</Field>
 				</div>
-				<Form
-					movements={robotMovements}
-					onUpdate={setRobotMovements}
-					key={JSON.stringify(robotMovements)}
-					teamColor={teamColor(selectedTeam)}
-					readyToPlay={readyToMove}
-				/>
+				{!teamIsReadyToPlay && (
+					<Form
+						movements={robotMovements}
+						onUpdate={setRobotMovements}
+						key={JSON.stringify(robotMovements)}
+						teamColor={teamColor(selectedTeam)}
+					/>
+				)}
 			</div>
 		</>
 	)
