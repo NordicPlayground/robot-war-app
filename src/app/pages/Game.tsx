@@ -40,6 +40,10 @@ export const Game = () => {
 
 	const [blockScroll, allowScroll] = useScrollBlock()
 	const [activeRobot, setActiveRobot] = useState<string>()
+	const [fightUnlocked, setFightUnlocked] = useState<boolean>(false)
+
+	// Used to test if I could disable the inputs in robotconfig
+	const [readyToMove, setReadyToMove] = useState<boolean>(true)
 
 	const updateRobotCommandFromGesture = ({
 		mac,
@@ -117,11 +121,28 @@ export const Game = () => {
 				onPointerUp={handleRobotGestureEnd}
 			>
 				<div>
+					<div className="form-check form-switch me-2">
+						<input
+							className="form-check-input"
+							type="checkbox"
+							id="unlockDelete"
+							checked={fightUnlocked}
+							onChange={({ target: { checked } }) => {
+								setFightUnlocked(checked)
+							}}
+						/>
+						<label className="form-check-label" htmlFor="unlockDelete">
+							Enable to unlock fight button
+						</label>
+					</div>
 					<button
 						type="button"
 						className="btn btn-danger"
+						disabled={!fightUnlocked}
 						onClick={() => {
 							teamFight(selectedTeam)
+							setReadyToMove(false)
+							setFightUnlocked(false)
 						}}
 					>
 						Fight!
@@ -193,6 +214,7 @@ export const Game = () => {
 					onUpdate={setRobotMovements}
 					key={JSON.stringify(robotMovements)}
 					teamColor={teamColor(selectedTeam)}
+					readyToPlay={readyToMove}
 				/>
 			</div>
 		</>

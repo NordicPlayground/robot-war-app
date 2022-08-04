@@ -22,6 +22,7 @@ export const Admin = () => {
 
 	const [selectedRobot, setSelectedRobot] = useState<string>()
 	const [blockScroll, allowScroll] = useScrollBlock()
+	const [moveRobotsUnlocked, setMoveRobotsUnlocked] = useState<boolean>(false)
 
 	// Create inital positions and rotation on the map
 	// Distribute robots alternating in start zones of teams
@@ -71,6 +72,34 @@ export const Admin = () => {
 
 	return (
 		<div>
+			<div>
+				<div className="form-check form-switch me-2">
+					<input
+						className="form-check-input"
+						type="checkbox"
+						id="unlockMoveRobots"
+						checked={moveRobotsUnlocked}
+						onChange={({ target: { checked } }) => {
+							setMoveRobotsUnlocked(checked)
+						}}
+					/>
+					<label className="form-check-label" htmlFor="unlockMoveRobots">
+						Enable Finished Moved Robots button
+					</label>
+				</div>
+				<button
+					type="button"
+					className="btn btn-danger"
+					disabled={!moveRobotsUnlocked}
+					onClick={() => {
+						setMoveRobotsUnlocked(false)
+						//Need to add function for confirming that admin has finished moving the robots
+					}}
+				>
+					Finished Moving Robots
+				</button>
+			</div>
+
 			<div className={style.field}>
 				<Field
 					heightMm={field.heightMm}

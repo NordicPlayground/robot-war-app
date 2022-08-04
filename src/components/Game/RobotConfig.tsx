@@ -9,6 +9,7 @@ export const RobotConfig = ({
 	onUpdateDriveTimeMs,
 	maxDriveTimeMs,
 	teamColor,
+	readyToPlay,
 }: {
 	id: string
 	angleDeg: number
@@ -17,6 +18,7 @@ export const RobotConfig = ({
 	onUpdateDriveTimeMs: (driveTimeMs: number) => void
 	maxDriveTimeMs?: number
 	teamColor: string
+	readyToPlay: boolean
 }) => {
 	const [angleInput, setAngleInput] = useState<string>(angleDeg.toString())
 	const [driveTimeInput, setDriveTimeInput] = useState<string>(
@@ -46,6 +48,7 @@ export const RobotConfig = ({
 									width={30}
 									height={30}
 									value={angleInput}
+									disabled={!readyToPlay}
 									onChange={(e) => setAngleInput(e.target.value)}
 									onBlur={() => {
 										const angleDeg = Math.max(
@@ -91,6 +94,7 @@ export const RobotConfig = ({
 									step={20}
 									max={maxDriveTimeMs ?? 1000}
 									value={driveTimeInput}
+									disabled={!readyToPlay}
 									onChange={(e) => setDriveTimeInput(e.target.value)}
 									onBlur={() => {
 										const driveTimeMs = Math.max(
