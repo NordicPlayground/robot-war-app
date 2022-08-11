@@ -135,14 +135,16 @@ describe('Test a full game', () => {
 				game.teamFight(teamA) // First team
 
 				// After a team has marked itself ready to fight, we can read out that they are
-				expect(game.teamsReady()).toContain(teamA)
+				expect(game.teamsFinishedConfiguringRobotsMovement()).toContain(teamA)
 				// teamB hasn't yet marked that they are ready to fight
-				expect(game.teamsReady()).not.toContain(teamB)
+				expect(game.teamsFinishedConfiguringRobotsMovement()).not.toContain(
+					teamB,
+				)
 			})
 
 			test('that teamB can enter the fight', () => {
 				game.teamFight(teamB)
-				expect(game.teamsReady()).toContain(teamB)
+				expect(game.teamsFinishedConfiguringRobotsMovement()).toContain(teamB)
 			})
 		})
 	})
@@ -200,7 +202,7 @@ describe('Test a full game', () => {
 			const listener = jest.fn()
 			game.on(GameEngineEventType.next_round, listener)
 			game.adminNextRound()
-			expect(game.teamsReady()).toEqual([])
+			expect(game.teamsFinishedConfiguringRobotsMovement()).toEqual([])
 			expect(game.winnerTeam).toBeUndefined()
 			expect(listener).toHaveBeenCalledWith({
 				name: GameEngineEventType.next_round,
@@ -223,8 +225,8 @@ describe('Test a full game', () => {
 		test('that teams can set themselves ready for round 2', () => {
 			game.teamFight(teamA)
 			game.teamFight(teamB)
-			expect(game.teamsReady()).toContain(teamA)
-			expect(game.teamsReady()).toContain(teamB)
+			expect(game.teamsFinishedConfiguringRobotsMovement()).toContain(teamA)
+			expect(game.teamsFinishedConfiguringRobotsMovement()).toContain(teamB)
 		})
 	})
 

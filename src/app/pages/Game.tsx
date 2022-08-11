@@ -18,7 +18,12 @@ export const Game = () => {
 	const { robotWidthMm, robotLengthMm, startZoneSizeMm } = useAppConfig()
 	const {
 		robots,
-		game: { field, teamFight, teamSetRobotMovement, teamsReady },
+		game: {
+			field,
+			teamFight,
+			teamSetRobotMovement,
+			teamsFinishedConfiguringRobotsMovement,
+		},
 		teams,
 	} = useCore()
 	const { helperLinesNumber } = useAppConfig()
@@ -99,7 +104,8 @@ export const Game = () => {
 	if (selectedTeam === undefined)
 		return <SelectTeam teams={teams} onSelect={setSelectedTeam} />
 
-	const teamIsReadyToPlay = teamsReady().includes(selectedTeam)
+	const teamIsReadyToPlay =
+		teamsFinishedConfiguringRobotsMovement().includes(selectedTeam)
 
 	return (
 		<>

@@ -56,7 +56,9 @@ describe('User', () => {
 			expect(() => {
 				game.teamFight(randomTeam) // this should not work
 			}).toThrow(`Unknown team provided: ${randomTeam}`)
-			expect(game.teamsReady()).not.toContain(randomTeam)
+			expect(game.teamsFinishedConfiguringRobotsMovement()).not.toContain(
+				randomTeam,
+			)
 		})
 	})
 })

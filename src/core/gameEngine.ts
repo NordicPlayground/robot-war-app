@@ -37,9 +37,9 @@ export type GameEngine = {
 	 */
 	teams: () => string[]
 	/**
-	 * Returns the list of teams ready to fight
+	 * Returns the list of teams that have finished configuring the movement of their robots
 	 */
-	teamsReady: () => string[]
+	teamsFinishedConfiguringRobotsMovement: () => string[]
 	/**
 	 * Returns the name of winner team
 	 */
@@ -228,7 +228,7 @@ export const gameEngine = ({
 	return {
 		field,
 		teams: listOfTeams,
-		teamsReady: () => teamsReady,
+		teamsFinishedConfiguringRobotsMovement: () => teamsReady,
 		winnerTeam,
 		robots: () =>
 			Object.entries(robots)

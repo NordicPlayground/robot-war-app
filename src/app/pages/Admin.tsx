@@ -22,12 +22,16 @@ export const Admin = () => {
 			adminSetRobotPosition,
 			adminSetAllRobotPositions,
 			adminNextRound,
+			teamsFinishedConfiguringRobotsMovement,
+			teams,
 		},
 	} = useCore()
 
 	const [selectedRobot, setSelectedRobot] = useState<string>()
 	const [blockScroll, allowScroll] = useScrollBlock()
 	const [moveRobotsUnlocked, setMoveRobotsUnlocked] = useState<boolean>(false)
+	const configuringRobotMovementInProgress =
+		teamsFinishedConfiguringRobotsMovement().length !== teams().length
 
 	useEffect(() => {
 		const updates: Parameters<typeof adminSetAllRobotPositions>[0] = {}
@@ -81,6 +85,7 @@ export const Admin = () => {
 						className="form-check-input"
 						type="checkbox"
 						id="unlockMoveRobots"
+						disabled={configuringRobotMovementInProgress}
 						checked={moveRobotsUnlocked}
 						onChange={({ target: { checked } }) => {
 							setMoveRobotsUnlocked(checked)
