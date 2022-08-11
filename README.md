@@ -38,7 +38,7 @@ You can then run the tests using
 
     npm test
 
-# Configurations to run the application
+## Configurations to run the application
 
 The application relies on cloud communication and updates from actual robots to
 work correctly.
@@ -54,9 +54,9 @@ work correctly.
 
 4. To display the robots on the app, you need actual robots communicating with
    the cloud. To get around this, you can simulate robots by following the next
-   steps
+   steps.
 
-#### Run application with simulated robots
+## Run application with simulated robots
 
 1. Go to the Game Controller page on the application, and send the first
    reported message. This will simulate the existence of robots in the cloud,
@@ -66,3 +66,24 @@ work correctly.
    robots, press "SEND REPORTED" on the settings page. This will just update the
    reported state of the robots with the desired robot commands that are set in
    the game page after pressing the "Fight!" button.
+
+## Assign robots to teams
+
+The admin has the responsibility to assign robots to teams. Also, this role is
+able to set the robots' position and rotation.
+
+Below the game map, there is a list of the detected robots. To assign a robot to
+a team, write the name of the team into the input field or select it directly
+from the teams options below the input field. After assigning the the robot
+team, all the robots on the map within the same team will be rendered in the
+same color.
+
+### Positioning and rotation
+
+On the admin view, the robots can be placed and rotated as needed, which will be
+reflected in the user view as well. The following table explain how to do it:
+
+| ---                  | Mobile                    | Desktop               |
+| -------------------- | ------------------------- | --------------------- |
+| **Set New Position** | Press long time on robot  | Double click on robot |
+| **Set New Rotation** | Press short time on robot | Click on robot        |

@@ -8,7 +8,7 @@ export const Form: FunctionComponent<{
 	) => void
 	teamColor: string
 }> = ({ movements, onUpdate: onUpdateCommands, teamColor }) => (
-	<form>
+	<>
 		{Object.entries(movements)
 			.sort(([macA], [macB]) => macA.localeCompare(macB))
 			.map(([robotMac, { angleDeg, driveTimeMs }]) => (
@@ -38,5 +38,5 @@ export const Form: FunctionComponent<{
 					teamColor={teamColor}
 				></RobotConfig>
 			))}
-	</form>
+	</>
 )
