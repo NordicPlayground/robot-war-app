@@ -19,7 +19,14 @@ export const Admin = () => {
 		useAppConfig()
 	const {
 		robots,
-		game: { field, adminSetRobotPosition, adminSetAllRobotPositions },
+		game: {
+			field,
+			adminSetRobotPosition,
+			adminSetAllRobotPositions,
+			adminNextRound,
+			teamsFinishedConfiguringRobotsMovement,
+			teams,
+		},
 	} = useCore()
 
 	const [selectedRobot, setSelectedRobot] = useState<{
@@ -27,6 +34,9 @@ export const Admin = () => {
 		action: string | undefined
 	}>()
 	const [blockScroll, allowScroll] = useScrollBlock()
+	const [moveRobotsUnlocked, setMoveRobotsUnlocked] = useState<boolean>(false)
+	const configuringRobotMovementInProgress =
+		teamsFinishedConfiguringRobotsMovement().length !== teams().length
 	const {
 		start: startRobotGesture,
 		end: endRobotGesture,
@@ -34,8 +44,6 @@ export const Admin = () => {
 	} = useDragGesture()
 	const { startLongPressDetection, endLongPressDetection } = usePressDetection()
 
-	// Create inital positions and rotation on the map
-	// Distribute robots alternating in start zones of teams
 	useEffect(() => {
 		const updates: Parameters<typeof adminSetAllRobotPositions>[0] = {}
 		const macs = Object.keys(robots)
@@ -96,6 +104,35 @@ export const Admin = () => {
 
 	return (
 		<div>
+			<div>
+				<div className="form-check form-switch me-2">
+					<input
+						className="form-check-input"
+						type="checkbox"
+						id="unlockMoveRobots"
+						disabled={configuringRobotMovementInProgress}
+						checked={moveRobotsUnlocked}
+						onChange={({ target: { checked } }) => {
+							setMoveRobotsUnlocked(checked)
+						}}
+					/>
+					<label className="form-check-label" htmlFor="unlockMoveRobots">
+						Enable Finished Moved Robots button
+					</label>
+				</div>
+				<button
+					type="button"
+					className="btn btn-danger"
+					disabled={!moveRobotsUnlocked}
+					onClick={() => {
+						setMoveRobotsUnlocked(false)
+						adminNextRound()
+						// admin next round should clear the teamsReady list
+					}}
+				>
+					Finished Moving Robots
+				</button>
+			</div>
 			<div
 				className={style.field}
 				onPointerMove={(e) => {

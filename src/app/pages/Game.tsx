@@ -18,7 +18,12 @@ export const Game = () => {
 	const { robotWidthMm, robotLengthMm, startZoneSizeMm } = useAppConfig()
 	const {
 		robots,
-		game: { field, teamFight, teamSetRobotMovement },
+		game: {
+			field,
+			teamFight,
+			teamSetRobotMovement,
+			teamsFinishedConfiguringRobotsMovement,
+		},
 		teams,
 	} = useCore()
 	const { helperLinesNumber } = useAppConfig()
@@ -40,6 +45,7 @@ export const Game = () => {
 
 	const [blockScroll, allowScroll] = useScrollBlock()
 	const [activeRobot, setActiveRobot] = useState<string>()
+	const [fightUnlocked, setFightUnlocked] = useState<boolean>(false)
 
 	const updateRobotCommandFromGesture = ({
 		mac,
@@ -98,6 +104,9 @@ export const Game = () => {
 	if (selectedTeam === undefined)
 		return <SelectTeam teams={teams} onSelect={setSelectedTeam} />
 
+	const teamIsReadyToPlay =
+		teamsFinishedConfiguringRobotsMovement().includes(selectedTeam)
+
 	return (
 		<>
 			<div
@@ -117,11 +126,28 @@ export const Game = () => {
 				onPointerUp={handleRobotGestureEnd}
 			>
 				<div>
+					<div className="form-check form-switch me-2">
+						<input
+							className="form-check-input"
+							type="checkbox"
+							id="unlockDelete"
+							disabled={teamIsReadyToPlay}
+							checked={fightUnlocked}
+							onChange={({ target: { checked } }) => {
+								setFightUnlocked(checked)
+							}}
+						/>
+						<label className="form-check-label" htmlFor="unlockDelete">
+							Enable to unlock fight button
+						</label>
+					</div>
 					<button
 						type="button"
 						className="btn btn-danger"
+						disabled={!fightUnlocked}
 						onClick={() => {
 							teamFight(selectedTeam)
+							setFightUnlocked(false)
 						}}
 					>
 						Fight!
@@ -170,7 +196,7 @@ export const Game = () => {
 									}
 									outline={activeRobot !== undefined && activeRobot !== mac}
 									onPointerDown={(args) => {
-										if (robotBelongsToTeam) {
+										if (robotBelongsToTeam && !teamIsReadyToPlay) {
 											setActiveRobot(mac)
 											blockScroll()
 											startRobotGesture({
@@ -188,12 +214,14 @@ export const Game = () => {
 						})}
 					</Field>
 				</div>
-				<Form
-					movements={robotMovements}
-					onUpdate={setRobotMovements}
-					key={JSON.stringify(robotMovements)}
-					teamColor={teamColor(selectedTeam)}
-				/>
+				{!teamIsReadyToPlay && (
+					<Form
+						movements={robotMovements}
+						onUpdate={setRobotMovements}
+						key={JSON.stringify(robotMovements)}
+						teamColor={teamColor(selectedTeam)}
+					/>
+				)}
 			</div>
 		</>
 	)
