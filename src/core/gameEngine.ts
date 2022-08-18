@@ -309,16 +309,8 @@ export const gameEngine = ({
 				positions,
 			})
 		},
-		teamSetRobotMovement: (address, { angleDeg, driveTimeMs }) => {
-			updateRobotMovement(address, angleDeg, driveTimeMs)
-
-			notify({
-				name: GameEngineEventType.robot_movement_set,
-				address,
-				angleDeg,
-				driveTimeMs,
-			})
-		},
+		teamSetRobotMovement: (address, { angleDeg, driveTimeMs }) =>
+			updateRobotMovement(address, angleDeg, driveTimeMs),
 		teamSetAllRobotMovements: (movements) => {
 			Object.entries(movements).forEach(
 				([robotAddress, { angleDeg, driveTimeMs }]) => {
@@ -346,6 +338,16 @@ export const gameEngine = ({
 			teamsReady.push(team)
 			const allReady = areAllTeamsReady()
 			if (allReady) {
+				Object.entries(robots).forEach(
+					([address, { angleDeg, driveTimeMs }]) => {
+						notify({
+							name: GameEngineEventType.robot_movement_set,
+							address,
+							angleDeg,
+							driveTimeMs,
+						})
+					},
+				)
 				notify({
 					name: GameEngineEventType.teams_ready_to_fight,
 				})

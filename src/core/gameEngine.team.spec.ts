@@ -76,7 +76,7 @@ describe('The team should not be able to change the desired robot positions afte
 			})
 		})
 
-		test('that an event is emitted when the desired movement is set by the user', () => {
+		test('that an event is emitted when fight is confirmed by all teams', () => {
 			const listener = jest.fn()
 			const game = simpleGame()
 			const robot1 = randomMac()
@@ -96,6 +96,8 @@ describe('The team should not be able to change the desired robot positions afte
 				angleDeg: 90,
 				driveTimeMs: 500,
 			})
+
+			game.teamFight('Team A')
 
 			expect(game.robots()).toMatchObject({
 				[robot1]: { angleDeg: 90, driveTimeMs: 500 },
