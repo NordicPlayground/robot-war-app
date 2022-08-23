@@ -54,7 +54,7 @@ export const useAWSIoTPersistence = (): void => {
 				merge(updates, update)
 			}
 			pendingAdminChanges = []
-			console.log(`[useAWSIoTPersistence]`, 'persisting', updates)
+			console.log(`[useAWSIoTPersistence********]`, 'persisting', updates)
 			const res = await updateShadow({
 				iotDataPlaneClient,
 				thingName,
@@ -65,14 +65,17 @@ export const useAWSIoTPersistence = (): void => {
 				console.error(res.error)
 				console.error(res.error.details)
 			} else {
+				console.log({ res }, '++++')
 				updateAdminVersion(res.version)
 			}
 		}, 1000)
 
+		// using desired shadow as the team shadow
 		let pendingTeamChanges: Record<string, any>[] = []
 		const debouncedPersistTeamChange = debounce(async () => {
 			const updates = {}
 			for (const update of pendingTeamChanges) {
+				console.log(update)
 				merge(updates, update)
 			}
 			pendingTeamChanges = []
@@ -83,11 +86,12 @@ export const useAWSIoTPersistence = (): void => {
 				schema: Type.Object({
 					desired: Type.Object({ robots: Type.Record(MacAddress, Robot) }),
 				}),
-			})({ desired: { robots: updates } })
+			})({ desired: { robots: updates } }) // persist here
 			if (res !== undefined && 'error' in res) {
 				console.error(res.error)
 				console.error(res.error.details)
 			} else {
+				console.log({ res }, '!!!')
 				updateGatewayVersion(res.version)
 			}
 		}, 1000)
@@ -135,12 +139,19 @@ export const useAWSIoTPersistence = (): void => {
 					game.gatewayReportDiscoveredRobots(
 						maybeGameControllerShadow.state.reported.robots,
 					)
+					//game.gatewayReportTeamsReady(maybeAdminShadow.reported.team_ready_to_fight)
 				}
 				// Restore admin positioning
 				if ('error' in maybeAdminShadow) {
 					console.error(maybeAdminShadow)
 				} else {
 					updateAdminVersion(maybeAdminShadow.version)
+					console.log('maybeAdminShadow, ', { maybeAdminShadow })
+					if (maybeAdminShadow.state.reported.teamsReadyToFight !== undefined) {
+						game.gatewayReportTeamsReady(
+							maybeAdminShadow.state.reported.teamsReadyToFight,
+						)
+					}
 					if (
 						maybeAdminShadow.state.reported.robotFieldPosition !== undefined
 					) {
@@ -207,6 +218,15 @@ export const useAWSIoTPersistence = (): void => {
 								`next version`,
 								maybeAdminState.version,
 							)
+							if (
+								maybeAdminState.state.reported.teamsReadyToFight !== undefined
+							) {
+								disableListeners()
+								game.gatewayReportTeamsReady(
+									maybeAdminState.state.reported.teamsReadyToFight,
+								)
+								enableListeners()
+							}
 							if (
 								maybeAdminState.state.reported.robotFieldPosition !== undefined
 							) {
