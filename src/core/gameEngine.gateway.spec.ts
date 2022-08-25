@@ -1,6 +1,4 @@
-import { GameEngineEventType } from 'core/gameEngine.js'
 import { randomMac } from 'core/test/randomMac.js'
-import { randomRobot } from 'core/test/randomRobot.js'
 import { simpleGame } from 'core/test/simpleGame.js'
 
 describe('Gateway', () => {
@@ -26,7 +24,7 @@ describe('Gateway', () => {
 		expect(gameWithChangingRobots.robots()).toHaveProperty(r2)
 	})
 
-	describe('Gateway should receive a notification when both teams are ready to fight', () => {
+	/*describe('Gateway should receive a notification when both teams are ready to fight', () => {
 		const teamA = 'Team A'
 		const teamB = 'Team B'
 		const game = simpleGame()
@@ -132,5 +130,5 @@ describe('Gateway', () => {
 				name: GameEngineEventType.teams_ready_to_fight,
 			})
 		})
-	})
+	})*/
 })
