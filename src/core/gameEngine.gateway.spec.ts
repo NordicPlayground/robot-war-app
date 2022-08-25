@@ -56,15 +56,25 @@ describe('Gateway', () => {
 
 			const listener = jest.fn()
 			game.on(GameEngineEventType.teams_ready_to_fight, listener)
+			game.on(GameEngineEventType.robot_movement_set, listener)
 
 			// Team A marks ready to fight
 			game.teamFight(teamA)
 			expect(listener).not.toHaveBeenCalledWith({
 				name: GameEngineEventType.teams_ready_to_fight,
 			})
+			expect(listener).not.toHaveBeenCalledWith({
+				name: GameEngineEventType.robot_movement_set,
+			})
 
 			// Team B marks ready to fight, now all teams are ready
 			game.teamFight(teamB)
+
+			expect(listener).toHaveBeenCalledWith(
+				expect.objectContaining({
+					name: GameEngineEventType.robot_movement_set,
+				}),
+			)
 			expect(listener).toHaveBeenCalledWith({
 				name: GameEngineEventType.teams_ready_to_fight,
 			})
@@ -88,6 +98,7 @@ describe('Gateway', () => {
 			const game = simpleGame()
 			const listener = jest.fn()
 			game.on(GameEngineEventType.teams_ready_to_fight, listener)
+			game.on(GameEngineEventType.robot_movement_set, listener)
 
 			const r1 = randomMac()
 			const r2 = randomMac()
@@ -103,12 +114,20 @@ describe('Gateway', () => {
 
 			game.teamFight('Team A')
 			game.teamFight('Team B')
+			expect(listener).not.toHaveBeenCalledWith({
+				name: GameEngineEventType.robot_movement_set,
+			})
 			expect(listener).not.toHaveBeenLastCalledWith({
 				name: GameEngineEventType.teams_ready_to_fight,
 			})
 
 			// Only when all three teams are ready!
 			game.teamFight('Team C')
+			expect(listener).toHaveBeenCalledWith(
+				expect.objectContaining({
+					name: GameEngineEventType.robot_movement_set,
+				}),
+			)
 			expect(listener).toHaveBeenLastCalledWith({
 				name: GameEngineEventType.teams_ready_to_fight,
 			})
