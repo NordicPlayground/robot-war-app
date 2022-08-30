@@ -7,7 +7,6 @@ export const gameEvent2AdminStateUpdate = (
 ): Static<typeof AdminShadowUpdate>['reported'] | undefined => {
 	switch (event.name) {
 		case GameEngineEventType.teams_ready_to_fight:
-			console.log('inside of case GameEngineEventType.team_ready_to_fight')
 			return {
 				teamsReadyToFight: event.teamsReady,
 			}

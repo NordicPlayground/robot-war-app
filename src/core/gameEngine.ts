@@ -37,7 +37,7 @@ export type GameEngine = {
 	 */
 	teams: () => string[]
 	/**
-	 * Returns the list of teams that have finished configuring the movement of their robots  // but from the gateway
+	 * Returns the list of teams that have finished configuring the movement of their robots
 	 */
 	teamsFinishedConfiguringRobotsMovement: () => string[]
 	/**
@@ -164,7 +164,7 @@ export const gameEngine = ({
 		robotTeamAssignments[robotAddress]
 
 	const listOfTeams = () => [...new Set(Object.values(robotTeamAssignments))]
-	const areAllTeamsReady = () => teamsReady.length === listOfTeams().length // check from shadow
+	const areAllTeamsReady = () => teamsReady.length === listOfTeams().length
 	const hasTeamRobots = (team: string) => listOfTeams().includes(team)
 
 	const updatePosition = (
@@ -268,7 +268,6 @@ export const gameEngine = ({
 			notify({ name: GameEngineEventType.robots_discovered })
 		},
 		gatewayReportTeamsReady: (teams) => {
-			console.log('!AQUI!!!!!!!!!!!!!!HERE!!!!!!!!!!!!', teams, teamsReady)
 			if (teams.length === 0 && teamsReady.length > 0) teamsReady = []
 			const alreadyReadyTeams = teamsReady
 			teams.forEach((team) => {
@@ -324,7 +323,6 @@ export const gameEngine = ({
 		teamSetRobotMovement: (address, { angleDeg, driveTimeMs }) => {
 			updateRobotMovement(address, angleDeg, driveTimeMs)
 
-			// desired team shadow
 			notify({
 				name: GameEngineEventType.robot_movement_set,
 				address,
@@ -356,19 +354,12 @@ export const gameEngine = ({
 				throw new Error(`Team has no robots: ${team}`)
 			}
 
-			console.log('start')
-			console.log('--------')
-			console.log(teamsReady)
 			teamsReady.push(team)
-			console.log(teamsReady)
-			console.log('--------')
 
 			notify({
 				name: GameEngineEventType.teams_ready_to_fight,
 				teamsReady,
 			})
-
-			console.log({ teamsReady })
 
 			const allReady = areAllTeamsReady()
 			if (allReady) {
