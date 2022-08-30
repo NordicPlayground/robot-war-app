@@ -56,10 +56,6 @@ export const CoreProvider: FunctionComponent<{
 	useEffect(() => {
 		const updater: EventListener = ({ name, ...rest }) => {
 			console.debug(`[core]`, name, rest)
-			console.log(
-				gameInstance.current.teamsFinishedConfiguringRobotsMovement(),
-				'Teams ready from core',
-			)
 			setRobots(gameInstance.current.robots())
 			setTeams(gameInstance.current.teams())
 		}
