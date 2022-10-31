@@ -1,5 +1,6 @@
 import { useCore } from 'hooks/useCore'
 import { useState } from 'react'
+import { shortId } from 'utils/shortId.js'
 import { teamColor } from 'utils/teamColor'
 
 export const RobotTeamAssigner = () => {
@@ -27,7 +28,7 @@ export const RobotTeamAssigner = () => {
 						)
 						.map(([address, robot]) => (
 							<li key={address}>
-								{address.slice(0, 3) + ' '}
+								{shortId(address) + ' '}
 								<RobotTeam
 									address={address}
 									team={robot.team}
