@@ -13,7 +13,7 @@ export const SelectTeam: FunctionComponent<{
 		return (
 			<Popup>
 				<h1 className={styles.title}>Please wait ...</h1>
-				<p>The GameMaster is preparing the game.</p>
+				<p>The Game Administrator is preparing the game.</p>
 			</Popup>
 		)
 	}
