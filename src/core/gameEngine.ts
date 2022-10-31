@@ -61,6 +61,7 @@ export type GameEngine = {
 			Partial<Static<typeof RobotInGame>>
 		>,
 	) => void
+	gatewayReportTeamsReady: (team: string[]) => void
 	/**
 	 * Used by the Admin to assign a robot to a team
 	 */
@@ -266,6 +267,16 @@ export const gameEngine = ({
 			}
 			notify({ name: GameEngineEventType.robots_discovered })
 		},
+		gatewayReportTeamsReady: (teams) => {
+			if (teams.length === 0 && teamsReady.length > 0) teamsReady = []
+			const alreadyReadyTeams = teamsReady
+			teams.forEach((team) => {
+				console.log({ team })
+				if (!alreadyReadyTeams.includes(team)) alreadyReadyTeams.push(team)
+			})
+
+			//notify({ name: GameEngineEventType.robots_discovered })
+		},
 		adminAssignRobotToTeam: (robotAddress, team) => {
 			validateTeamName(team)
 			robotTeamAssignments[robotAddress] = team
@@ -344,6 +355,12 @@ export const gameEngine = ({
 			}
 
 			teamsReady.push(team)
+
+			notify({
+				name: GameEngineEventType.teams_ready_to_fight,
+				teamsReady,
+			})
+
 			const allReady = areAllTeamsReady()
 			if (allReady) {
 				notify({
@@ -359,6 +376,10 @@ export const gameEngine = ({
 				throw new Error(`Round is already in progress!`)
 			}
 			teamsReady = []
+			notify({
+				name: GameEngineEventType.teams_ready_to_fight,
+				teamsReady: [],
+			})
 			notify({
 				name: GameEngineEventType.next_round,
 			})

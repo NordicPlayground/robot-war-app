@@ -141,6 +141,11 @@ export const useAWSIoTPersistence = (): void => {
 					console.error(maybeAdminShadow)
 				} else {
 					updateAdminVersion(maybeAdminShadow.version)
+					if (maybeAdminShadow.state.reported.teamsReadyToFight !== undefined) {
+						game.gatewayReportTeamsReady(
+							maybeAdminShadow.state.reported.teamsReadyToFight,
+						)
+					}
 					if (
 						maybeAdminShadow.state.reported.robotFieldPosition !== undefined
 					) {
@@ -207,6 +212,15 @@ export const useAWSIoTPersistence = (): void => {
 								`next version`,
 								maybeAdminState.version,
 							)
+							if (
+								maybeAdminState.state.reported.teamsReadyToFight !== undefined
+							) {
+								disableListeners()
+								game.gatewayReportTeamsReady(
+									maybeAdminState.state.reported.teamsReadyToFight,
+								)
+								enableListeners()
+							}
 							if (
 								maybeAdminState.state.reported.robotFieldPosition !== undefined
 							) {
