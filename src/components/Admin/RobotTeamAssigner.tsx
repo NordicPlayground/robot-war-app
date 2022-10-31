@@ -27,7 +27,7 @@ export const RobotTeamAssigner = () => {
 						)
 						.map(([address, robot]) => (
 							<li key={address}>
-								{address}
+								{address.slice(0, 3) + ' '}
 								<RobotTeam
 									address={address}
 									team={robot.team}
@@ -59,7 +59,7 @@ const RobotTeam = ({
 
 	return (
 		<>
-			<label htmlFor={`robot-${address}-name`}>Team</label>
+			<label htmlFor={`robot-${address}-name`}>Team {':'}</label>
 			<input
 				type={'text'}
 				id={`robot-${address}-name`}

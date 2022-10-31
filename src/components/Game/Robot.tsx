@@ -165,7 +165,7 @@ export const Robot = ({
 				textAnchor="middle"
 				data-test-id="label"
 			>
-				{id}
+				{id.slice(0, 3)}
 			</text>
 		</g>
 	)

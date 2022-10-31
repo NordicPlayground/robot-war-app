@@ -4,7 +4,7 @@ import { isolateComponent } from 'isolate-react'
 import { randomColor } from 'utils/randomColor.js'
 
 describe('Robot', () => {
-	it('should render the MAC as a label', () => {
+	it('should render the 3 first digit of MAC as a label', () => {
 		const label = randomMac()
 		const robot = isolateComponent(
 			<Robot
@@ -17,7 +17,9 @@ describe('Robot', () => {
 				rotationDeg={0}
 			/>,
 		)
-		expect(robot.findOne('[data-test-id=label]').content()).toContain(label)
+		expect(robot.findOne('[data-test-id=label]').content()).toContain(
+			label.slice(0, 3),
+		)
 	})
 
 	it('should render a triangle with the tip facing north', () => {

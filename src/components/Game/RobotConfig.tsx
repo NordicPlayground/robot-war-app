@@ -31,7 +31,7 @@ export const RobotConfig = ({
 						backgroundColor: teamColor,
 					}}
 				>
-					Robot {id}
+					Robot {id.slice(0, 3)}
 				</div>
 				<div className="card-body">
 					<fieldset className="mt-1">
