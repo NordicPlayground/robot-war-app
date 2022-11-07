@@ -28,7 +28,7 @@ export const RobotTeamAssigner = () => {
 						)
 						.map(([address, robot]) => (
 							<li key={address}>
-								{shortId(address) + ' '}
+								{shortId(address)}{' '}
 								<RobotTeam
 									address={address}
 									team={robot.team}
