@@ -1,5 +1,6 @@
 import { Main } from 'components/Main'
 import { useState } from 'react'
+import { shortId } from 'utils/shortId.js'
 
 export const RobotConfig = ({
 	id,
@@ -31,7 +32,7 @@ export const RobotConfig = ({
 						backgroundColor: teamColor,
 					}}
 				>
-					Robot {id}
+					Robot {shortId(id)}
 				</div>
 				<div className="card-body">
 					<fieldset className="mt-1">

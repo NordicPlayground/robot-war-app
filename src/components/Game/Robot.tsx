@@ -1,6 +1,7 @@
 import Color from 'color'
 import styles from 'components/Game/Robot.module.css'
 import { nanoid } from 'nanoid'
+import { shortId } from 'utils/shortId.js'
 
 const getMouseCoordinates = (
 	e: React.MouseEvent<SVGGElement, MouseEvent>,
@@ -165,7 +166,7 @@ export const Robot = ({
 				textAnchor="middle"
 				data-test-id="label"
 			>
-				{id}
+				{shortId(id)}
 			</text>
 		</g>
 	)

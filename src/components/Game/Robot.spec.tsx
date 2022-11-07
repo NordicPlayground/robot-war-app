@@ -2,9 +2,10 @@ import { Robot } from 'components/Game/Robot.js'
 import { randomMac } from 'core/test/randomMac.js'
 import { isolateComponent } from 'isolate-react'
 import { randomColor } from 'utils/randomColor.js'
+import { shortId } from 'utils/shortId.js'
 
 describe('Robot', () => {
-	it('should render the MAC as a label', () => {
+	it('should render the shortId of MAC as a label', () => {
 		const label = randomMac()
 		const robot = isolateComponent(
 			<Robot
@@ -17,7 +18,9 @@ describe('Robot', () => {
 				rotationDeg={0}
 			/>,
 		)
-		expect(robot.findOne('[data-test-id=label]').content()).toContain(label)
+		expect(robot.findOne('[data-test-id=label]').content()).toContain(
+			shortId(label),
+		)
 	})
 
 	it('should render a triangle with the tip facing north', () => {
