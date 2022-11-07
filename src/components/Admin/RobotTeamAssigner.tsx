@@ -60,7 +60,7 @@ const RobotTeam = ({
 
 	return (
 		<>
-			<label htmlFor={`robot-${address}-name`}>Team {':'}</label>
+			<label htmlFor={`robot-${address}-name`}>Team:</label>
 			<input
 				type={'text'}
 				id={`robot-${address}-name`}
